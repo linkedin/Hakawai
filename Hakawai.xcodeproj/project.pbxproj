@@ -1,0 +1,420 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E1C9676019A2A66000A4AA93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675F19A2A66000A4AA93 /* Foundation.framework */; };
+		E1C9676519A2A66000A4AA93 /* Hakawai.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = E1C9676419A2A66000A4AA93 /* Hakawai.h */; };
+		E1C9676719A2A66000A4AA93 /* Hakawai.m in Sources */ = {isa = PBXBuildFile; fileRef = E1C9676619A2A66000A4AA93 /* Hakawai.m */; };
+		E1C9676E19A2A66000A4AA93 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9676D19A2A66000A4AA93 /* XCTest.framework */; };
+		E1C9676F19A2A66000A4AA93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675F19A2A66000A4AA93 /* Foundation.framework */; };
+		E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9677019A2A66000A4AA93 /* UIKit.framework */; };
+		E1C9677419A2A66000A4AA93 /* libHakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675C19A2A66000A4AA93 /* libHakawai.a */; };
+		E1C9677A19A2A66000A4AA93 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E1C9677819A2A66000A4AA93 /* InfoPlist.strings */; };
+		E1C9677C19A2A66000A4AA93 /* HakawaiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1C9677B19A2A66000A4AA93 /* HakawaiTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E1C9677219A2A66000A4AA93 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E1C9675419A2A66000A4AA93 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E1C9675B19A2A66000A4AA93;
+			remoteInfo = Hakawai;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E1C9675A19A2A66000A4AA93 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				E1C9676519A2A66000A4AA93 /* Hakawai.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		E1C9675C19A2A66000A4AA93 /* libHakawai.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHakawai.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1C9675F19A2A66000A4AA93 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		E1C9676319A2A66000A4AA93 /* Hakawai-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hakawai-Prefix.pch"; sourceTree = "<group>"; };
+		E1C9676419A2A66000A4AA93 /* Hakawai.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Hakawai.h; sourceTree = "<group>"; };
+		E1C9676619A2A66000A4AA93 /* Hakawai.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Hakawai.m; sourceTree = "<group>"; };
+		E1C9676C19A2A66000A4AA93 /* HakawaiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HakawaiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1C9676D19A2A66000A4AA93 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		E1C9677019A2A66000A4AA93 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		E1C9677719A2A66000A4AA93 /* HakawaiTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "HakawaiTests-Info.plist"; sourceTree = "<group>"; };
+		E1C9677919A2A66000A4AA93 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E1C9677B19A2A66000A4AA93 /* HakawaiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HakawaiTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E1C9675919A2A66000A4AA93 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1C9676019A2A66000A4AA93 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E1C9676919A2A66000A4AA93 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1C9677419A2A66000A4AA93 /* libHakawai.a in Frameworks */,
+				E1C9676E19A2A66000A4AA93 /* XCTest.framework in Frameworks */,
+				E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */,
+				E1C9676F19A2A66000A4AA93 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E1C9675319A2A66000A4AA93 = {
+			isa = PBXGroup;
+			children = (
+				E1C9676119A2A66000A4AA93 /* Hakawai */,
+				E1C9677519A2A66000A4AA93 /* HakawaiTests */,
+				E1C9675E19A2A66000A4AA93 /* Frameworks */,
+				E1C9675D19A2A66000A4AA93 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E1C9675D19A2A66000A4AA93 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E1C9675C19A2A66000A4AA93 /* libHakawai.a */,
+				E1C9676C19A2A66000A4AA93 /* HakawaiTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E1C9675E19A2A66000A4AA93 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E1C9675F19A2A66000A4AA93 /* Foundation.framework */,
+				E1C9676D19A2A66000A4AA93 /* XCTest.framework */,
+				E1C9677019A2A66000A4AA93 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E1C9676119A2A66000A4AA93 /* Hakawai */ = {
+			isa = PBXGroup;
+			children = (
+				E1C9676419A2A66000A4AA93 /* Hakawai.h */,
+				E1C9676619A2A66000A4AA93 /* Hakawai.m */,
+				E1C9676219A2A66000A4AA93 /* Supporting Files */,
+			);
+			path = Hakawai;
+			sourceTree = "<group>";
+		};
+		E1C9676219A2A66000A4AA93 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E1C9676319A2A66000A4AA93 /* Hakawai-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E1C9677519A2A66000A4AA93 /* HakawaiTests */ = {
+			isa = PBXGroup;
+			children = (
+				E1C9677B19A2A66000A4AA93 /* HakawaiTests.m */,
+				E1C9677619A2A66000A4AA93 /* Supporting Files */,
+			);
+			path = HakawaiTests;
+			sourceTree = "<group>";
+		};
+		E1C9677619A2A66000A4AA93 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E1C9677719A2A66000A4AA93 /* HakawaiTests-Info.plist */,
+				E1C9677819A2A66000A4AA93 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E1C9675B19A2A66000A4AA93 /* Hakawai */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E1C9677F19A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "Hakawai" */;
+			buildPhases = (
+				E1C9675819A2A66000A4AA93 /* Sources */,
+				E1C9675919A2A66000A4AA93 /* Frameworks */,
+				E1C9675A19A2A66000A4AA93 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Hakawai;
+			productName = Hakawai;
+			productReference = E1C9675C19A2A66000A4AA93 /* libHakawai.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		E1C9676B19A2A66000A4AA93 /* HakawaiTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E1C9678219A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "HakawaiTests" */;
+			buildPhases = (
+				E1C9676819A2A66000A4AA93 /* Sources */,
+				E1C9676919A2A66000A4AA93 /* Frameworks */,
+				E1C9676A19A2A66000A4AA93 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E1C9677319A2A66000A4AA93 /* PBXTargetDependency */,
+			);
+			name = HakawaiTests;
+			productName = HakawaiTests;
+			productReference = E1C9676C19A2A66000A4AA93 /* HakawaiTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E1C9675419A2A66000A4AA93 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = LinkedIn;
+			};
+			buildConfigurationList = E1C9675719A2A66000A4AA93 /* Build configuration list for PBXProject "Hakawai" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E1C9675319A2A66000A4AA93;
+			productRefGroup = E1C9675D19A2A66000A4AA93 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E1C9675B19A2A66000A4AA93 /* Hakawai */,
+				E1C9676B19A2A66000A4AA93 /* HakawaiTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E1C9676A19A2A66000A4AA93 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1C9677A19A2A66000A4AA93 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E1C9675819A2A66000A4AA93 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1C9676719A2A66000A4AA93 /* Hakawai.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E1C9676819A2A66000A4AA93 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1C9677C19A2A66000A4AA93 /* HakawaiTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E1C9677319A2A66000A4AA93 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E1C9675B19A2A66000A4AA93 /* Hakawai */;
+			targetProxy = E1C9677219A2A66000A4AA93 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E1C9677819A2A66000A4AA93 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E1C9677919A2A66000A4AA93 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E1C9677D19A2A66000A4AA93 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		E1C9677E19A2A66000A4AA93 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E1C9678019A2A66000A4AA93 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/Hakawai.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		E1C9678119A2A66000A4AA93 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/Hakawai.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		E1C9678319A2A66000A4AA93 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "HakawaiTests/HakawaiTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		E1C9678419A2A66000A4AA93 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
+				INFOPLIST_FILE = "HakawaiTests/HakawaiTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E1C9675719A2A66000A4AA93 /* Build configuration list for PBXProject "Hakawai" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1C9677D19A2A66000A4AA93 /* Debug */,
+				E1C9677E19A2A66000A4AA93 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E1C9677F19A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "Hakawai" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1C9678019A2A66000A4AA93 /* Debug */,
+				E1C9678119A2A66000A4AA93 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		E1C9678219A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "HakawaiTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1C9678319A2A66000A4AA93 /* Debug */,
+				E1C9678419A2A66000A4AA93 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E1C9675419A2A66000A4AA93 /* Project object */;
+}
