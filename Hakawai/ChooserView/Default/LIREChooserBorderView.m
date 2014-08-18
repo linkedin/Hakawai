@@ -1,0 +1,157 @@
+//
+//  LIREChooserBorderView.m
+//  LIRichEditorLibrary
+//
+//  Created by Austin Zheng on 5/28/14.
+//  Copyright (c) 2014 LinkedIn. All rights reserved.
+//
+
+#import "LIREChooserBorderView.h"
+
+@interface LIREChooserBorderView ()
+@property (nonatomic, readonly) CGFloat arrowWidth;
+@property (nonatomic, readonly) CGFloat arrowHeight;
+@end
+
+@implementation LIREChooserBorderView
+
+- (id)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        // Initialization code
+        self.backgroundColor = [UIColor clearColor];
+        self.strokeThickness = 1.0;
+        self.pointerXPercent = 0.5;
+    }
+    return self;
+}
+
+- (void)drawRect:(CGRect)rect {
+    [super drawRect:rect];
+    if (self.arrowVisible) {
+        [self drawBorderWithPointer];
+    }
+    else {
+        [self drawBorderWithoutPointer];
+    }
+}
+
+- (void)drawBorderWithoutPointer {
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(context);
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGRect bounds = self.bounds;
+
+    CGFloat currentY = self.borderOnTop ? bounds.size.height - self.strokeThickness/2.0 : (0 + self.strokeThickness/2.0);
+    CGPathMoveToPoint(path, NULL, 0, currentY);
+    CGPathAddLineToPoint(path, NULL, bounds.size.width, currentY);
+    CGContextAddPath(context, path);
+
+    CGContextSetLineWidth(context, self.strokeThickness);
+    [self.strokeColor setStroke];
+    CGContextDrawPath(context, kCGPathStroke);
+    CGPathRelease(path);
+    CGContextRestoreGState(context);
+}
+
+- (void)drawBorderWithPointer {
+    CGSize size = self.bounds.size;
+    CGFloat baseY = self.borderOnTop ? (size.height - self.strokeThickness/2.0) : (0 + self.strokeThickness/2.0);
+    CGFloat topY = baseY + self.arrowTipYOffset;
+
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(context);
+
+    // Left line segment
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathMoveToPoint(path, NULL, 0, baseY);
+    CGPathAddLineToPoint(path, NULL, self.arrowLeftX, baseY);
+    CGPathAddLineToPoint(path, NULL, self.arrowMiddleX, topY);
+    CGPathAddLineToPoint(path, NULL, self.arrowRightX, baseY);
+    CGPathAddLineToPoint(path, NULL, size.width, baseY);
+    CGContextSetLineJoin(context, kCGLineJoinRound);
+
+    CGContextAddPath(context, path);
+    CGContextSetLineWidth(context, self.strokeThickness);
+    [self.strokeColor setStroke];
+    CGContextDrawPath(context, kCGPathStroke);
+    CGPathRelease(path);
+    CGContextRestoreGState(context);
+
+    [self moveArrowToPosition];
+}
+
+- (void)moveArrowToPosition {
+    BOOL arrowPointsUp = self.borderOnTop;
+    CGFloat xPosition = floorf((self.bounds.size.width * self.pointerXPercent) - (self.arrowWidth/2.0));
+    CGFloat yPosition = arrowPointsUp ? (self.bounds.size.height - self.arrowHeight) : 0;
+    [self.delegate moveArrowViewToPositionRelativeToBorderView:CGPointMake(xPosition, yPosition)];
+}
+
+
+#pragma mark - Properties
+
+- (void)setArrowVisible:(BOOL)arrowVisible {
+    _arrowVisible = arrowVisible;
+    [self setNeedsDisplay];
+}
+
+- (void)setBorderOnTop:(BOOL)borderOnTop {
+    _borderOnTop = borderOnTop;
+    [self setNeedsDisplay];
+}
+
+- (void)setPointerXPercent:(CGFloat)pointerXPercent {
+    if (_pointerXPercent == pointerXPercent) return;
+    // Clamp to bounds
+    static const CGFloat lowerClamp = 0.05;
+    static const CGFloat upperClamp = 0.95;
+    if (pointerXPercent < lowerClamp) pointerXPercent = lowerClamp;
+    if (pointerXPercent > upperClamp) pointerXPercent = upperClamp;
+    _pointerXPercent = pointerXPercent;
+    [self setNeedsDisplay];
+}
+
+- (UIColor *)strokeColor {
+    if (!_strokeColor) {
+        _strokeColor = [UIColor colorWithRed:0.66 green:0.66 blue:0.67 alpha:1.0];
+    }
+    return _strokeColor;
+}
+
+- (UIColor *)arrowFillColor {
+    if (!_arrowFillColor) {
+        _arrowFillColor = [UIColor whiteColor];
+    }
+    return _arrowFillColor;
+}
+
+- (CGFloat)arrowWidth {
+    return [self.delegate sizeForArrowView].width;
+}
+
+- (CGFloat)arrowHeight {
+    return [self.delegate sizeForArrowView].height;
+}
+
+
+#pragma mark - Computed properties
+
+- (CGFloat)arrowLeftX {
+    return self.arrowMiddleX - self.arrowWidth/2.0;
+}
+
+- (CGFloat)arrowMiddleX {
+    return floorf(self.pointerXPercent * (self.bounds.size.width));
+}
+
+- (CGFloat)arrowRightX {
+    return self.arrowMiddleX + self.arrowWidth/2.0;
+}
+
+- (CGFloat)arrowTipYOffset {
+    BOOL arrowPointsUp = self.borderOnTop;
+    return arrowPointsUp ? self.strokeThickness/2.0 - self.arrowHeight : self.arrowHeight - self.strokeThickness/2.0;
+}
+
+@end

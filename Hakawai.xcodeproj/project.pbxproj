@@ -7,9 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1B3088119A2C0D60096DE0E /* HKWAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087019A2C0D60096DE0E /* HKWAttribute.m */; };
+		E1B3088219A2C0D60096DE0E /* HKWTextView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087419A2C0D60096DE0E /* HKWTextView+Extras.m */; };
+		E1B3088319A2C0D60096DE0E /* HKWTextView+Plugins.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087619A2C0D60096DE0E /* HKWTextView+Plugins.m */; };
+		E1B3088419A2C0D60096DE0E /* HKWTextView+Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087819A2C0D60096DE0E /* HKWTextView+Utilities.m */; };
+		E1B3088519A2C0D60096DE0E /* HKWTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087A19A2C0D60096DE0E /* HKWTextView.m */; };
+		E1B3088619A2C0D60096DE0E /* HKWLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */; };
+		E1B3088719A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */; };
+		E1B3089319A2C1890096DE0E /* HKWMentionsAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */; };
+		E1B3089419A2C1890096DE0E /* HKWMentionsCreationStateMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachine.m */; };
+		E1B3089519A2C1890096DE0E /* HKWMentionsPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */; };
+		E1B3089619A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */; };
+		E1B308A419A2C21A0096DE0E /* HKWDefaultChooserArrowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */; };
+		E1B308A519A2C21A0096DE0E /* HKWDefaultChooserBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */; };
+		E1B308A719A2C21A0096DE0E /* HKWDefaultChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */; };
+		E1B308A819A2C21A0096DE0E /* HKWAbstractChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */; };
 		E1C9676019A2A66000A4AA93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675F19A2A66000A4AA93 /* Foundation.framework */; };
-		E1C9676519A2A66000A4AA93 /* Hakawai.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = E1C9676419A2A66000A4AA93 /* Hakawai.h */; };
-		E1C9676719A2A66000A4AA93 /* Hakawai.m in Sources */ = {isa = PBXBuildFile; fileRef = E1C9676619A2A66000A4AA93 /* Hakawai.m */; };
 		E1C9676E19A2A66000A4AA93 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9676D19A2A66000A4AA93 /* XCTest.framework */; };
 		E1C9676F19A2A66000A4AA93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675F19A2A66000A4AA93 /* Foundation.framework */; };
 		E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9677019A2A66000A4AA93 /* UIKit.framework */; };
@@ -35,18 +48,54 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				E1C9676519A2A66000A4AA93 /* Hakawai.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E1B3086C19A2C0D60096DE0E /* _HKWPrivateConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWPrivateConstants.h; sourceTree = "<group>"; };
+		E1B3086D19A2C0D60096DE0E /* _HKWTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWTextView.h; sourceTree = "<group>"; };
+		E1B3086F19A2C0D60096DE0E /* HKWAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWAttribute.h; sourceTree = "<group>"; };
+		E1B3087019A2C0D60096DE0E /* HKWAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWAttribute.m; sourceTree = "<group>"; };
+		E1B3087119A2C0D60096DE0E /* HKWControlFlowPluginProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWControlFlowPluginProtocol.h; sourceTree = "<group>"; };
+		E1B3087219A2C0D60096DE0E /* HKWSimplePluginProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWSimplePluginProtocol.h; sourceTree = "<group>"; };
+		E1B3087319A2C0D60096DE0E /* HKWTextView+Extras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+Extras.h"; sourceTree = "<group>"; };
+		E1B3087419A2C0D60096DE0E /* HKWTextView+Extras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HKWTextView+Extras.m"; sourceTree = "<group>"; };
+		E1B3087519A2C0D60096DE0E /* HKWTextView+Plugins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+Plugins.h"; sourceTree = "<group>"; };
+		E1B3087619A2C0D60096DE0E /* HKWTextView+Plugins.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HKWTextView+Plugins.m"; sourceTree = "<group>"; };
+		E1B3087719A2C0D60096DE0E /* HKWTextView+Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+Utilities.h"; sourceTree = "<group>"; };
+		E1B3087819A2C0D60096DE0E /* HKWTextView+Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HKWTextView+Utilities.m"; sourceTree = "<group>"; };
+		E1B3087919A2C0D60096DE0E /* HKWTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWTextView.h; sourceTree = "<group>"; };
+		E1B3087A19A2C0D60096DE0E /* HKWTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextView.m; sourceTree = "<group>"; };
+		E1B3087C19A2C0D60096DE0E /* HKWCustomAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWCustomAttributes.h; sourceTree = "<group>"; };
+		E1B3087D19A2C0D60096DE0E /* HKWLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWLayoutManager.h; sourceTree = "<group>"; };
+		E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManager.m; sourceTree = "<group>"; };
+		E1B3087F19A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWRoundedRectBackgroundAttributeValue.h; sourceTree = "<group>"; };
+		E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWRoundedRectBackgroundAttributeValue.m; sourceTree = "<group>"; };
+		E1B3088919A2C1890096DE0E /* _HKWMentionsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsPlugin.h; path = Mentions/_HKWMentionsPlugin.h; sourceTree = "<group>"; };
+		E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsAttribute.h; path = Mentions/HKWMentionsAttribute.h; sourceTree = "<group>"; };
+		E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsAttribute.m; path = Mentions/HKWMentionsAttribute.m; sourceTree = "<group>"; };
+		E1B3088C19A2C1890096DE0E /* HKWMentionsCreationStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsCreationStateMachine.h; path = Mentions/HKWMentionsCreationStateMachine.h; sourceTree = "<group>"; };
+		E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsCreationStateMachine.m; path = Mentions/HKWMentionsCreationStateMachine.m; sourceTree = "<group>"; };
+		E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsEntityProtocol.h; path = Mentions/HKWMentionsEntityProtocol.h; sourceTree = "<group>"; };
+		E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsPlugin.h; path = Mentions/HKWMentionsPlugin.h; sourceTree = "<group>"; };
+		E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsPlugin.m; path = Mentions/HKWMentionsPlugin.m; sourceTree = "<group>"; };
+		E1B3089119A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsStartDetectionStateMachine.h; path = Mentions/HKWMentionsStartDetectionStateMachine.h; sourceTree = "<group>"; };
+		E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsStartDetectionStateMachine.m; path = Mentions/HKWMentionsStartDetectionStateMachine.m; sourceTree = "<group>"; };
+		E1B3089919A2C21A0096DE0E /* HKWDefaultChooserArrowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWDefaultChooserArrowView.h; sourceTree = "<group>"; };
+		E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserArrowView.m; sourceTree = "<group>"; };
+		E1B3089B19A2C21A0096DE0E /* HKWDefaultChooserBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWDefaultChooserBorderView.h; sourceTree = "<group>"; };
+		E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserBorderView.m; sourceTree = "<group>"; };
+		E1B3089F19A2C21A0096DE0E /* HKWDefaultChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWDefaultChooserView.h; sourceTree = "<group>"; };
+		E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserView.m; sourceTree = "<group>"; };
+		E1B308A119A2C21A0096DE0E /* HKWAbstractChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWAbstractChooserView.h; sourceTree = "<group>"; };
+		E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWAbstractChooserView.m; sourceTree = "<group>"; };
+		E1B308A319A2C21A0096DE0E /* HKWChooserViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWChooserViewProtocol.h; sourceTree = "<group>"; };
+		E1B308A919A2CC0F0096DE0E /* _HKWMentionsPrivateConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsPrivateConstants.h; path = Mentions/_HKWMentionsPrivateConstants.h; sourceTree = "<group>"; };
 		E1C9675C19A2A66000A4AA93 /* libHakawai.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHakawai.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1C9675F19A2A66000A4AA93 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E1C9676319A2A66000A4AA93 /* Hakawai-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hakawai-Prefix.pch"; sourceTree = "<group>"; };
-		E1C9676419A2A66000A4AA93 /* Hakawai.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Hakawai.h; sourceTree = "<group>"; };
-		E1C9676619A2A66000A4AA93 /* Hakawai.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Hakawai.m; sourceTree = "<group>"; };
 		E1C9676C19A2A66000A4AA93 /* HakawaiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HakawaiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1C9676D19A2A66000A4AA93 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		E1C9677019A2A66000A4AA93 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -78,6 +127,83 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E1B3086B19A2C0D60096DE0E /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				E1B3086C19A2C0D60096DE0E /* _HKWPrivateConstants.h */,
+				E1B3087219A2C0D60096DE0E /* HKWSimplePluginProtocol.h */,
+				E1B3087119A2C0D60096DE0E /* HKWControlFlowPluginProtocol.h */,
+				E1B3087919A2C0D60096DE0E /* HKWTextView.h */,
+				E1B3086D19A2C0D60096DE0E /* _HKWTextView.h */,
+				E1B3087A19A2C0D60096DE0E /* HKWTextView.m */,
+				E1B3087319A2C0D60096DE0E /* HKWTextView+Extras.h */,
+				E1B3087419A2C0D60096DE0E /* HKWTextView+Extras.m */,
+				E1B3087519A2C0D60096DE0E /* HKWTextView+Plugins.h */,
+				E1B3087619A2C0D60096DE0E /* HKWTextView+Plugins.m */,
+				E1B3087719A2C0D60096DE0E /* HKWTextView+Utilities.h */,
+				E1B3087819A2C0D60096DE0E /* HKWTextView+Utilities.m */,
+				E1B3086F19A2C0D60096DE0E /* HKWAttribute.h */,
+				E1B3087019A2C0D60096DE0E /* HKWAttribute.m */,
+				E1B3087B19A2C0D60096DE0E /* TextKit */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		E1B3087B19A2C0D60096DE0E /* TextKit */ = {
+			isa = PBXGroup;
+			children = (
+				E1B3087C19A2C0D60096DE0E /* HKWCustomAttributes.h */,
+				E1B3087D19A2C0D60096DE0E /* HKWLayoutManager.h */,
+				E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */,
+				E1B3087F19A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.h */,
+				E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */,
+			);
+			path = TextKit;
+			sourceTree = "<group>";
+		};
+		E1B3088819A2C1140096DE0E /* Mentions */ = {
+			isa = PBXGroup;
+			children = (
+				E1B308A919A2CC0F0096DE0E /* _HKWMentionsPrivateConstants.h */,
+				E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */,
+				E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */,
+				E1B3088919A2C1890096DE0E /* _HKWMentionsPlugin.h */,
+				E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */,
+				E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */,
+				E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */,
+				E1B3089119A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.h */,
+				E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */,
+				E1B3088C19A2C1890096DE0E /* HKWMentionsCreationStateMachine.h */,
+				E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachine.m */,
+			);
+			name = Mentions;
+			sourceTree = "<group>";
+		};
+		E1B3089719A2C1DB0096DE0E /* ChooserView */ = {
+			isa = PBXGroup;
+			children = (
+				E1B3089819A2C21A0096DE0E /* Default */,
+				E1B308A319A2C21A0096DE0E /* HKWChooserViewProtocol.h */,
+				E1B308A119A2C21A0096DE0E /* HKWAbstractChooserView.h */,
+				E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */,
+			);
+			name = ChooserView;
+			path = Core;
+			sourceTree = "<group>";
+		};
+		E1B3089819A2C21A0096DE0E /* Default */ = {
+			isa = PBXGroup;
+			children = (
+				E1B3089F19A2C21A0096DE0E /* HKWDefaultChooserView.h */,
+				E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */,
+				E1B3089919A2C21A0096DE0E /* HKWDefaultChooserArrowView.h */,
+				E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */,
+				E1B3089B19A2C21A0096DE0E /* HKWDefaultChooserBorderView.h */,
+				E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */,
+			);
+			path = Default;
+			sourceTree = "<group>";
+		};
 		E1C9675319A2A66000A4AA93 = {
 			isa = PBXGroup;
 			children = (
@@ -110,8 +236,9 @@
 		E1C9676119A2A66000A4AA93 /* Hakawai */ = {
 			isa = PBXGroup;
 			children = (
-				E1C9676419A2A66000A4AA93 /* Hakawai.h */,
-				E1C9676619A2A66000A4AA93 /* Hakawai.m */,
+				E1B3088819A2C1140096DE0E /* Mentions */,
+				E1B3086B19A2C0D60096DE0E /* Core */,
+				E1B3089719A2C1DB0096DE0E /* ChooserView */,
 				E1C9676219A2A66000A4AA93 /* Supporting Files */,
 			);
 			path = Hakawai;
@@ -224,7 +351,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1C9676719A2A66000A4AA93 /* Hakawai.m in Sources */,
+				E1B3089619A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m in Sources */,
+				E1B3088519A2C0D60096DE0E /* HKWTextView.m in Sources */,
+				E1B308A819A2C21A0096DE0E /* HKWAbstractChooserView.m in Sources */,
+				E1B3088719A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m in Sources */,
+				E1B3088119A2C0D60096DE0E /* HKWAttribute.m in Sources */,
+				E1B308A519A2C21A0096DE0E /* HKWDefaultChooserBorderView.m in Sources */,
+				E1B3088619A2C0D60096DE0E /* HKWLayoutManager.m in Sources */,
+				E1B3089419A2C1890096DE0E /* HKWMentionsCreationStateMachine.m in Sources */,
+				E1B3089519A2C1890096DE0E /* HKWMentionsPlugin.m in Sources */,
+				E1B3088219A2C0D60096DE0E /* HKWTextView+Extras.m in Sources */,
+				E1B308A719A2C21A0096DE0E /* HKWDefaultChooserView.m in Sources */,
+				E1B3088319A2C0D60096DE0E /* HKWTextView+Plugins.m in Sources */,
+				E1B3088419A2C0D60096DE0E /* HKWTextView+Utilities.m in Sources */,
+				E1B308A419A2C21A0096DE0E /* HKWDefaultChooserArrowView.m in Sources */,
+				E1B3089319A2C1890096DE0E /* HKWMentionsAttribute.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,7 +430,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -320,7 +461,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -405,6 +546,7 @@
 				E1C9678119A2A66000A4AA93 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E1C9678219A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "HakawaiTests" */ = {
 			isa = XCConfigurationList;
@@ -413,6 +555,7 @@
 				E1C9678419A2A66000A4AA93 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
