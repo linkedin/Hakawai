@@ -87,9 +87,7 @@
     if (location >= [self.attributedText length]) {
         location = [self.attributedText length] - 1;
     }
-    NSMutableAttributedString *buffer = [self.attributedText mutableCopy];
-    [buffer addAttribute:NSAttachmentAttributeName value:attachment range:NSMakeRange(location, 1)];
-    self.attributedText = buffer;
+    [self insertAttributedText:[NSAttributedString attributedStringWithAttachment:attachment] location:location];
     if ([self.externalDelegate respondsToSelector:@selector(textView:didReceiveNewTextAttachment:)]) {
         [self.externalDelegate textView:self didReceiveNewTextAttachment:attachment];
     }
@@ -247,7 +245,7 @@
 
 #pragma mark - API (helper views)
 
-- (void)attachAccessorySiblingView:(UIView *)view position:(CGPoint)position {
+- (void)attachSiblingAccessoryView:(UIView *)view position:(CGPoint)position {
     if (!view || self.attachedAccessoryView) {
         return;
     }
@@ -276,7 +274,7 @@
     UIView *nextView = self.customTopLevelView;
     if (!nextView) {
         // No custom top-level view. Find our own.
-        UIView *nextView = self;
+        nextView = self;
         NSInteger count = 0;
         while (YES) {
             NSAssert(count < 5000, @"Internal error: could not find superview of editor text view after maximum \

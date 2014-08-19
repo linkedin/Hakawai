@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>4A8E337E-E525-4B2A-B792-34318E4A4487</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Hakawai</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>DD57E0AD-E247-4105-97F5-002B540A9D47</key>
+		<string>ssh://gitli.corp.linkedin.com/azheng/hakawai.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Hakawai.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>DD57E0AD-E247-4105-97F5-002B540A9D47</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://gitli.corp.linkedin.com/azheng/hakawai.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>DD57E0AD-E247-4105-97F5-002B540A9D47</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>DD57E0AD-E247-4105-97F5-002B540A9D47</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Hakawai</string>
+		</dict>
+	</array>
+</dict>
+</plist>

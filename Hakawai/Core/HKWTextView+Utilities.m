@@ -43,26 +43,48 @@
 }
 
 - (NSRange)rangeForWordPrecedingCursor {
-    if (!self.inInsertionMode) {
+    NSUInteger selectedLocation = self.selectedRange.location;
+    NSCharacterSet *whitespaceNewlineSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    if (!self.inInsertionMode
+        || selectedLocation == 0
+        || [whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:selectedLocation]]) {
         return NSMakeRange(NSNotFound, 0);
     }
     // Walk backwards through the string to find the first delimiter.
-    NSCharacterSet *whitespaceSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     NSInteger location = 0;
-    for (NSInteger i=self.selectedRange.location - 1; i>=0; i--) {
-        unichar c = [self.text characterAtIndex:i];
-        if ([whitespaceSet characterIsMember:c]) {
-            location = i + 1;
-            break;
+    for (NSInteger i=selectedLocation - 1; i>=0; i--) {
+        if (i > 0) {
+            unichar c = [self.text characterAtIndex:i];
+            if ([whitespaceNewlineSet characterIsMember:c]) {
+                location = i + 1;
+                break;
+            }
         }
     }
-    NSInteger length = self.selectedRange.location - location;
+    NSInteger length;
+    if (selectedLocation == [self.text length]
+        || [whitespaceNewlineSet characterIsMember:[self.text characterAtIndex:selectedLocation]]) {
+        // We're at the end of a word, or the end of the text field in general
+        length = selectedLocation - location;
+    }
+    else {
+        // Walk forward through the string to find the end, or the next whitespace/newline
+        NSInteger cursor = location;
+        while (cursor < [self.text length]) {
+            cursor++;
+            if ([whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:cursor]]) {
+                cursor--;
+                break;
+            }
+        }
+        length = cursor - location;
+    }
     return NSMakeRange(location, length);
 }
 
 - (unichar)characterPrecedingLocation:(NSInteger)location {
     unichar character = (unichar)0;
-    if (location > 0) {
+    if (location > 0 && location <= [self.text length]) {
         character = [self.text characterAtIndex:(location - 1)];
     }
     return character;

@@ -18,10 +18,7 @@
 #import "_HKWPrivateConstants.h"
 
 @interface HKWTextView () <UITextViewDelegate>
-
-@property (nonatomic, strong) NSMutableDictionary *simplePlugins;
-@property (nonatomic, strong) id<HKWControlFlowPluginProtocol>controlFlowPlugin;
-
+@property (nonatomic, strong) NSMutableDictionary *simplePluginsDictionary;
 @end
 
 @implementation HKWTextView
@@ -29,22 +26,15 @@
 #pragma mark - Lifecycle
 
 - (instancetype)initWithFrame:(CGRect)frame {
-    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
-        // iOS 7
-        HKWLayoutManager *manager = [HKWLayoutManager new];
-        NSTextContainer *container = [[NSTextContainer alloc] initWithSize:CGSizeMake(frame.size.width, FLT_MAX)];
-        container.widthTracksTextView = YES;
-        container.heightTracksTextView = YES;
-        [manager addTextContainer:container];
-        NSTextStorage *storage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
-        [storage addLayoutManager:manager];
+    HKWLayoutManager *manager = [HKWLayoutManager new];
+    NSTextContainer *container = [[NSTextContainer alloc] initWithSize:CGSizeMake(frame.size.width, FLT_MAX)];
+    container.widthTracksTextView = YES;
+    container.heightTracksTextView = YES;
+    [manager addTextContainer:container];
+    NSTextStorage *storage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
+    [storage addLayoutManager:manager];
 
-        self = [super initWithFrame:frame textContainer:container];
-    }
-    else {
-        // iOS 6 fallback
-        self = [super initWithFrame:frame];
-    }
+    self = [super initWithFrame:frame textContainer:container];
     if (self) {
         [self setup];
     }
@@ -53,33 +43,27 @@
 
 // Build custom text container if the consumer is using a XIB.
 - (id)awakeAfterUsingCoder:(NSCoder *)aDecoder {
-    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
-        // iOS 7
-        HKWLayoutManager *manager = [HKWLayoutManager new];
+    HKWLayoutManager *manager = [HKWLayoutManager new];
 
-        NSTextContainer *container = [[NSTextContainer alloc] initWithSize:self.textContainer.size];
-        container.widthTracksTextView = self.textContainer.widthTracksTextView;
-        container.heightTracksTextView = self.textContainer.heightTracksTextView;
+    NSTextContainer *container = [[NSTextContainer alloc] initWithSize:self.textContainer.size];
+    container.widthTracksTextView = self.textContainer.widthTracksTextView;
+    container.heightTracksTextView = self.textContainer.heightTracksTextView;
 
-        [manager addTextContainer:container];
+    [manager addTextContainer:container];
 
-        NSTextStorage *storage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
-        [storage addLayoutManager:manager];
+    NSTextStorage *storage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
+    [storage addLayoutManager:manager];
 
-        HKWTextView *replacement = [[[self class] alloc] initWithFrame:self.frame textContainer:container];
-        replacement.font = self.font;
-        replacement.clearsOnInsertion = NO;
-        replacement.textAlignment = self.textAlignment;
-        replacement.textColor = self.textColor;
-        replacement.autocapitalizationType = self.autocapitalizationType;
-        replacement.autocorrectionType = self.autocorrectionType;
-        replacement.spellCheckingType = self.spellCheckingType;
-        [replacement setup];
-        return replacement;
-    }
-    // iOS 6 fallback
-    [self setup];
-    return self;
+    HKWTextView *replacement = [[[self class] alloc] initWithFrame:self.frame textContainer:container];
+    replacement.font = self.font;
+    replacement.clearsOnInsertion = NO;
+    replacement.textAlignment = self.textAlignment;
+    replacement.textColor = self.textColor;
+    replacement.autocapitalizationType = self.autocapitalizationType;
+    replacement.autocorrectionType = self.autocorrectionType;
+    replacement.spellCheckingType = self.spellCheckingType;
+    [replacement setup];
+    return replacement;
 }
 
 - (void)setup {
@@ -95,43 +79,25 @@
     if (!plugin) {
         return;
     }
-    if ([plugin respondsToSelector:@selector(pluginSupportsSystemVersion:)]) {
-        if (![plugin pluginSupportsSystemVersion:NSFoundationVersionNumber]) {
-            return;
-        }
-    }
-    else if (NSFoundationVersionNumber <= NSFoundationVersionNumber_iOS_6_1) {
-        HKWLOG(@"WARNING! Plug-in must opt in in order to support iOS 6.");
-        return;
-    }
     plugin.parentTextView = self;
-    self.simplePlugins[[plugin pluginName]] = plugin;
+    self.simplePluginsDictionary[[plugin pluginName]] = plugin;
 }
 
 - (void)removeSimplePluginNamed:(NSString *)name {
     if (!name) {
         return;
     }
-    id<HKWSimplePluginProtocol>plugin = self.simplePlugins[name];
+    id<HKWSimplePluginProtocol>plugin = self.simplePluginsDictionary[name];
     plugin.parentTextView = nil;
-    [self.simplePlugins removeObjectForKey:name];
+    [self.simplePluginsDictionary removeObjectForKey:name];
 }
 
-- (void)registerControlFlowPlugin:(id<HKWControlFlowPluginProtocol>)plugin {
-    if (!plugin) {
-        self.controlFlowPlugin.parentTextView = nil;
+- (void)setControlFlowPlugin:(id<HKWControlFlowPluginProtocol>)controlFlowPlugin {
+    if (!controlFlowPlugin) {
+        _controlFlowPlugin.parentTextView = nil;
     }
-    if ([plugin respondsToSelector:@selector(pluginSupportsSystemVersion:)]) {
-        if (![plugin pluginSupportsSystemVersion:NSFoundationVersionNumber]) {
-            return;
-        }
-    }
-    else if (NSFoundationVersionNumber <= NSFoundationVersionNumber_iOS_6_1) {
-        HKWLOG(@"WARNING! Plug-in must opt in in order to support iOS 6.");
-        return;
-    }
-    self.controlFlowPlugin = plugin;
-    plugin.parentTextView = self;
+    _controlFlowPlugin = controlFlowPlugin;
+    _controlFlowPlugin.parentTextView = self;
 }
 
 
@@ -217,9 +183,7 @@
     }
 }
 
-- (BOOL)textView:(UITextView *)textView
-shouldChangeTextInRange:(NSRange)range
- replacementText:(NSString *)replacementText {
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)replacementText {
     if (self.temporarilyDisableDelegate) {
         return YES;
     }
@@ -314,9 +278,7 @@ shouldChangeTextInRange:(NSRange)range
     }
 }
 
-- (BOOL)textView:(UITextView *)textView
-shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment
-         inRange:(NSRange)characterRange {
+- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
     if (self.temporarilyDisableDelegate) {
         return YES;
     }
@@ -366,11 +328,11 @@ shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment
 
 #pragma mark - Properties
 
-- (NSMutableDictionary *)simplePlugins {
-    if (!_simplePlugins) {
-        _simplePlugins = [NSMutableDictionary dictionary];
+- (NSMutableDictionary *)simplePluginsDictionary {
+    if (!_simplePluginsDictionary) {
+        _simplePluginsDictionary = [NSMutableDictionary dictionary];
     }
-    return _simplePlugins;
+    return _simplePluginsDictionary;
 }
 
 - (NSMutableDictionary *)customTypingAttributes {
@@ -378,6 +340,10 @@ shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment
         _customTypingAttributes = [NSMutableDictionary dictionary];
     }
     return _customTypingAttributes;
+}
+
+- (NSArray *)simplePlugins {
+    return [self.simplePluginsDictionary allValues];
 }
 
 - (CGFloat)lineFragmentPadding {

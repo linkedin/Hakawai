@@ -24,6 +24,4 @@
 
 @optional
 
-- (BOOL)pluginSupportsSystemVersion:(float)systemVersion;
-
 @end

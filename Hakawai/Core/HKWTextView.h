@@ -59,6 +59,15 @@
  */
 @property (nonatomic, readonly) BOOL inSingleLineViewportMode;
 
+/// An array containing references to the simple plug-ins registered with the text view
+@property (nonatomic, readonly) NSArray *simplePlugins;
+
+/*!
+ Register a control flow plug-in with the editor. Unlike simple plug-ins, only one control flow plug-in can be enabled
+ at a time. Pass in nil to remove any currently registered control flow plug-in.
+ */
+@property (nonatomic, strong) id<HKWControlFlowPluginProtocol>controlFlowPlugin;
+
 /*!
  Register a simple plug-in with the editor.
  */
@@ -68,11 +77,5 @@
  Unregister a simple plug-in with the editor.
  */
 - (void)removeSimplePluginNamed:(NSString *)name;
-
-/*!
- Register a control flow plug-in with the editor. Unlike simple plug-ins, only one control flow plug-in can be enabled
- at a time. Pass in nil to remove any currently registered control flow plug-in.
- */
-- (void)registerControlFlowPlugin:(id<HKWControlFlowPluginProtocol>)plugin;
 
 @end

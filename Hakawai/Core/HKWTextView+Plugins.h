@@ -150,7 +150,7 @@ typedef enum {
  and intercepts touch events within its bounds. Only one accessory view can be attached at a time. Calling this method
  with an accessory view already attached is a no-op.
  */
-- (void)attachAccessorySiblingView:(UIView *)view position:(CGPoint)position;
+- (void)attachSiblingAccessoryView:(UIView *)view position:(CGPoint)position;
 
 /*!
  Attach an accessory view to the primary view of the key window's root view controller. This is suitable for 'floating'

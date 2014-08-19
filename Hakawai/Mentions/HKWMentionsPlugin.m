@@ -628,14 +628,6 @@ typedef enum {
     [self resetCurrentMentionsData];
 }
 
-- (BOOL)pluginSupportsSystemVersion:(float)systemVersion {
-    if (systemVersion > NSFoundationVersionNumber_iOS_6_1) {
-        return YES;
-    }
-    HKWLOG(@"WARNING! Mentions plug-in is not supported on iOS 6.");
-    return NO;
-}
-
 
 #pragma mark - State machine
 
@@ -1422,7 +1414,7 @@ typedef enum {
             [self.parentTextView attachFreeFloatingAccessoryView:view absolutePosition:origin];
             break;
         case HKWAccessoryViewModeSibling:
-            [self.parentTextView attachAccessorySiblingView:view position:origin];
+            [self.parentTextView attachSiblingAccessoryView:view position:origin];
             break;
     }
 }

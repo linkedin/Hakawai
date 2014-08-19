@@ -6,6 +6,7 @@ target "Hakawai" do
 end
 
 target "HakawaiTests" do
-
+  pod 'Specta' 
+  pod 'Expecta'
 end
 

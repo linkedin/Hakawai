@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D923C7A86BAE4140B98CE674 /* libPods-HakawaiTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA135592875A450893230734 /* libPods-HakawaiTests.a */; };
+		E1233BFC19A303620052217A /* HKWTextViewPluginTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */; };
+		E1233C0019A3089B0052217A /* HKWTBasicDummyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233BFF19A3089B0052217A /* HKWTBasicDummyPlugin.m */; };
+		E1233C0319A3090B0052217A /* HKWTControlFlowDummyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233C0219A3090B0052217A /* HKWTControlFlowDummyPlugin.m */; };
+		E1233C0619A30EC80052217A /* HKWSingleLineViewportModeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233C0519A30EC80052217A /* HKWSingleLineViewportModeTests.m */; };
 		E1B3088119A2C0D60096DE0E /* HKWAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087019A2C0D60096DE0E /* HKWAttribute.m */; };
 		E1B3088219A2C0D60096DE0E /* HKWTextView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087419A2C0D60096DE0E /* HKWTextView+Extras.m */; };
 		E1B3088319A2C0D60096DE0E /* HKWTextView+Plugins.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087619A2C0D60096DE0E /* HKWTextView+Plugins.m */; };
@@ -28,7 +33,10 @@
 		E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9677019A2A66000A4AA93 /* UIKit.framework */; };
 		E1C9677419A2A66000A4AA93 /* libHakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675C19A2A66000A4AA93 /* libHakawai.a */; };
 		E1C9677A19A2A66000A4AA93 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E1C9677819A2A66000A4AA93 /* InfoPlist.strings */; };
-		E1C9677C19A2A66000A4AA93 /* HakawaiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1C9677B19A2A66000A4AA93 /* HakawaiTests.m */; };
+		E1D5501719A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501619A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m */; };
+		E1D5501A19A2F479001DCF1F /* HKWTextViewExtrasTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501919A2F479001DCF1F /* HKWTextViewExtrasTests.m */; };
+		E1D5501D19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */; };
+		E1DC1F8D19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +62,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DA135592875A450893230734 /* libPods-HakawaiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HakawaiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewPluginTests.m; sourceTree = "<group>"; };
+		E1233BFE19A3089B0052217A /* HKWTBasicDummyPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTBasicDummyPlugin.h; path = "Supporting Classes/HKWTBasicDummyPlugin.h"; sourceTree = "<group>"; };
+		E1233BFF19A3089B0052217A /* HKWTBasicDummyPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTBasicDummyPlugin.m; path = "Supporting Classes/HKWTBasicDummyPlugin.m"; sourceTree = "<group>"; };
+		E1233C0119A3090B0052217A /* HKWTControlFlowDummyPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTControlFlowDummyPlugin.h; path = "Supporting Classes/HKWTControlFlowDummyPlugin.h"; sourceTree = "<group>"; };
+		E1233C0219A3090B0052217A /* HKWTControlFlowDummyPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTControlFlowDummyPlugin.m; path = "Supporting Classes/HKWTControlFlowDummyPlugin.m"; sourceTree = "<group>"; };
+		E1233C0519A30EC80052217A /* HKWSingleLineViewportModeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWSingleLineViewportModeTests.m; sourceTree = "<group>"; };
 		E1B3086C19A2C0D60096DE0E /* _HKWPrivateConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWPrivateConstants.h; sourceTree = "<group>"; };
 		E1B3086D19A2C0D60096DE0E /* _HKWTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWTextView.h; sourceTree = "<group>"; };
 		E1B3086F19A2C0D60096DE0E /* HKWAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWAttribute.h; sourceTree = "<group>"; };
@@ -101,7 +116,11 @@
 		E1C9677019A2A66000A4AA93 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		E1C9677719A2A66000A4AA93 /* HakawaiTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "HakawaiTests-Info.plist"; sourceTree = "<group>"; };
 		E1C9677919A2A66000A4AA93 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		E1C9677B19A2A66000A4AA93 /* HakawaiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HakawaiTests.m; sourceTree = "<group>"; };
+		E1D5501619A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewUtilitiesTests.m; sourceTree = "<group>"; };
+		E1D5501919A2F479001DCF1F /* HKWTextViewExtrasTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewExtrasTests.m; sourceTree = "<group>"; };
+		E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewAccessoryViewTests.m; sourceTree = "<group>"; };
+		E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewTextTransformerTests.m; sourceTree = "<group>"; };
+		F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.xcconfig"; path = "Pods/Pods-HakawaiTests.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,12 +140,24 @@
 				E1C9676E19A2A66000A4AA93 /* XCTest.framework in Frameworks */,
 				E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */,
 				E1C9676F19A2A66000A4AA93 /* Foundation.framework in Frameworks */,
+				D923C7A86BAE4140B98CE674 /* libPods-HakawaiTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E1233BFD19A308790052217A /* Supporting Classes */ = {
+			isa = PBXGroup;
+			children = (
+				E1233BFE19A3089B0052217A /* HKWTBasicDummyPlugin.h */,
+				E1233BFF19A3089B0052217A /* HKWTBasicDummyPlugin.m */,
+				E1233C0119A3090B0052217A /* HKWTControlFlowDummyPlugin.h */,
+				E1233C0219A3090B0052217A /* HKWTControlFlowDummyPlugin.m */,
+			);
+			name = "Supporting Classes";
+			sourceTree = "<group>";
+		};
 		E1B3086B19A2C0D60096DE0E /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -211,6 +242,7 @@
 				E1C9677519A2A66000A4AA93 /* HakawaiTests */,
 				E1C9675E19A2A66000A4AA93 /* Frameworks */,
 				E1C9675D19A2A66000A4AA93 /* Products */,
+				F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -229,6 +261,7 @@
 				E1C9675F19A2A66000A4AA93 /* Foundation.framework */,
 				E1C9676D19A2A66000A4AA93 /* XCTest.framework */,
 				E1C9677019A2A66000A4AA93 /* UIKit.framework */,
+				DA135592875A450893230734 /* libPods-HakawaiTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -255,7 +288,13 @@
 		E1C9677519A2A66000A4AA93 /* HakawaiTests */ = {
 			isa = PBXGroup;
 			children = (
-				E1C9677B19A2A66000A4AA93 /* HakawaiTests.m */,
+				E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */,
+				E1D5501919A2F479001DCF1F /* HKWTextViewExtrasTests.m */,
+				E1D5501619A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m */,
+				E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */,
+				E1233C0519A30EC80052217A /* HKWSingleLineViewportModeTests.m */,
+				E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */,
+				E1233BFD19A308790052217A /* Supporting Classes */,
 				E1C9677619A2A66000A4AA93 /* Supporting Files */,
 			);
 			path = HakawaiTests;
@@ -294,9 +333,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E1C9678219A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "HakawaiTests" */;
 			buildPhases = (
+				D955317DCA2B4C8697710DD2 /* Check Pods Manifest.lock */,
 				E1C9676819A2A66000A4AA93 /* Sources */,
 				E1C9676919A2A66000A4AA93 /* Frameworks */,
 				E1C9676A19A2A66000A4AA93 /* Resources */,
+				78EF1E9F7A6348EBBC9EC13B /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -316,6 +357,11 @@
 			attributes = {
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = LinkedIn;
+				TargetAttributes = {
+					E1C9676B19A2A66000A4AA93 = {
+						TestTargetID = E1C9675B19A2A66000A4AA93;
+					};
+				};
 			};
 			buildConfigurationList = E1C9675719A2A66000A4AA93 /* Build configuration list for PBXProject "Hakawai" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -346,6 +392,39 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		78EF1E9F7A6348EBBC9EC13B /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-HakawaiTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D955317DCA2B4C8697710DD2 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		E1C9675819A2A66000A4AA93 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -373,7 +452,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1C9677C19A2A66000A4AA93 /* HakawaiTests.m in Sources */,
+				E1DC1F8D19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m in Sources */,
+				E1D5501719A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m in Sources */,
+				E1233BFC19A303620052217A /* HKWTextViewPluginTests.m in Sources */,
+				E1D5501D19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m in Sources */,
+				E1233C0019A3089B0052217A /* HKWTBasicDummyPlugin.m in Sources */,
+				E1D5501A19A2F479001DCF1F /* HKWTextViewExtrasTests.m in Sources */,
+				E1233C0619A30EC80052217A /* HKWSingleLineViewportModeTests.m in Sources */,
+				E1233C0319A3090B0052217A /* HKWTControlFlowDummyPlugin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,6 +579,7 @@
 		};
 		E1C9678319A2A66000A4AA93 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -513,6 +600,7 @@
 		};
 		E1C9678419A2A66000A4AA93 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
