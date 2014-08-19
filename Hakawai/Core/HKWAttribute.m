@@ -10,7 +10,7 @@
 
 @interface HKWAttribute ()
 @property (nonatomic, strong, readwrite) NSString *attribute;
-@property (nonatomic, strong, readwrite) NSObject *parameter;
+@property (nonatomic, strong, readwrite) id parameter;
 @end
 
 @implementation HKWAttribute
@@ -96,6 +96,18 @@
 
 + (instancetype)expansionAttributeWithExpansion:(CGFloat)expansion {
     return [[self class] instanceWithAttribute:NSExpansionAttributeName parameter:@(expansion)];
+}
+
++ (NSDictionary *)attributeDictionaryWithAttributes:(NSArray *)attributes {
+    NSMutableDictionary *buffer = [NSMutableDictionary dictionary];
+    for (id object in attributes) {
+        if (![object isKindOfClass:[HKWAttribute class]]) {
+            continue;
+        }
+        HKWAttribute *attr = (HKWAttribute *)object;
+        [buffer setObject:attr.parameter forKey:attr.attribute];
+    }
+    return [buffer copy];
 }
 
 @end

@@ -89,7 +89,7 @@ describe(@"control flow plugin API", ^{
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];\
     });
 
-    it(@"should properly register and unregister control flow plugins plug-ins", ^{
+    it(@"should properly register and unregister control flow plug-ins", ^{
         HKWTControlFlowDummyPlugin *p1 = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p1"];
         HKWTControlFlowDummyPlugin *p2 = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p2"];
 

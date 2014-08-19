@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Hakawai"
-  s.version      = "0.0.2"
+  s.version      = "0.0.3"
   s.summary      = "Hakawai is a subclass of UITextView which adds additional functionality, and supports the use of modular plug-ins."
   s.description  = <<-DESC
                    TODO

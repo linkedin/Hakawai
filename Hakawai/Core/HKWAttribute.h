@@ -10,11 +10,14 @@
 
 /*!
  An object representing an attribute which can be applied to part of an attributed string.
+
+ \note HKWAttribute objects aren't used anywhere else in the library, but are present for convenience and usage in
+ future plug-ins.
  */
 @interface HKWAttribute : NSObject
 
 @property (nonatomic, readonly) NSString *attribute;
-@property (nonatomic, readonly) NSObject *parameter;
+@property (nonatomic, readonly) id parameter;
 
 + (instancetype)fontAttributeWithFont:(UIFont *)font;
 + (instancetype)paragraphStyleAttributeWithStyle:(NSParagraphStyle *)style;
@@ -37,5 +40,10 @@
 + (instancetype)expansionAttributeWithExpansion:(CGFloat)expansion;
 
 // NSWritingDirectionAttributeName is not supported
+
+/*!
+ Given an array of \c HKWAttribute objects, generate an attribute dictionary
+ */
++ (NSDictionary *)attributeDictionaryWithAttributes:(NSArray *)attributes;
 
 @end

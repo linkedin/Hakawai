@@ -1,5 +1,5 @@
 //
-//  HKWSingleLineViewportModeTests.m
+//  HKWTextViewSingleLineViewportModeTests.m
 //  Hakawai
 //
 //  Created by Austin Zheng on 8/18/14.

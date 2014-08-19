@@ -74,6 +74,11 @@ describe(@"transformTextAtRange with plain text", ^{
         }];
         expect(textView.text).to.equal(@"rown fox jumps over the lazy dog");
     });
+
+    it(@"should properly ignore a nil block", ^{
+        [textView transformTextAtRange:NSMakeRange(0, 11) withTransformer:nil];
+        expect(textView.text).to.equal(baseString);
+    });
 });
 
 describe(@"transformTextAtRange with attributed text", ^{
@@ -312,7 +317,7 @@ SpecEnd
 SpecBegin(removeTextForRange)
 
 describe(@"removeTextForRange", ^{
-    static NSString *const baseString = @"The quick brown fox jumps over the lazy dog";
+    NSString *baseString = @"The quick brown fox jumps over the lazy dog";
     __block HKWTextView *textView;
 
     beforeEach(^{

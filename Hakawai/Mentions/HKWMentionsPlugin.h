@@ -55,8 +55,6 @@ static NSString *const HKWMentionAttributeName = @"HKWMentionAttributeName";
 
  \c HKWMentionsChooserPositionModeCustomNoLockNoArrow is a custom mode where the chooser is configured with no chrome
  and the text view is never locked.
-
- (Apologies for the hideous enum. Swift's ADTs will offer better tools for doing this sort of thing.)
  */
 typedef enum {
     HKWMentionsChooserPositionModeEnclosedTop = 0,
@@ -252,7 +250,7 @@ typedef enum {
 
 /*!
  Add a mention attribute to the text view's text. This method is intended to be called when the text view is first
- being populated with text (for example, when a user decides to edit an existing post containing mentions).
+ being populated with text (for example, when a user decides to edit an existing document containing mentions).
 
  \param mention    a mention object representing the mention to add. The \c range property on the object must be set
                    properly. In addition, the length of \c range must match the length of the \c mentionText property,

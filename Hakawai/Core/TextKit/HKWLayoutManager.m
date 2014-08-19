@@ -10,7 +10,6 @@
 
 #import "HKWCustomAttributes.h"
 
-
 typedef NSArray RoundedRectAttributeTuple;
 typedef NSMutableArray RangeValuesBuffer;
 typedef NSMutableArray RectValuesBuffer;
