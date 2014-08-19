@@ -2,8 +2,12 @@
 //  HKWMentionsPlugin.m
 //  Hakawai
 //
-//  Copyright (c) 2014 LinkedIn
-//  Released under the terms of the MIT License
+//  Copyright (c) 2014 LinkedIn Corp. All rights reserved.
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+//  the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+//  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
 #import "_HKWMentionsPlugin.h"
@@ -227,7 +231,7 @@ typedef enum {
 - (NSArray *)mentions {
     NSMutableArray *buffer = [NSMutableArray array];
 
-    [self.parentTextView.attributedText enumerateAttributesInRange:FULL_RANGE(self.parentTextView.attributedText)
+    [self.parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(self.parentTextView.attributedText)
                                                            options:0 usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
                                                                id mentionObject = attrs[HKWMentionAttributeName];
                                                                if (![mentionObject isKindOfClass:[HKWMentionsAttribute class]]) {
@@ -280,9 +284,9 @@ typedef enum {
             return input;
         }
         NSMutableAttributedString *buffer = [input mutableCopy];
-        [buffer addAttribute:HKWMentionAttributeName value:mention range:FULL_RANGE(input)];
+        [buffer addAttribute:HKWMentionAttributeName value:mention range:HKW_FULL_RANGE(input)];
         for (NSString *attributeName in mentionAttributes) {
-            [buffer addAttribute:attributeName value:mentionAttributes[attributeName] range:FULL_RANGE(input)];
+            [buffer addAttribute:attributeName value:mentionAttributes[attributeName] range:HKW_FULL_RANGE(input)];
         }
         return [buffer copy];
     }];
@@ -311,7 +315,7 @@ typedef enum {
         return nil;
     }
     NSMutableArray *buffer = [NSMutableArray array];
-    [attributedString enumerateAttributesInRange:FULL_RANGE(attributedString)
+    [attributedString enumerateAttributesInRange:HKW_FULL_RANGE(attributedString)
                                          options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
                                       usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
                                           for (NSString *attributeName in attrs) {
@@ -424,7 +428,7 @@ typedef enum {
     id mentionData = [parentText attribute:HKWMentionAttributeName
                                    atIndex:range.location
                      longestEffectiveRange:&dataRange
-                                   inRange:FULL_RANGE(parentText)];
+                                   inRange:HKW_FULL_RANGE(parentText)];
     NSAssert(mentionData, @"There must be a mention at this location. There was no mention attribute found.");
     NSAssert([mentionData isKindOfClass:[HKWMentionsAttribute class]],
              @"The mention attribe was found, but its value was of an unexpected type: '%@'",
@@ -443,10 +447,10 @@ typedef enum {
         NSDictionary *attributesToRemove = (selected ? unselectedAttributes : selectedAttributes);
         NSDictionary *attributesToAdd = (selected ? selectedAttributes : unselectedAttributes);
         for (NSString *key in attributesToRemove) {
-            [buffer removeAttribute:key range:FULL_RANGE(input)];
+            [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
         for (NSString *key in attributesToAdd) {
-            [buffer addAttribute:key value:attributesToAdd[key] range:FULL_RANGE(input)];
+            [buffer addAttribute:key value:attributesToAdd[key] range:HKW_FULL_RANGE(input)];
         }
         return [buffer copy];
     }];
@@ -464,7 +468,7 @@ typedef enum {
         return;
     }
     NSMutableArray *ranges = [NSMutableArray array];
-    [self.parentTextView.attributedText enumerateAttributesInRange:FULL_RANGE(self.parentTextView.attributedText)
+    [self.parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(self.parentTextView.attributedText)
                                                            options:0
                                                         usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
                                                             // Find all attributes in the string subsection.
@@ -484,14 +488,14 @@ typedef enum {
         [self.parentTextView transformTextAtRange:[v rangeValue]
                                   withTransformer:^NSAttributedString *(NSAttributedString *input) {
                                       NSMutableAttributedString *buffer = [input mutableCopy];
-                                      [buffer removeAttribute:HKWMentionAttributeName range:FULL_RANGE(input)];
+                                      [buffer removeAttribute:HKWMentionAttributeName range:HKW_FULL_RANGE(input)];
                                       // NOTE: We may need to add support for capturing and restoring any attributes
                                       //  overwritten by applying the special mentions attributes in the future.
                                       for (NSString *key in unselectedAttributes) {
-                                          [buffer removeAttribute:key range:FULL_RANGE(input)];
+                                          [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
                                       }
                                       for (NSString *key in selectedAttributes) {
-                                          [buffer removeAttribute:key range:FULL_RANGE(input)];
+                                          [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
                                       }
                                       return [buffer copy];
                                   }];
@@ -513,7 +517,7 @@ typedef enum {
     id mentionData = [parentText attribute:HKWMentionAttributeName
                                    atIndex:range.location
                      longestEffectiveRange:&dataRange
-                                   inRange:FULL_RANGE(parentText)];
+                                   inRange:HKW_FULL_RANGE(parentText)];
     NSAssert([mentionData isKindOfClass:[HKWMentionsAttribute class]]
              && dataRange.length == range.length
              && dataRange.location == range.location,
@@ -527,14 +531,14 @@ typedef enum {
     NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
     [self.parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
         NSMutableAttributedString *buffer = [input mutableCopy];
-        [buffer removeAttribute:HKWMentionAttributeName range:FULL_RANGE(input)];
+        [buffer removeAttribute:HKWMentionAttributeName range:HKW_FULL_RANGE(input)];
         // NOTE: We may need to add support for capturing and restoring any attributes overwritten by applying the
         //  special mentions attributes in the future.
         for (NSString *key in selectedAttributes) {
-            [buffer removeAttribute:key range:FULL_RANGE(input)];
+            [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
         for (NSString *key in unselectedAttributes) {
-            [buffer removeAttribute:key range:FULL_RANGE(input)];
+            [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
         return [buffer copy];
     }];
@@ -587,7 +591,7 @@ typedef enum {
     id value = [parentText attribute:HKWMentionAttributeName
                              atIndex:location - 1
                longestEffectiveRange:range
-                             inRange:FULL_RANGE(parentText)];
+                             inRange:HKW_FULL_RANGE(parentText)];
     if ([value isKindOfClass:[HKWMentionsAttribute class]]) {
         // Typechecking
         return (HKWMentionsAttribute *)value;

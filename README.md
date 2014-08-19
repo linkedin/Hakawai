@@ -117,4 +117,4 @@ According to Wikipedia, "In Māori mythology, [...] Hakawai is a monstrous bird 
 Copyright & License
 -------------------
 
-Hakawai © 2014 LinkedIn Corp. Released under the terms of the MIT License.
+Hakawai © 2014 LinkedIn Corp. Licensed under the terms of the Apache License, Version 2.0.
