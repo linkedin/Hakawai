@@ -10,9 +10,9 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
-#import "HKWDefaultChooserView.h"
-#import "HKWDefaultChooserBorderView.h"
-#import "HKWDefaultChooserArrowView.h"
+#import "_HKWDefaultChooserView.h"
+#import "_HKWDefaultChooserBorderView.h"
+#import "_HKWDefaultChooserArrowView.h"
 
 #define LINE_WIDTH 1
 

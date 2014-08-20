@@ -22,7 +22,7 @@ Get Started
 
 Hakawai makes extensive use of TextKit, and requires iOS 7.1 or later. (Unfortunately, there are severe TextKit bugs in 7.0 that break many of the features offered by the library.)
 
-If you are using CocoaPods, just add ``pod Hakawai`` to your Podfile. Otherwise, check out the project and copy the source files into your own project.
+If you are using CocoaPods, just add ``pod 'Hakawai'`` to your Podfile. Otherwise, check out the project and copy the source files into your own project.
 
 Hakawai uses class extensions, and as a result you should add the -ObjC linker flag to your project settings if it's not there already. CocoaPods will automatically configure this for you if it's not already set.
 

@@ -14,7 +14,7 @@
 
 #import "HKWTextView+Plugins.h"
 
-#import "HKWLayoutManager.h"
+#import "_HKWLayoutManager.h"
 
 #import "HKWSimplePluginProtocol.h"
 #import "HKWControlFlowPluginProtocol.h"

@@ -16,9 +16,9 @@
 #define Hakawai__HKWMentionsPrivateConstants_h
 
 // Comment this out if state transitions should not be explicitly logged.
-//#define LOG_STATE_TRANSITIONS
+//#define HKW_LOG_STATE_TRANSITIONS
 
-#if defined(DEBUG) && defined(LOG_STATE_TRANSITIONS)
+#if defined(DEBUG) && defined(HKW_LOG_STATE_TRANSITIONS)
 #define HKW_STATE_LOG(msg, ...) NSLog(msg, ##__VA_ARGS__)
 #else
 #define HKW_STATE_LOG(msg, ...)

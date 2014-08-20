@@ -10,7 +10,7 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
-#import "HKWDefaultChooserArrowView.h"
+#import "_HKWDefaultChooserArrowView.h"
 
 const static CGFloat ARROW_VIEW_WIDTH = 10.0;
 const static CGFloat ARROW_VIEW_HEIGHT = 5.0;

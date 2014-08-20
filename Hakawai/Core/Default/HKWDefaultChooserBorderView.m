@@ -10,7 +10,7 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
-#import "HKWDefaultChooserBorderView.h"
+#import "_HKWDefaultChooserBorderView.h"
 
 @interface HKWDefaultChooserBorderView ()
 @property (nonatomic, readonly) CGFloat arrowWidth;

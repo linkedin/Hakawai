@@ -10,10 +10,10 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
-#import "HKWMentionsCreationStateMachine.h"
+#import "_HKWMentionsCreationStateMachine.h"
 
 #import "HKWAbstractChooserView.h"
-#import "HKWDefaultChooserView.h"
+#import "_HKWDefaultChooserView.h"
 #import "HKWMentionsAttribute.h"
 
 #import "_HKWMentionsPrivateConstants.h"

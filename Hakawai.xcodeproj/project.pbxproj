@@ -86,25 +86,25 @@
 		E1B3087919A2C0D60096DE0E /* HKWTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWTextView.h; sourceTree = "<group>"; };
 		E1B3087A19A2C0D60096DE0E /* HKWTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextView.m; sourceTree = "<group>"; };
 		E1B3087C19A2C0D60096DE0E /* HKWCustomAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWCustomAttributes.h; sourceTree = "<group>"; };
-		E1B3087D19A2C0D60096DE0E /* HKWLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWLayoutManager.h; sourceTree = "<group>"; };
+		E1B3087D19A2C0D60096DE0E /* _HKWLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWLayoutManager.h; sourceTree = "<group>"; };
 		E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManager.m; sourceTree = "<group>"; };
 		E1B3087F19A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWRoundedRectBackgroundAttributeValue.h; sourceTree = "<group>"; };
 		E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWRoundedRectBackgroundAttributeValue.m; sourceTree = "<group>"; };
 		E1B3088919A2C1890096DE0E /* _HKWMentionsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsPlugin.h; path = Mentions/_HKWMentionsPlugin.h; sourceTree = "<group>"; };
 		E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsAttribute.h; path = Mentions/HKWMentionsAttribute.h; sourceTree = "<group>"; };
 		E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsAttribute.m; path = Mentions/HKWMentionsAttribute.m; sourceTree = "<group>"; };
-		E1B3088C19A2C1890096DE0E /* HKWMentionsCreationStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsCreationStateMachine.h; path = Mentions/HKWMentionsCreationStateMachine.h; sourceTree = "<group>"; };
+		E1B3088C19A2C1890096DE0E /* _HKWMentionsCreationStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsCreationStateMachine.h; path = Mentions/_HKWMentionsCreationStateMachine.h; sourceTree = "<group>"; };
 		E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsCreationStateMachine.m; path = Mentions/HKWMentionsCreationStateMachine.m; sourceTree = "<group>"; };
 		E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsEntityProtocol.h; path = Mentions/HKWMentionsEntityProtocol.h; sourceTree = "<group>"; };
 		E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsPlugin.h; path = Mentions/HKWMentionsPlugin.h; sourceTree = "<group>"; };
 		E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsPlugin.m; path = Mentions/HKWMentionsPlugin.m; sourceTree = "<group>"; };
-		E1B3089119A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsStartDetectionStateMachine.h; path = Mentions/HKWMentionsStartDetectionStateMachine.h; sourceTree = "<group>"; };
+		E1B3089119A2C1890096DE0E /* _HKWMentionsStartDetectionStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsStartDetectionStateMachine.h; path = Mentions/_HKWMentionsStartDetectionStateMachine.h; sourceTree = "<group>"; };
 		E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsStartDetectionStateMachine.m; path = Mentions/HKWMentionsStartDetectionStateMachine.m; sourceTree = "<group>"; };
-		E1B3089919A2C21A0096DE0E /* HKWDefaultChooserArrowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWDefaultChooserArrowView.h; sourceTree = "<group>"; };
+		E1B3089919A2C21A0096DE0E /* _HKWDefaultChooserArrowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWDefaultChooserArrowView.h; sourceTree = "<group>"; };
 		E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserArrowView.m; sourceTree = "<group>"; };
-		E1B3089B19A2C21A0096DE0E /* HKWDefaultChooserBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWDefaultChooserBorderView.h; sourceTree = "<group>"; };
+		E1B3089B19A2C21A0096DE0E /* _HKWDefaultChooserBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWDefaultChooserBorderView.h; sourceTree = "<group>"; };
 		E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserBorderView.m; sourceTree = "<group>"; };
-		E1B3089F19A2C21A0096DE0E /* HKWDefaultChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWDefaultChooserView.h; sourceTree = "<group>"; };
+		E1B3089F19A2C21A0096DE0E /* _HKWDefaultChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWDefaultChooserView.h; sourceTree = "<group>"; };
 		E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserView.m; sourceTree = "<group>"; };
 		E1B308A119A2C21A0096DE0E /* HKWAbstractChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWAbstractChooserView.h; sourceTree = "<group>"; };
 		E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWAbstractChooserView.m; sourceTree = "<group>"; };
@@ -186,7 +186,7 @@
 			isa = PBXGroup;
 			children = (
 				E1B3087C19A2C0D60096DE0E /* HKWCustomAttributes.h */,
-				E1B3087D19A2C0D60096DE0E /* HKWLayoutManager.h */,
+				E1B3087D19A2C0D60096DE0E /* _HKWLayoutManager.h */,
 				E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */,
 				E1B3087F19A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.h */,
 				E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */,
@@ -204,9 +204,9 @@
 				E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */,
 				E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */,
 				E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */,
-				E1B3089119A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.h */,
+				E1B3089119A2C1890096DE0E /* _HKWMentionsStartDetectionStateMachine.h */,
 				E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */,
-				E1B3088C19A2C1890096DE0E /* HKWMentionsCreationStateMachine.h */,
+				E1B3088C19A2C1890096DE0E /* _HKWMentionsCreationStateMachine.h */,
 				E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachine.m */,
 			);
 			name = Mentions;
@@ -227,11 +227,11 @@
 		E1B3089819A2C21A0096DE0E /* Default */ = {
 			isa = PBXGroup;
 			children = (
-				E1B3089F19A2C21A0096DE0E /* HKWDefaultChooserView.h */,
+				E1B3089F19A2C21A0096DE0E /* _HKWDefaultChooserView.h */,
 				E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */,
-				E1B3089919A2C21A0096DE0E /* HKWDefaultChooserArrowView.h */,
+				E1B3089919A2C21A0096DE0E /* _HKWDefaultChooserArrowView.h */,
 				E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */,
-				E1B3089B19A2C21A0096DE0E /* HKWDefaultChooserBorderView.h */,
+				E1B3089B19A2C21A0096DE0E /* _HKWDefaultChooserBorderView.h */,
 				E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */,
 			);
 			path = Default;

@@ -13,7 +13,7 @@
 #import <UIKit/UIKit.h>
 
 #import "HKWAbstractChooserView.h"
-#import "HKWDefaultChooserBorderView.h"
+#import "_HKWDefaultChooserBorderView.h"
 
 @interface HKWDefaultChooserView : HKWAbstractChooserView <HKWDefaultChooserBorderViewProtocol>
 

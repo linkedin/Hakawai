@@ -22,8 +22,8 @@
 
 #import "HKWMentionsAttribute.h"
 
-#import "HKWMentionsStartDetectionStateMachine.h"
-#import "HKWMentionsCreationStateMachine.h"
+#import "_HKWMentionsStartDetectionStateMachine.h"
+#import "_HKWMentionsCreationStateMachine.h"
 
 #import "HKWAbstractChooserView.h"
 
