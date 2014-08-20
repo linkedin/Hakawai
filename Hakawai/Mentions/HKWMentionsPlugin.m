@@ -307,6 +307,39 @@ typedef enum {
     }
 }
 
+- (void)performInitialSetup {
+    NSAssert(self.parentTextView != nil, @"Internal error: parent text view is nil; it should have been set already");
+    // Disable 'undo'; it doesn't work right with mentions yet
+    self.shouldEnableUndoUponUnregistration = [self.parentTextView.undoManager isUndoRegistrationEnabled];
+    [self.parentTextView.undoManager disableUndoRegistration];
+
+    // Disable spell checking
+    [self.parentTextView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
+
+    // Initialize the state (as if the insertion point changed)
+    NSUInteger location = self.parentTextView.selectedRange.location;
+    unichar precedingChar = [self.parentTextView characterPrecedingLocation:location];
+    [self advanceStateForInsertionChanged:precedingChar location:location];
+}
+
+- (void)performFinalCleanup {
+    // Cancel mentions creation, if it's happening
+    if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
+        [self.creationStateMachine cancelMentionCreation];
+    }
+
+    // Remove the accessory view from the parent text view's view hierarchy
+    [self.parentTextView detachAccessoryView:self.chooserView];
+    [self.creationStateMachine resetChooserView];
+
+    // Enable 'undo' if this plug-in is being unregistered
+    if (self.shouldEnableUndoUponUnregistration) {
+        [self.parentTextView.undoManager enableUndoRegistration];
+    }
+    // Restore the parent text view's spell checking
+    [self.parentTextView restoreOriginalSpellChecking:NO];
+}
+
 
 #pragma mark - Utility
 
@@ -1494,30 +1527,6 @@ typedef enum {
 
 - (void)setCurrentlySelectedMentionRange:(NSRange)currentlySelectedMentionRange {
     _currentlySelectedMentionRange = currentlySelectedMentionRange;
-}
-
-- (void)setParentTextView:(HKWTextView *)parentTextView {
-    if (_parentTextView && ![_parentTextView.undoManager isUndoRegistrationEnabled]) {
-        // Enable 'undo' if this plug-in is being unregistered.
-        [_parentTextView.undoManager enableUndoRegistration];
-        [_parentTextView detachAccessoryView:self.chooserView];
-        [_parentTextView restoreOriginalSpellChecking:NO];
-        [self.creationStateMachine resetChooserView];
-        if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
-            [self.creationStateMachine cancelMentionCreation];
-        }
-    }
-    _parentTextView = parentTextView;
-    if ([parentTextView.undoManager isUndoRegistrationEnabled]) {
-        // Disable 'undo' if this plug-in is registered.
-        [parentTextView.undoManager disableUndoRegistration];
-    }
-    if (parentTextView) {
-        [parentTextView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
-        // Initialize the state (as if the insertion point changed)
-        unichar precedingChar = [parentTextView characterPrecedingLocation:parentTextView.selectedRange.location];
-        [self advanceStateForInsertionChanged:precedingChar location:parentTextView.selectedRange.location];
-    }
 }
 
 - (BOOL)loadingCellSupported {

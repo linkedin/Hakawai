@@ -23,8 +23,25 @@
  */
 @protocol HKWSimplePluginProtocol <NSObject>
 
+/// A string containing a unique identifier for this plug-in
 @property (nonatomic, readonly) NSString *pluginName;
+
+/// A weak reference to the \c HKWTextView instance owning this plug-in currently; it is set and unset automatically
 @property (nonatomic, weak) HKWTextView *parentTextView;
+
+/*!
+ Perform any initial setup required when the plug-in is first registered to a text view.
+
+ \note This method is called after the parent text view sets the plug-in's \c parentTextView property.
+ */
+- (void)performInitialSetup;
+
+/*!
+ Perform any final cleanup required when the plug-in is unregistered from a text view.
+
+ \note This method is called before the parent text view nils out the plug-in's \c parentTextView property.
+ */
+- (void)performFinalCleanup;
 
 @optional
 

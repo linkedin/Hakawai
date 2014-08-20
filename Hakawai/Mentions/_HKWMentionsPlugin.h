@@ -18,4 +18,6 @@
 @property (nonatomic) NSInteger implicitSearchLength;
 @property (nonatomic, readonly) BOOL implicitMentionsEnabled;
 
+@property (nonatomic) BOOL shouldEnableUndoUponUnregistration;
+
 @end

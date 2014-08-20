@@ -71,6 +71,11 @@
 
 #pragma mark - Accessory view
 
+@property (nonatomic) BOOL disableAutolayoutForAccessoryViews;
+
+/// An array holding on to a list of Auto Layout constraints for an accessory view.
+@property (nonatomic, strong) NSMutableArray *accessoryViewConstraints;
+
 /// The attached accessory view (if any). Note that this is a weak reference.
 @property (nonatomic, weak, readwrite) UIView *attachedAccessoryView;
 

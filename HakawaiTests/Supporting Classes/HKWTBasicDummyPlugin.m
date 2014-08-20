@@ -23,4 +23,16 @@
     return plugin;
 }
 
+- (void)performInitialSetup {
+    if (self.registerBlock) {
+        self.registerBlock();
+    }
+}
+
+- (void)performFinalCleanup {
+    if (self.unregisterBlock) {
+        self.unregisterBlock();
+    }
+}
+
 @end

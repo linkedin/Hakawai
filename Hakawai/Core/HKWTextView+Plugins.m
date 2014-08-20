@@ -261,6 +261,22 @@
     self.attachedAccessoryView = view;
     self.accessoryViewMode = HKWAccessoryViewModeSibling;
     [self.superview addSubview:view];
+    if (self.disableAutolayoutForAccessoryViews) {
+        return;
+    }
+    // Add constraints to properly pin the accessory view
+    [self.accessoryViewConstraints removeAllObjects];
+    NSMutableArray *constraintBuffer = [NSMutableArray array];
+    [constraintBuffer addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-X-[v]"
+                                                                                  options:0
+                                                                                  metrics:@{@"X": @(f.origin.x)}
+                                                                                    views:@{@"v": view}]];
+    [constraintBuffer addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-Y-[v]"
+                                                                                  options:0
+                                                                                  metrics:@{@"Y": @(f.origin.y)}
+                                                                                    views:@{@"v": view}]];
+    self.accessoryViewConstraints = constraintBuffer;
+    [self.superview addConstraints:constraintBuffer];
 }
 
 - (void)attachFreeFloatingAccessoryView:(UIView *)view absolutePosition:(CGPoint)position {
@@ -294,6 +310,22 @@
     }
     HKWLOG(@"Adding free-floating accessory view as subview of top-level view: (%@)...", nextView);
     [nextView addSubview:view];
+    if (!nextView || self.disableAutolayoutForAccessoryViews) {
+        return;
+    }
+    // Add constraints to properly pin the accessory view
+    [self.accessoryViewConstraints removeAllObjects];
+    NSMutableArray *constraintBuffer = [NSMutableArray array];
+    [constraintBuffer addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-X-[v]"
+                                                                                  options:0
+                                                                                  metrics:@{@"X": @(position.x)}
+                                                                                    views:@{@"v": view}]];
+    [constraintBuffer addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-Y-[v]"
+                                                                                  options:0
+                                                                                  metrics:@{@"Y": @(position.y)}
+                                                                                    views:@{@"v": view}]];
+    self.accessoryViewConstraints = constraintBuffer;
+    [nextView addConstraints:constraintBuffer];
 }
 
 - (void)detachAccessoryView:(UIView *)view {
@@ -303,6 +335,10 @@
     HKWLOG(@"Detaching accessory view...");
     self.attachedAccessoryView = nil;
     [view removeFromSuperview];
+    if (!self.disableAutolayoutForAccessoryViews) {
+        [view removeConstraints:self.accessoryViewConstraints];
+    }
+    [self.accessoryViewConstraints removeAllObjects];
 }
 
 - (void)setTopLevelViewForAccessoryViewPositioning:(UIView *)view {

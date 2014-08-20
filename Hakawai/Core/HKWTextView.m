@@ -80,10 +80,12 @@
 #pragma mark - Plugin Handling
 
 - (void)addSimplePlugin:(id<HKWSimplePluginProtocol>)plugin {
-    if (!plugin) {
+    if (!plugin || [self.simplePluginsDictionary objectForKey:[plugin pluginName]]) {
+        // Don't allow registration of nil or duplicate plug-ins
         return;
     }
     plugin.parentTextView = self;
+    [plugin performInitialSetup];
     self.simplePluginsDictionary[[plugin pluginName]] = plugin;
 }
 
@@ -92,16 +94,24 @@
         return;
     }
     id<HKWSimplePluginProtocol>plugin = self.simplePluginsDictionary[name];
+    [plugin performFinalCleanup];
     plugin.parentTextView = nil;
     [self.simplePluginsDictionary removeObjectForKey:name];
 }
 
 - (void)setControlFlowPlugin:(id<HKWControlFlowPluginProtocol>)controlFlowPlugin {
-    if (!controlFlowPlugin) {
+    if (_controlFlowPlugin) {
+        // There's an existing plug-in. Unregister it.
+        [_controlFlowPlugin performFinalCleanup];
         _controlFlowPlugin.parentTextView = nil;
     }
+    if (controlFlowPlugin) {
+        // Now, register the new plug-in (if it's not nil)
+        controlFlowPlugin.parentTextView = self;
+        [controlFlowPlugin performInitialSetup];
+    }
+    // Set the backing var
     _controlFlowPlugin = controlFlowPlugin;
-    _controlFlowPlugin.parentTextView = self;
 }
 
 
@@ -351,14 +361,14 @@
 }
 
 - (CGFloat)lineFragmentPadding {
-    if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_6_1) {
-        // iOS 7
-        return self.textContainer.lineFragmentPadding;
+    return self.textContainer.lineFragmentPadding;
+}
+
+- (NSMutableArray *)accessoryViewConstraints {
+    if (!_accessoryViewConstraints) {
+        _accessoryViewConstraints = [NSMutableArray arrayWithCapacity:2];
     }
-    else {
-        // iOS 6
-        return self.contentInset.left;
-    }
+    return _accessoryViewConstraints;
 }
 
 - (void)setFrame:(CGRect)frame {

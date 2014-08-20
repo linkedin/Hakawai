@@ -19,6 +19,9 @@
 
 @property (nonatomic, strong) NSString *pluginName;
 
+@property (nonatomic, copy) void (^registerBlock)(void);
+@property (nonatomic, copy) void (^unregisterBlock)(void);
+
 @property (nonatomic, copy) void (^shouldBeginEditingBlock)(void);
 @property (nonatomic, copy) void (^didBeginEditingBlock)(void);
 @property (nonatomic, copy) void (^shouldEndEditingBlock)(void);

@@ -41,7 +41,7 @@ typedef enum {
 } HKWAccessoryViewMode;
 
 /*!
- This category provides an API for plug-ins registered to the text view.
+ This category provides an API for plug-ins registered to the text view, and other potentially useful API methods.
  */
 @interface HKWTextView (Plugins)
 
@@ -148,6 +148,14 @@ typedef enum {
 
 
 #pragma mark - API (helper views)
+
+/*!
+ If set to YES, the accessory view APIs will not add (or remove) Auto Layout constraints to accessory views in order to
+ position them correctly relative to their superviews.
+ 
+ \note This property is intended only for ensuring compatibility with older code.
+ */
+@property (nonatomic) BOOL disableAutolayoutForAccessoryViews;
 
 /*!
  Attach an accessory view to the text editor as a sibling view. An accessory view floats 'above' the text editor view

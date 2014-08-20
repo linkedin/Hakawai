@@ -23,7 +23,22 @@
     return plugin;
 }
 
+- (void)performInitialSetup {
+    if (self.registerBlock) {
+        self.registerBlock();
+    }
+}
+
+- (void)performFinalCleanup {
+    if (self.unregisterBlock) {
+        self.unregisterBlock();
+    }
+}
+
 - (void)resetBlocks {
+    self.registerBlock = nil;
+    self.unregisterBlock = nil;
+
     self.shouldBeginEditingBlock = nil;
     self.didBeginEditingBlock = nil;
     self.shouldEndEditingBlock = nil;

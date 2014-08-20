@@ -91,7 +91,7 @@ describe(@"control flow plugin API", ^{
     __block HKWTextView *textView;
 
     beforeEach(^{
-        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];\
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
     });
 
     it(@"should properly register and unregister control flow plug-ins", ^{
@@ -132,7 +132,8 @@ describe(@"control flow plugin API", ^{
             rightBlockWasCalled = YES;
         };
         void (^failBlock)(void) = ^{
-            XCTFail(@"Fail block was called");
+            // Always fail
+            expect(NO).to.beTruthy();
         };
 
         // Test APIs
@@ -212,6 +213,225 @@ describe(@"control flow plugin API", ^{
         [textView textViewDidChangeSelection:textView];
         [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0)];
         [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10)];
+    });
+});
+
+SpecEnd
+
+SpecBegin(registerUnregisterHooks)
+
+describe(@"simple plug-in register/unregister hooks", ^{
+    __block HKWTextView *textView;
+    __block BOOL rightBlockWasCalled = NO;
+    void (^blockToCall)(void) = ^{
+        rightBlockWasCalled = YES;
+    };
+    void (^failBlock)(void) = ^{
+        // Always fail
+        expect(NO).to.beTruthy();
+    };
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    });
+
+    it(@"should properly fire", ^{
+        HKWTBasicDummyPlugin *p1 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p1"];
+        HKWTBasicDummyPlugin *p2 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p2"];
+        HKWTBasicDummyPlugin *p3 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p3"];
+
+        p1.registerBlock = failBlock;
+        p2.registerBlock = failBlock;
+        p3.registerBlock = failBlock;
+        p1.unregisterBlock = failBlock;
+        p2.unregisterBlock = failBlock;
+        p3.unregisterBlock = failBlock;
+
+        // Add a plug-in
+        p1.registerBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView addSimplePlugin:p1];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Add another plug-in
+        p1.registerBlock = failBlock;
+        p2.registerBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView addSimplePlugin:p2];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Remove p2
+        p2.registerBlock = failBlock;
+        p2.unregisterBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView removeSimplePluginNamed:p2.pluginName];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Add p3
+        p2.unregisterBlock = failBlock;
+        p3.registerBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView addSimplePlugin:p3];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Remove p1
+        p3.registerBlock = failBlock;
+        p1.unregisterBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView removeSimplePluginNamed:p1.pluginName];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Remove p3
+        p1.unregisterBlock = failBlock;
+        p3.unregisterBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView removeSimplePluginNamed:p3.pluginName];
+        expect(rightBlockWasCalled).to.beTruthy();
+    });
+
+    it(@"should properly ignore re-registration", ^{
+        HKWTBasicDummyPlugin *p1 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p1"];
+        HKWTBasicDummyPlugin *p2 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p2"];
+        p2.registerBlock = failBlock;
+        p2.unregisterBlock = failBlock;
+
+        // Add p1
+        p1.registerBlock = blockToCall;
+        p1.unregisterBlock = failBlock;
+        rightBlockWasCalled = NO;
+        [textView addSimplePlugin:p1];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Add p1 again
+        p1.registerBlock = failBlock;
+        [textView addSimplePlugin:p1];
+
+        // Add p2
+        p2.registerBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView addSimplePlugin:p2];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Add p1 again
+        p2.registerBlock = failBlock;
+        [textView addSimplePlugin:p1];
+    });
+
+    it(@"should properly ignore spurious unregistration", ^{
+        HKWTBasicDummyPlugin *p1 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p1"];
+        HKWTBasicDummyPlugin *p2 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p2"];
+        p2.registerBlock = failBlock;
+        p2.unregisterBlock = failBlock;
+
+        // Add p1
+        p1.registerBlock = blockToCall;
+        p1.unregisterBlock = failBlock;
+        rightBlockWasCalled = NO;
+        [textView addSimplePlugin:p1];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Try to remove p2
+        p1.registerBlock = failBlock;
+        [textView removeSimplePluginNamed:p2.pluginName];
+
+        // Try to remove p1
+        p1.registerBlock = failBlock;
+        p1.unregisterBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView removeSimplePluginNamed:p1.pluginName];
+        expect(rightBlockWasCalled).to.beTruthy();
+    });
+
+    it(@"should properly ignore duplicate unregistration", ^{
+        HKWTBasicDummyPlugin *p1 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p1"];
+
+        // Add p1
+        p1.registerBlock = blockToCall;
+        p1.unregisterBlock = failBlock;
+        rightBlockWasCalled = NO;
+        [textView addSimplePlugin:p1];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Try to remove p1
+        p1.registerBlock = failBlock;
+        p1.unregisterBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        [textView removeSimplePluginNamed:p1.pluginName];
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        // Try to remove p1 again
+        p1.unregisterBlock = failBlock;
+        [textView removeSimplePluginNamed:p1.pluginName];
+    });
+});
+
+describe(@"control flow plug-in register/unregister hooks", ^{
+    __block HKWTextView *textView;
+    __block BOOL rightBlockWasCalled = NO;
+    void (^blockToCall)(void) = ^{
+        rightBlockWasCalled = YES;
+    };
+    void (^failBlock)(void) = ^{
+        // Always fail
+        expect(NO).to.beTruthy();
+    };
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    });
+
+    it(@"should properly fire when registering and unregistering a plug-in", ^{
+        HKWTControlFlowDummyPlugin *p1 = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p1"];
+
+        p1.registerBlock = blockToCall;
+        p1.unregisterBlock = failBlock;
+        rightBlockWasCalled = NO;
+        textView.controlFlowPlugin = p1;
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        p1.registerBlock = failBlock;
+        p1.unregisterBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        textView.controlFlowPlugin = nil;
+        expect(rightBlockWasCalled).to.beTruthy();
+    });
+
+    it(@"should properly fire when replacing a plug-in with another", ^{
+        HKWTControlFlowDummyPlugin *p1 = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p1"];
+        HKWTControlFlowDummyPlugin *p2 = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p2"];
+
+        p1.registerBlock = blockToCall;
+        p1.unregisterBlock = failBlock;
+        p2.registerBlock = failBlock;
+        p2.unregisterBlock = failBlock;
+        rightBlockWasCalled = NO;
+        textView.controlFlowPlugin = p1;
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        p1.registerBlock = failBlock;
+        p1.unregisterBlock = blockToCall;
+        p2.registerBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        textView.controlFlowPlugin = p2;
+        // This test needs a bit of work. It only checks that either of the blocks was called, not both
+        expect(rightBlockWasCalled).to.beTruthy();
+    });
+
+    it(@"should properly handle re-registration of the same plug-in", ^{
+        HKWTControlFlowDummyPlugin *p1 = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p1"];
+
+        p1.registerBlock = blockToCall;
+        p1.unregisterBlock = failBlock;
+        rightBlockWasCalled = NO;
+        textView.controlFlowPlugin = p1;
+        expect(rightBlockWasCalled).to.beTruthy();
+
+        p1.registerBlock = blockToCall;
+        p1.unregisterBlock = blockToCall;
+        rightBlockWasCalled = NO;
+        textView.controlFlowPlugin = p1;
+        // This test needs a bit of work. It only checks that either of the blocks was called, not both
+        expect(rightBlockWasCalled).to.beTruthy();
     });
 });
 
