@@ -1,5 +1,5 @@
-Hakawai
-=======
+hakawai-textview
+================
 
 A subclass of ``UITextView`` providing extended functionality and support for 'plug-ins'. Hakawai ships with the 'Mentions' plug-in, which provides a powerful and flexible way to easily add social-media-esque 'mentions'-style annotation support to your iOS application.
 
@@ -15,6 +15,7 @@ Features
 - Programmatically dismiss autocorrect suggestions, and temporarily override the autocorrect, autocorrection, and spell checking modes.
 - Extend functionality by registering or unregistering plug-ins.
 - Custom 'rounded rect background' attribute, and a custom layout manager allowing additional attributes to be defined.
+- *EXPERIMENTAL* - Easily monitor user changes to the text view's contents using the optional Abstraction Layer; two-stage insertion for Chinese and Japanese keyboards is also properly handled. The Abstraction Layer is built into the text view; it can also be pulled out and used independently if you desire.
 
 
 Get Started
@@ -34,7 +35,9 @@ Plug-ins
 
 Plugins are defined in the podspec file as subspecs, so you can pick and choose which plug-ins you want to use (as long as you include the Core subspec). If you are not using CocoaPods, each plug-in is located in a separate group in Xcode, and each plug-in's group can be deleted wholesale without compromising the functionality of the core library.
 
-Hakawai supports two types of plug-ins. 'Simple' and 'control flow' plug-ins both receive references to the parent ``HKWTextView``, but control flow plug-ins can also implement ``UITextViewDelegate`` methods, allowing them to respond to changes in the text view's state. Plug-ins also have access to all the APIs of the core ``HKWTextView``.
+Hakawai supports two types of plug-ins. 'Simple' and 'control flow' plug-ins both receive references to the parent ``HKWTextView``, but control flow plug-ins can also implement additional delegate methods, allowing them to respond to changes in the text view's state. Plug-ins also have access to all the APIs of the core ``HKWTextView``.
+
+There are two types of control flow plug-ins. *Direct control flow plug-ins* receive ``UITextViewDelegate`` methods in order to monitor the state of the text view and respond to user actions. *Abstraction layer control flow plug-ins* receive ``HKWAbstractionLayerDelegate`` methods instead. Note that only at most one of the two types of control flow plug-ins may be registered to the text view at a time.
 
 Multiple simple plug-ins may be registered at once, but only one control flow plug-in can be registered at a time. Plug-ins can also be unregistered at any time.
 
@@ -106,6 +109,18 @@ When the plug-in is in the annotation creation process, inserting or deleting ch
 If the user enters or deletes characters to the point where there are no results, and then types a whitespace or newline character, the creation process is immediately canceled. If the user taps within the single line viewport, moves the cursor, or tries to cut or paste test, the creation process is canceled.
 
 If an annotation is created, the creation process is canceled, or the cursor is moved to a location where the preceding character is neither a whitespace or a newline, the plug-in is considered to be *stalled*. The annotation creation process will not be allowed to start again until the user types a whitespace or newline character, or moves the cursor to precede a whitespace or newline character (or the very beginning of the text).
+
+
+Contributions
+-------------
+
+Bug reports, feature requests, pull requests, comments, criticism, and honest feedback are all welcome. Please email austinzheng (at) gmail (dot) com.
+
+Plans for this library include:
+
+- Verifying proper functionality and integration of Abstraction Layer
+- Abstraction Layer support for Korean text input
+- Automated testing
 
 
 Etymology

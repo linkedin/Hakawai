@@ -59,8 +59,24 @@
     [storage addLayoutManager:manager];
 
     HKWTextView *replacement = [[[self class] alloc] initWithFrame:self.frame textContainer:container];
+    replacement.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // Copy over constraints
+    NSMutableArray *constraintBuffer = [NSMutableArray array];
+    for (NSLayoutConstraint *c in self.constraints) {
+        [constraintBuffer addObject:[replacement translatedConstraintFor:c originalObject:self]];
+    }
+    [self removeConstraints:self.constraints];
+    [replacement addConstraints:constraintBuffer];
+
+    replacement.backgroundColor = self.backgroundColor;
+
     replacement.font = self.font;
+
     replacement.clearsOnInsertion = NO;
+    replacement.selectable = self.selectable;
+    replacement.editable = self.editable;
+    
     replacement.textAlignment = self.textAlignment;
     replacement.textColor = self.textColor;
     replacement.autocapitalizationType = self.autocapitalizationType;
@@ -76,6 +92,30 @@
     self.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.abstractionLayer = [HKWAbstractionLayer instanceWithTextView:self changeRejection:YES];
+}
+
+- (NSLayoutConstraint *)translatedConstraintFor:(NSLayoutConstraint *)constraint originalObject:(id)original {
+    if (constraint.firstItem == original) {
+        return [NSLayoutConstraint constraintWithItem:self
+                                            attribute:constraint.firstAttribute
+                                            relatedBy:constraint.relation
+                                               toItem:constraint.secondItem
+                                            attribute:constraint.secondAttribute
+                                           multiplier:constraint.multiplier
+                                             constant:constraint.constant];
+    }
+    else if (constraint.secondItem == original) {
+        return [NSLayoutConstraint constraintWithItem:constraint.firstItem
+                                            attribute:constraint.firstAttribute
+                                            relatedBy:constraint.relation
+                                               toItem:self
+                                            attribute:constraint.secondAttribute
+                                           multiplier:constraint.multiplier
+                                             constant:constraint.constant];
+    }
+    else {
+        return constraint;
+    }
 }
 
 
@@ -127,6 +167,7 @@
         // There's an existing plug-in. Unregister it.
         [_abstractionControlFlowPlugin performFinalCleanup];
         _abstractionControlFlowPlugin.parentTextView = nil;
+        self.abstractionLayer.delegate = nil;
     }
     else if (abstractionControlFlowPlugin != nil && self.controlFlowPlugin != nil) {
         // There's a direct control flow plug-in.
@@ -136,6 +177,7 @@
     }
     // Reset the abstraction layer
     [self.abstractionLayer textViewDidProgrammaticallyUpdate];
+    self.abstractionLayer.delegate = abstractionControlFlowPlugin;
     _abstractionControlFlowPlugin = abstractionControlFlowPlugin;
 }
 

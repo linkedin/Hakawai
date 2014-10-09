@@ -15,7 +15,7 @@
 
 /*!
  Known issues:
- - Properly handling of Korean input is currently not implemented.
+ - Proper handling of Korean input is currently not implemented.
  - Double-space after entering Japanese text results in a notification that a space was replaced with two spaces, not
    two insertions of one space each.
  */

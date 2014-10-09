@@ -1,0 +1,394 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E11DF8C319E7741D0072F4AD /* MentionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E11DF8C219E7741D0072F4AD /* MentionsManager.m */; };
+		E11DF8C619E774CD0072F4AD /* MentionEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = E11DF8C519E774CD0072F4AD /* MentionEntity.m */; };
+		E1562BA119E72A6F00D68787 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E1562BA019E72A6F00D68787 /* main.m */; };
+		E1562BA419E72A6F00D68787 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E1562BA319E72A6F00D68787 /* AppDelegate.m */; };
+		E1562BA719E72A6F00D68787 /* BasicDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1562BA619E72A6F00D68787 /* BasicDemoViewController.m */; };
+		E1562BAA19E72A6F00D68787 /* AbstractionLayerDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1562BA919E72A6F00D68787 /* AbstractionLayerDemoViewController.m */; };
+		E1562BAD19E72A6F00D68787 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1562BAB19E72A6F00D68787 /* Main.storyboard */; };
+		E1562BAF19E72A6F00D68787 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1562BAE19E72A6F00D68787 /* Images.xcassets */; };
+		E1562BB219E72A6F00D68787 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1562BB019E72A6F00D68787 /* LaunchScreen.xib */; };
+		E1562BC919E72C2600D68787 /* MentionsDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1562BC819E72C2600D68787 /* MentionsDemoViewController.m */; };
+		E1562BD319E737BB00D68787 /* SampleAbstractionLayerPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1562BD219E737BB00D68787 /* SampleAbstractionLayerPlugin.m */; };
+		E1562BD519E73C4600D68787 /* libHakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1562BD419E73C4600D68787 /* libHakawai.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		E11DF8C119E7741D0072F4AD /* MentionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MentionsManager.h; sourceTree = "<group>"; };
+		E11DF8C219E7741D0072F4AD /* MentionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MentionsManager.m; sourceTree = "<group>"; };
+		E11DF8C419E774CD0072F4AD /* MentionEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MentionEntity.h; sourceTree = "<group>"; };
+		E11DF8C519E774CD0072F4AD /* MentionEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MentionEntity.m; sourceTree = "<group>"; };
+		E1562B9B19E72A6F00D68787 /* HakawaiDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HakawaiDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1562B9F19E72A6F00D68787 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E1562BA019E72A6F00D68787 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E1562BA219E72A6F00D68787 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		E1562BA319E72A6F00D68787 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		E1562BA519E72A6F00D68787 /* BasicDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BasicDemoViewController.h; sourceTree = "<group>"; };
+		E1562BA619E72A6F00D68787 /* BasicDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BasicDemoViewController.m; sourceTree = "<group>"; };
+		E1562BA819E72A6F00D68787 /* AbstractionLayerDemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AbstractionLayerDemoViewController.h; sourceTree = "<group>"; };
+		E1562BA919E72A6F00D68787 /* AbstractionLayerDemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AbstractionLayerDemoViewController.m; sourceTree = "<group>"; };
+		E1562BAC19E72A6F00D68787 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E1562BAE19E72A6F00D68787 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		E1562BB119E72A6F00D68787 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		E1562BC719E72C2600D68787 /* MentionsDemoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MentionsDemoViewController.h; sourceTree = "<group>"; };
+		E1562BC819E72C2600D68787 /* MentionsDemoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MentionsDemoViewController.m; sourceTree = "<group>"; };
+		E1562BD119E737BB00D68787 /* SampleAbstractionLayerPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleAbstractionLayerPlugin.h; sourceTree = "<group>"; };
+		E1562BD219E737BB00D68787 /* SampleAbstractionLayerPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleAbstractionLayerPlugin.m; sourceTree = "<group>"; };
+		E1562BD419E73C4600D68787 /* libHakawai.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHakawai.a; path = "../../../Library/Developer/Xcode/DerivedData/Hakawai-cjeestplxjjygthexnwbgdlvmstc/Build/Products/Debug-iphoneos/libHakawai.a"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E1562B9819E72A6F00D68787 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1562BD519E73C4600D68787 /* libHakawai.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E1562B9219E72A6F00D68787 = {
+			isa = PBXGroup;
+			children = (
+				E1562BD419E73C4600D68787 /* libHakawai.a */,
+				E1562B9D19E72A6F00D68787 /* HakawaiDemo */,
+				E1562B9C19E72A6F00D68787 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E1562B9C19E72A6F00D68787 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E1562B9B19E72A6F00D68787 /* HakawaiDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E1562B9D19E72A6F00D68787 /* HakawaiDemo */ = {
+			isa = PBXGroup;
+			children = (
+				E1562BA219E72A6F00D68787 /* AppDelegate.h */,
+				E1562BA319E72A6F00D68787 /* AppDelegate.m */,
+				E1562BCA19E72C4400D68787 /* Basic */,
+				E1562BCB19E72C4B00D68787 /* AbstractionLayer */,
+				E1562BCC19E72C5100D68787 /* Mentions */,
+				E1562BAB19E72A6F00D68787 /* Main.storyboard */,
+				E1562BAE19E72A6F00D68787 /* Images.xcassets */,
+				E1562BB019E72A6F00D68787 /* LaunchScreen.xib */,
+				E1562B9E19E72A6F00D68787 /* Supporting Files */,
+			);
+			path = HakawaiDemo;
+			sourceTree = "<group>";
+		};
+		E1562B9E19E72A6F00D68787 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E1562B9F19E72A6F00D68787 /* Info.plist */,
+				E1562BA019E72A6F00D68787 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E1562BCA19E72C4400D68787 /* Basic */ = {
+			isa = PBXGroup;
+			children = (
+				E1562BA519E72A6F00D68787 /* BasicDemoViewController.h */,
+				E1562BA619E72A6F00D68787 /* BasicDemoViewController.m */,
+			);
+			name = Basic;
+			sourceTree = "<group>";
+		};
+		E1562BCB19E72C4B00D68787 /* AbstractionLayer */ = {
+			isa = PBXGroup;
+			children = (
+				E1562BA819E72A6F00D68787 /* AbstractionLayerDemoViewController.h */,
+				E1562BA919E72A6F00D68787 /* AbstractionLayerDemoViewController.m */,
+				E1562BD119E737BB00D68787 /* SampleAbstractionLayerPlugin.h */,
+				E1562BD219E737BB00D68787 /* SampleAbstractionLayerPlugin.m */,
+			);
+			name = AbstractionLayer;
+			sourceTree = "<group>";
+		};
+		E1562BCC19E72C5100D68787 /* Mentions */ = {
+			isa = PBXGroup;
+			children = (
+				E1562BC719E72C2600D68787 /* MentionsDemoViewController.h */,
+				E1562BC819E72C2600D68787 /* MentionsDemoViewController.m */,
+				E11DF8C119E7741D0072F4AD /* MentionsManager.h */,
+				E11DF8C219E7741D0072F4AD /* MentionsManager.m */,
+				E11DF8C419E774CD0072F4AD /* MentionEntity.h */,
+				E11DF8C519E774CD0072F4AD /* MentionEntity.m */,
+			);
+			name = Mentions;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E1562B9A19E72A6F00D68787 /* HakawaiDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E1562BC119E72A7000D68787 /* Build configuration list for PBXNativeTarget "HakawaiDemo" */;
+			buildPhases = (
+				E1562B9719E72A6F00D68787 /* Sources */,
+				E1562B9819E72A6F00D68787 /* Frameworks */,
+				E1562B9919E72A6F00D68787 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HakawaiDemo;
+			productName = HakawaiDemo;
+			productReference = E1562B9B19E72A6F00D68787 /* HakawaiDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E1562B9319E72A6F00D68787 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = LinkedIn;
+				TargetAttributes = {
+					E1562B9A19E72A6F00D68787 = {
+						CreatedOnToolsVersion = 6.0;
+					};
+				};
+			};
+			buildConfigurationList = E1562B9619E72A6F00D68787 /* Build configuration list for PBXProject "HakawaiDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E1562B9219E72A6F00D68787;
+			productRefGroup = E1562B9C19E72A6F00D68787 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E1562B9A19E72A6F00D68787 /* HakawaiDemo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E1562B9919E72A6F00D68787 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1562BAD19E72A6F00D68787 /* Main.storyboard in Resources */,
+				E1562BB219E72A6F00D68787 /* LaunchScreen.xib in Resources */,
+				E1562BAF19E72A6F00D68787 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E1562B9719E72A6F00D68787 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1562BAA19E72A6F00D68787 /* AbstractionLayerDemoViewController.m in Sources */,
+				E11DF8C619E774CD0072F4AD /* MentionEntity.m in Sources */,
+				E1562BC919E72C2600D68787 /* MentionsDemoViewController.m in Sources */,
+				E1562BA419E72A6F00D68787 /* AppDelegate.m in Sources */,
+				E1562BA719E72A6F00D68787 /* BasicDemoViewController.m in Sources */,
+				E11DF8C319E7741D0072F4AD /* MentionsManager.m in Sources */,
+				E1562BA119E72A6F00D68787 /* main.m in Sources */,
+				E1562BD319E737BB00D68787 /* SampleAbstractionLayerPlugin.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		E1562BAB19E72A6F00D68787 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E1562BAC19E72A6F00D68787 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		E1562BB019E72A6F00D68787 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E1562BB119E72A6F00D68787 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E1562BBF19E72A7000D68787 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"../**",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E1562BC019E72A7000D68787 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"../**",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E1562BC219E72A7000D68787 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"../../Hakawai/**",
+				);
+				INFOPLIST_FILE = HakawaiDemo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/azheng/OpenSource/Hakawai/build/Debug-iphoneos",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Hakawai-cjeestplxjjygthexnwbgdlvmstc/Build/Products/Debug-iphoneos",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E1562BC319E72A7000D68787 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"../../Hakawai/**",
+				);
+				INFOPLIST_FILE = HakawaiDemo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/azheng/OpenSource/Hakawai/build/Debug-iphoneos",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Hakawai-cjeestplxjjygthexnwbgdlvmstc/Build/Products/Debug-iphoneos",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E1562B9619E72A6F00D68787 /* Build configuration list for PBXProject "HakawaiDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1562BBF19E72A7000D68787 /* Debug */,
+				E1562BC019E72A7000D68787 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E1562BC119E72A7000D68787 /* Build configuration list for PBXNativeTarget "HakawaiDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E1562BC219E72A7000D68787 /* Debug */,
+				E1562BC319E72A7000D68787 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E1562B9319E72A6F00D68787 /* Project object */;
+}

@@ -275,12 +275,12 @@ typedef enum : NSUInteger {
             break;
         case HKWAbstractionLayerStateShouldChangeCalled:
             NSAssert(self.markState == HKWAbstractionLayerMarkStateNone, @"Internal error");
-            NSAssert([self.changeString length] == 1, @"Internal error");
             NSAssert(!currentlyMarked, @"Internal error");
             if (self.changeType == HKWAbstractionLayerChangeTypeInsertion) {
                 // This only happens when the two-space-to-period feature is invoked
                 // In this case, the original change (insert a [second] space) is discarded, and replaced with the new
                 //  update
+                NSAssert([self.changeString length] == 1, @"Internal error");
                 if ([text length] > 0 && range.length > 0) {
                     // Discard the previous insertion
                     self.changeType = HKWAbstractionLayerChangeTypeReplacement;
@@ -309,7 +309,18 @@ typedef enum : NSUInteger {
                         self.changeString = [self.changeString stringByAppendingString:text];
                     }
                     else {
-                        NSAssert(NO, @"Internal error: unsupported state");
+                        // If we get here, the user has attempted to select a predictive autocorrect suggestion to
+                        //  complete a word right after a change is rejected. Even though we ask the text view to insert
+                        //  the word, it won't. The abstraction layer chooses to report the actual behavior.
+                        // EXAMPLE: We type in 'T', then we set the delegate to reject changes and type in 'h' and 'a'
+                        //  (both of which won't actually show up). Then we select "That'll" from the suggestions. Even
+                        //  though the text view delegate will attempt to insert "That'll" and " ", only the " " will
+                        //  actually be committed to the buffer.
+                        self.changeType = HKWAbstractionLayerChangeTypeInsertion;
+                        self.changeString = text;
+                        self.changeRange = range;
+                        // TODO: Figure out why the initial change isn't being committed. Is this a problem with the
+                        //  abstraction layer or an OS issue?
                     }
                     break;
                 case HKWAbstractionLayerChangeTypeDeletion:
