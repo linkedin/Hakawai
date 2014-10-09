@@ -28,7 +28,7 @@
 
 @end
 
-@protocol HKWSimplePluginProtocol, HKWControlFlowPluginProtocol;
+@protocol HKWSimplePluginProtocol, HKWDirectControlFlowPluginProtocol, HKWAbstractionLayerControlFlowPluginProtocol;
 
 /*!
  An enhanced text view designed for use with various plug-ins. It provides additional functionality which a developer
@@ -69,8 +69,20 @@
 /*!
  Register a control flow plug-in with the editor. Unlike simple plug-ins, only one control flow plug-in can be enabled
  at a time. Pass in nil to remove any currently registered control flow plug-in.
+
+ \note If a abstraction layer control flow plug-in is registered, setting this method will unregister the other plug-in;
+ however, setting this to nil if an abstraction layer plug-in is registered will do nothing.
  */
-@property (nonatomic, strong) id<HKWControlFlowPluginProtocol>controlFlowPlugin;
+@property (nonatomic, strong) id<HKWDirectControlFlowPluginProtocol>controlFlowPlugin;
+
+/*!
+ Register a control flow plug-in with the editor. Unlike simple plug-ins, only one control flow plug-in can be enabled
+ at a time. Pass in nil to remove any currently registered control flow plug-in.
+
+ \note If a abstraction layer control flow plug-in is registered, setting this method will unregister the other plug-in;
+ however, setting this to nil if a direct plug-in is registered will do nothing.
+ */
+@property (nonatomic, strong) id<HKWAbstractionLayerControlFlowPluginProtocol>abstractionControlFlowPlugin;
 
 /*!
  Register a simple plug-in with the editor.

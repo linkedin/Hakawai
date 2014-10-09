@@ -1,5 +1,5 @@
 //
-//  HKWControlFlowPluginProtocol.h
+//  HKWControlFlowPluginProtocols.h
 //  Hakawai
 //
 //  Copyright (c) 2014 LinkedIn Corp. All rights reserved.
@@ -14,6 +14,7 @@
 #import <UIKit/UIKit.h>
 
 #import "HKWSimplePluginProtocol.h"
+#import "HKWAbstractionLayer.h"
 
 @class HKWTextView;
 
@@ -26,7 +27,7 @@
 
  \note The \c HKWControlFlowPluginProtocol inherits from the \c UITextViewDelegate protocol.
  */
-@protocol HKWControlFlowPluginProtocol <UITextViewDelegate, HKWSimplePluginProtocol>
+@protocol HKWDirectControlFlowPluginProtocol <UITextViewDelegate, HKWSimplePluginProtocol>
 @optional
 
 /*!
@@ -40,5 +41,30 @@
  and the user tapped on the text view somewhere.
  */
 - (void)singleLineViewportTapped;
+
+@end
+
+@protocol HKWAbstractionLayerControlFlowPluginProtocol <HKWAbstractionLayerDelegate, HKWSimplePluginProtocol>
+@optional
+
+/*!
+ If available, this method is called when the text view is in single line viewport mode, but the viewport changes (e.g.
+ because the user typed text that spilled over onto the next line).
+ */
+- (void)singleLineViewportChanged;
+
+/*!
+ If available, this method is called when the text view is in single line viewport mode, tap interception is enabled,
+ and the user tapped on the text view somewhere.
+ */
+- (void)singleLineViewportTapped;
+
+// UITextViewDelegate optional helper methods
+- (BOOL)textViewShouldBeginEditing:(UITextView *)textView;
+- (BOOL)textViewShouldEndEditing:(UITextView *)textView;
+- (void)textViewDidBeginEditing:(UITextView *)textView;
+- (void)textViewDidEndEditing:(UITextView *)textView;
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange;
+- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange;
 
 @end

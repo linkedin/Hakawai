@@ -17,11 +17,11 @@
 #import "_HKWLayoutManager.h"
 
 #import "HKWSimplePluginProtocol.h"
-#import "HKWControlFlowPluginProtocol.h"
+#import "HKWControlFlowPluginProtocols.h"
 
 #import "_HKWPrivateConstants.h"
 
-@interface HKWTextView () <UITextViewDelegate>
+@interface HKWTextView () <UITextViewDelegate, HKWAbstractionLayerDelegate>
 @property (nonatomic, strong) NSMutableDictionary *simplePluginsDictionary;
 @end
 
@@ -72,8 +72,10 @@
 
 - (void)setup {
     self.delegate = self;
-    self.temporarilyDisableDelegate = NO;
+    self.firstResponderIsCycling = NO;
     self.translatesAutoresizingMaskIntoConstraints = NO;
+
+    self.abstractionLayer = [HKWAbstractionLayer instanceWithTextView:self changeRejection:YES];
 }
 
 
@@ -99,11 +101,17 @@
     [self.simplePluginsDictionary removeObjectForKey:name];
 }
 
-- (void)setControlFlowPlugin:(id<HKWControlFlowPluginProtocol>)controlFlowPlugin {
+- (void)setControlFlowPlugin:(id<HKWDirectControlFlowPluginProtocol>)controlFlowPlugin {
     if (_controlFlowPlugin) {
         // There's an existing plug-in. Unregister it.
         [_controlFlowPlugin performFinalCleanup];
         _controlFlowPlugin.parentTextView = nil;
+    }
+    else if (controlFlowPlugin != nil && self.abstractionControlFlowPlugin != nil) {
+        // There's an abstraction layer control flow plug-in.
+        [self.abstractionControlFlowPlugin performFinalCleanup];
+        self.abstractionControlFlowPlugin.parentTextView = nil;
+        self.abstractionControlFlowPlugin = nil;
     }
     if (controlFlowPlugin) {
         // Now, register the new plug-in (if it's not nil)
@@ -112,6 +120,27 @@
     }
     // Set the backing var
     _controlFlowPlugin = controlFlowPlugin;
+}
+
+- (void)setAbstractionControlFlowPlugin:(id<HKWAbstractionLayerControlFlowPluginProtocol>)abstractionControlFlowPlugin {
+    if (_abstractionControlFlowPlugin) {
+        // There's an existing plug-in. Unregister it.
+        [_abstractionControlFlowPlugin performFinalCleanup];
+        _abstractionControlFlowPlugin.parentTextView = nil;
+    }
+    else if (abstractionControlFlowPlugin != nil && self.controlFlowPlugin != nil) {
+        // There's a direct control flow plug-in.
+        [self.controlFlowPlugin performFinalCleanup];
+        self.controlFlowPlugin.parentTextView = nil;
+        self.controlFlowPlugin = nil;
+    }
+    // Reset the abstraction layer
+    [self.abstractionLayer textViewDidProgrammaticallyUpdate];
+    _abstractionControlFlowPlugin = abstractionControlFlowPlugin;
+}
+
+- (BOOL)abstractionLayerEnabled {
+    return self.abstractionControlFlowPlugin != nil;
 }
 
 
@@ -134,6 +163,9 @@
     if ([self.controlFlowPlugin respondsToSelector:@selector(singleLineViewportTapped)]) {
         [self.controlFlowPlugin singleLineViewportTapped];
     }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(singleLineViewportTapped)]) {
+        [self.abstractionControlFlowPlugin singleLineViewportTapped];
+    }
     // Next, inform the delegate
     if ([self.externalDelegate respondsToSelector:@selector(textViewWasTappedInSingleLineViewportMode:)]) {
         [self.externalDelegate textViewWasTappedInSingleLineViewportMode:self];
@@ -144,11 +176,14 @@
 #pragma mark - UITextViewDelegate
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
-    if (self.temporarilyDisableDelegate) {
+    if (self.firstResponderIsCycling) {
         return YES;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
         return [self.controlFlowPlugin textViewShouldBeginEditing:textView];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
+        return [self.abstractionControlFlowPlugin textViewShouldBeginEditing:textView];
     }
     // Forward to external delegate
     if ([self.externalDelegate respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
@@ -158,11 +193,14 @@
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    if (self.temporarilyDisableDelegate) {
+    if (self.firstResponderIsCycling) {
         return;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
         [self.controlFlowPlugin textViewDidBeginEditing:textView];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
+        [self.abstractionControlFlowPlugin textViewDidBeginEditing:textView];
     }
     // Forward to external delegate
     if ([self.externalDelegate respondsToSelector:@selector(textViewDidBeginEditing:)]) {
@@ -171,11 +209,14 @@
 }
 
 - (BOOL)textViewShouldEndEditing:(UITextView *)textView {
-    if (self.temporarilyDisableDelegate) {
+    if (self.firstResponderIsCycling) {
         return YES;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
         return [self.controlFlowPlugin textViewShouldEndEditing:textView];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
+        return [self.abstractionControlFlowPlugin textViewShouldEndEditing:textView];
     }
     // Forward to external delegate
     if ([self.externalDelegate respondsToSelector:@selector(textViewShouldEndEditing:)]) {
@@ -185,11 +226,14 @@
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView {
-    if (self.temporarilyDisableDelegate) {
+    if (self.firstResponderIsCycling) {
         return;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
         [self.controlFlowPlugin textViewDidEndEditing:textView];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
+        [self.abstractionControlFlowPlugin textViewDidEndEditing:textView];
     }
     // Forward to external delegate
     if ([self.externalDelegate respondsToSelector:@selector(textViewDidEndEditing:)]) {
@@ -198,7 +242,12 @@
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)replacementText {
-    if (self.temporarilyDisableDelegate) {
+    // Note that the abstraction layer overrides all other behavior
+    if (self.abstractionLayerEnabled) {
+        return [self.abstractionLayer textViewShouldChangeTextInRange:range replacementText:replacementText];
+    }
+
+    if (self.firstResponderIsCycling) {
         return YES;
     }
     // Inform plug-in
@@ -233,7 +282,12 @@
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    if (self.temporarilyDisableDelegate) {
+    if (self.abstractionLayerEnabled) {
+        [self.abstractionLayer textViewDidChange];
+        return;
+    }
+
+    if (self.firstResponderIsCycling) {
         return;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidChange:)]) {
@@ -246,7 +300,12 @@
 }
 
 - (void)textViewDidChangeSelection:(UITextView *)textView {
-    if (self.temporarilyDisableDelegate) {
+    if (self.abstractionLayerEnabled) {
+        [self.abstractionLayer textViewDidChangeSelection];
+        return;
+    }
+
+    if (self.firstResponderIsCycling) {
         return;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidChangeSelection:)]) {
@@ -288,12 +347,15 @@
             if ([self.controlFlowPlugin respondsToSelector:@selector(singleLineViewportChanged)]) {
                 [self.controlFlowPlugin singleLineViewportChanged];
             }
+            else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(singleLineViewportChanged)]) {
+                [self.abstractionControlFlowPlugin singleLineViewportChanged];
+            }
         }
     }
 }
 
 - (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
-    if (self.temporarilyDisableDelegate) {
+    if (self.firstResponderIsCycling) {
         return YES;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
@@ -301,6 +363,12 @@
                shouldInteractWithTextAttachment:textAttachment
                                         inRange:characterRange];
     }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
+        return [self.abstractionControlFlowPlugin textView:textView
+               shouldInteractWithTextAttachment:textAttachment
+                                        inRange:characterRange];
+    }
+
     // Forward to external delegate
     if ([self.externalDelegate respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
         return [self.externalDelegate textView:textView
@@ -311,17 +379,84 @@
 }
 
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
-    if (self.temporarilyDisableDelegate) {
+    if (self.firstResponderIsCycling) {
         return YES;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)]) {
         return [self.controlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)]) {
+        return [self.abstractionControlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange];
     }
     // Forward to external delegate
     if ([self.externalDelegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)]) {
         return [self.externalDelegate textView:textView shouldInteractWithURL:URL inRange:characterRange];
     }
     return YES;
+}
+
+
+#pragma mark - HKWAbstractionViewDelegate
+
+- (BOOL)textView:(UITextView *)textView
+    textInserted:(NSString *)text
+      atLocation:(NSUInteger)location
+     autocorrect:(BOOL)autocorrect {
+    NSAssert(self.abstractionLayerEnabled, @"Internal error");
+    if ([self.abstractionControlFlowPlugin
+         respondsToSelector:@selector(textView:textInserted:atLocation:autocorrect:)]) {
+        [self.abstractionControlFlowPlugin textView:textView
+                                       textInserted:text
+                                         atLocation:location
+                                        autocorrect:autocorrect];
+    }
+    return YES;
+}
+
+- (BOOL)textView:(UITextView *)textView textDeletedFromLocation:(NSUInteger)location length:(NSUInteger)length {
+    NSAssert(self.abstractionLayerEnabled, @"Internal error");
+    if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:textDeletedFromLocation:length:)]) {
+        [self.abstractionControlFlowPlugin textView:textView
+                            textDeletedFromLocation:location
+                                             length:length];
+    }
+    return YES;
+}
+
+- (BOOL)textView:(UITextView *)textView replacedTextAtRange:(NSRange)replacementRange
+         newText:(NSString *)newText
+     autocorrect:(BOOL)autocorrect {
+    NSAssert(self.abstractionLayerEnabled, @"Internal error");
+    if ([self.abstractionControlFlowPlugin
+         respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
+        [self.abstractionControlFlowPlugin textView:textView
+                                replacedTextAtRange:replacementRange
+                                            newText:newText
+                                        autocorrect:autocorrect];
+    }
+    return YES;
+}
+
+- (void)textView:(UITextView *)textView cursorChangedToInsertion:(NSUInteger)location {
+    NSAssert(self.abstractionLayerEnabled, @"Internal error");
+    if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:cursorChangedToInsertion:)]) {
+        [self.abstractionControlFlowPlugin textView:textView cursorChangedToInsertion:location];
+    }
+}
+
+- (void)textView:(UITextView *)textView cursorChangedToSelection:(NSRange)selectionRange {
+    NSAssert(self.abstractionLayerEnabled, @"Internal error");
+    if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:cursorChangedToSelection:)]) {
+        [self.abstractionControlFlowPlugin textView:textView cursorChangedToSelection:selectionRange];
+    }
+}
+
+- (void)textView:(UITextView *)textView characterDeletionWasIgnoredAtLocation:(NSUInteger)location {
+    NSAssert(self.abstractionLayerEnabled, @"Internal error");
+    if ([self.abstractionControlFlowPlugin
+         respondsToSelector:@selector(textView:characterDeletionWasIgnoredAtLocation:)]) {
+        [self.abstractionControlFlowPlugin textView:textView characterDeletionWasIgnoredAtLocation:location];
+    }
 }
 
 

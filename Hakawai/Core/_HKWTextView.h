@@ -13,8 +13,15 @@
 #import "HKWTextView.h"
 
 #import "HKWTextView+Plugins.h"
+#import "HKWAbstractionLayer.h"
 
 @interface HKWTextView ()
+
+#pragma mark - Abstraction layer
+
+@property (nonatomic, strong) HKWAbstractionLayer *abstractionLayer;
+@property (nonatomic, readonly) BOOL abstractionLayerEnabled;
+
 
 #pragma mark - Support machinery
 
@@ -28,7 +35,7 @@
  This property prevents any of the UITextView delegate methods from being fired while it is YES. This is used to prevent
  several types of manipulations to the text view from spuriously triggering additional behavior.
  */
-@property (nonatomic) BOOL temporarilyDisableDelegate;
+@property (nonatomic) BOOL firstResponderIsCycling;
 
 /*!
  This property prevents the 'selection changed' \c UITextViewDelegate method from being forwarded to any registered

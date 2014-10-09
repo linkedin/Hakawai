@@ -11,6 +11,13 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
+/*
+ IMPORTANT NOTE:
+ CocoaPods and XCTest don't work properly in Xcode 6.0.x. If you update the CocoaPod dependencies you may need to
+ manually fix the pod project configuration. See the following link:
+ http://stackoverflow.com/questions/24275470/xctest-xctest-h-not-found-on-old-projects-built-in-xcode-6
+ */
+
 #define EXP_SHORTHAND
 
 #import "Specta.h"

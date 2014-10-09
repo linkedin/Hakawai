@@ -12,7 +12,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "HKWControlFlowPluginProtocol.h"
+#import "HKWControlFlowPluginProtocols.h"
 #import "HKWMentionsEntityProtocol.h"
 #import "HKWChooserViewProtocol.h"
 
@@ -195,7 +195,7 @@ typedef enum {
 @class HKWMentionsAttribute;
 @class HKWAbstractChooserView;
 
-@interface HKWMentionsPlugin : NSObject <HKWControlFlowPluginProtocol>
+@interface HKWMentionsPlugin : NSObject <HKWDirectControlFlowPluginProtocol>
 
 @property (nonatomic, weak) id<HKWMentionsDelegate> delegate;
 @property (nonatomic, weak) id<HKWMentionsStateChangeDelegate> stateChangeDelegate;

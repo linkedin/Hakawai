@@ -13,9 +13,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import "HKWControlFlowPluginProtocol.h"
+#import "HKWControlFlowPluginProtocols.h"
 
-@interface HKWTControlFlowDummyPlugin : NSObject <HKWControlFlowPluginProtocol>
+@interface HKWTControlFlowDummyPlugin : NSObject <HKWDirectControlFlowPluginProtocol>
 
 @property (nonatomic, strong) NSString *pluginName;
 

@@ -114,7 +114,12 @@ typedef enum {
     NSRange originalRange = self.selectedRange;
     NSAttributedString *originalText = [self.attributedText copy];
 
-    self.temporarilyDisableDelegate = YES;
+    BOOL usingAbstraction = self.abstractionLayerEnabled;
+    if (usingAbstraction) {
+        [self.abstractionLayer pushIgnore];
+    }
+
+    self.firstResponderIsCycling = YES;
     [self resignFirstResponder];
 
     switch (mode) {
@@ -160,7 +165,10 @@ typedef enum {
     }
     self.attributedText = originalText;
     self.selectedRange = originalRange;
-    self.temporarilyDisableDelegate = NO;
+    self.firstResponderIsCycling = NO;
+    if (usingAbstraction) {
+        [self.abstractionLayer popIgnore];
+    }
 }
 
 + (HKWCycleFirstResponderMode)modeForAutocapitalization:(UITextAutocapitalizationType)type {

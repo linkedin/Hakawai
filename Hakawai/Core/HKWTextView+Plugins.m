@@ -29,9 +29,16 @@
 
 - (void)transformTextAtRange:(NSRange)range
              withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
+    BOOL usingAbstraction = self.abstractionLayerEnabled;
     if (transformer && [self.attributedText length] == 0 && range.location == 0) {
         // Special case: text view text is empty; beginning is valid
+        if (usingAbstraction) {
+            [self.abstractionLayer pushIgnore];
+        }
         self.attributedText = transformer(nil);
+        if (usingAbstraction) {
+            [self.abstractionLayer popIgnore];
+        }
         return;
     }
     if (!transformer
@@ -40,6 +47,9 @@
         return;
     }
 
+    if (usingAbstraction) {
+        [self.abstractionLayer pushIgnore];
+    }
     BOOL shouldRestore = self.selectedRange.length == 0 && self.selectedRange.location != NSNotFound;
     NSRange originalSelectedRange = self.selectedRange;
     self.transformInProgress = YES;
@@ -66,6 +76,9 @@
     if ([self.externalDelegate respondsToSelector:@selector(textView:didChangeAttributedTextTo:originalText:originalRange:)]) {
         [self.externalDelegate textView:self didChangeAttributedTextTo:infixString originalText:originalInfix originalRange:range];
     }
+    if (usingAbstraction) {
+        [self.abstractionLayer popIgnore];
+    }
 }
 
 - (void)insertPlainText:(NSString *)text location:(NSUInteger)location {
@@ -83,10 +96,20 @@
 
 - (void)insertTextAttachment:(NSTextAttachment *)attachment location:(NSUInteger)location {
     if (!attachment) return;
+    BOOL usingAbstraction = self.abstractionLayerEnabled;
     if ([self.attributedText length] == 0) {
         // Special case: text view text is empty; index is valid
+        if (usingAbstraction) {
+            [self.abstractionLayer pushIgnore];
+        }
         if (location == 0) self.attributedText = [NSAttributedString attributedStringWithAttachment:attachment];
+        if (usingAbstraction) {
+            [self.abstractionLayer popIgnore];
+        }
         return;
+    }
+    if (usingAbstraction) {
+        [self.abstractionLayer pushIgnore];
     }
     if (location >= [self.attributedText length]) {
         location = [self.attributedText length] - 1;
@@ -94,6 +117,9 @@
     [self insertAttributedText:[NSAttributedString attributedStringWithAttachment:attachment] location:location];
     if ([self.externalDelegate respondsToSelector:@selector(textView:didReceiveNewTextAttachment:)]) {
         [self.externalDelegate textView:self didReceiveNewTextAttachment:attachment];
+    }
+    if (usingAbstraction) {
+        [self.abstractionLayer popIgnore];
     }
 }
 
