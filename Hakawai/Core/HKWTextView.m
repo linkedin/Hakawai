@@ -119,6 +119,16 @@
 }
 
 
+#pragma mark - UIResponder
+
+- (void)paste:(id)sender {
+    [super paste:sender];
+    if ([self.externalDelegate respondsToSelector:@selector(textViewDidHaveTextPastedIn:)]) {
+        [self.externalDelegate textViewDidHaveTextPastedIn:self];
+    }
+}
+
+
 #pragma mark - Plugin Handling
 
 - (void)addSimplePlugin:(id<HKWSimplePluginProtocol>)plugin {
@@ -289,7 +299,27 @@
         return [self.abstractionLayer textViewShouldChangeTextInRange:range replacementText:replacementText];
     }
 
+    if (self.shouldRejectAutocorrectInsertions
+        && [replacementText length] > 1
+        && ![replacementText isEqualToString:[[UIPasteboard generalPasteboard] string]]) {
+        // PROVISIONAL FIX
+        // We need some way to distinguish autocorrect insertions from pasting in text. Since currently the only way
+        //  that multiple characters can be inserted at a time is through pasting text from the pasteboard, we can check
+        //  the text in the pasteboard against the string to be inserted to determine whether or not the request is
+        //  coming from the autocorrect module
+        return NO;
+    }
     if (self.firstResponderIsCycling) {
+        return NO;
+    }
+    if ([replacementText length] > 1
+        && ![replacementText isEqualToString:[[UIPasteboard generalPasteboard] string]]) {
+        // PROVISIONAL FIX
+        // We need a way to distinguish predictive text insertions from pasting in text. Disabiling Autocorrect has a similar
+        // issue but that hack is further protected by the shouldRejectAutocorrectInsertions flag. Just like for autocorrect we
+        // can check against the pasteboard to validate that the string being inserted was not pasted by the user. When a text
+        // sugestion is selected, Apple will call this method once for the word being inserted, and then a second time for a
+        // space that is added after the word.
         return YES;
     }
     // Inform plug-in

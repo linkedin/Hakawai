@@ -23,6 +23,15 @@
 #pragma mark - Autoediting-related APIs
 
 /*!
+ A property allowing a plug-in to inform the text view as to whether or not attempts by the autocorrect/predictive text
+ system should be ignored.
+
+ \warning This property is ignored if the abstraction layer is in use. The abstraction layer uses a different mechanism
+ to accept or ignore attempted changes to the text view.
+ */
+@property (nonatomic) BOOL shouldRejectAutocorrectInsertions;
+
+/*!
  If an autocorrect suggestion is currently being proposed, reject it. Otherwise, this method does nothing.
  */
 - (void)dismissAutocorrectSuggestion;

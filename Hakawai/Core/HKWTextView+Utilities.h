@@ -24,8 +24,18 @@
 - (CGRect)rectForWordPrecedingCursor;
 
 /*!
- Return the range for the word immediately preceding the cursor. If there is no word preceding the cursor, the range's
- location will be marked as the \c NSNotFound constant.
+ Return the range for the word immediately preceding the location. If there is no word preceding the location, the
+ range's location will be marked as the \c NSNotFound constant.
+
+ \param location    the location from where to begin searching
+ \param toEnd       whether or not the reported range should encompass the entire word, not just the length from the
+                    beginning of the word to \c location
+ */
+- (NSRange)rangeForWordPrecedingLocation:(NSInteger)location searchToEnd:(BOOL)toEnd;
+
+/*!
+ Return the range for the word immediately preceding the current selection range's start location. If there is no word
+ preceding the location, this method returns the \c NSNotFound constant.
  */
 - (NSRange)rangeForWordPrecedingCursor;
 

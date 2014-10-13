@@ -30,10 +30,6 @@
 @property (nonatomic, strong) UIView *tableViewBufferView;
 
 // Constraints (descriptions in terms of arrow-pointing-up mode)
-/// The constraint describing the height of the chooser view
-@property (nonatomic, strong) NSLayoutConstraint *chooserHeightConstraint;
-/// The constraint describing the width of the chooser view
-@property (nonatomic, strong) NSLayoutConstraint *chooserWidthConstraint;
 /// The constraint fixing the top of the border subview to the top of the chooser view
 @property (nonatomic, strong) NSLayoutConstraint *borderToContainerVerticalConstraint;
 /// The constraint fixing the top of the arrow subview to the top of the chooser view
@@ -106,23 +102,28 @@
 
 #pragma mark - Private
 
+- (void)layoutSubviews {
+    // TODO: Figure out how to support this for the case where the entity chooser view is being animated; right now it
+    //  only works if the transition is instant
+    // Update the mask for the table view container
+    [super layoutSubviews];
+    self.tableViewContainer.layer.mask = [self maskLayerForMode:self.borderMode];
+}
+
 - (void)initialSetupForFrame:(CGRect)frame {
     [self setupTableView];
 
     self.backgroundColor = [UIColor clearColor];
-    self.chooserWidthConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"[c(==W)]" options:0
-                                                                          metrics:@{@"W": @(frame.size.width)}
-                                                                            views:@{@"c": self}][0];
-    self.chooserHeightConstraint = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[c(==H)]" options:0
-                                                                           metrics:@{@"H": @(frame.size.height)}
-                                                                             views:@{@"c": self}][0];
-    [self addConstraints:@[self.chooserWidthConstraint, self.chooserHeightConstraint]];
     self.translatesAutoresizingMaskIntoConstraints = NO;
     [self updateSubviewConstraintsForMode:HKWChooserBorderModeNone];
     self.borderMode = HKWChooserBorderModeNone;
 }
 
 - (CALayer *)maskLayerForMode:(HKWChooserBorderMode)mode {
+    // Force view to be laid out. This is so that the bounds are correct if additional Auto Layout constraints were
+    //  added that would change the original frame.
+    [self layoutIfNeeded];
+    // Set up the mask
     CAShapeLayer *layer = [CAShapeLayer layer];
     layer.frame = self.bounds;
     layer.backgroundColor = [[UIColor clearColor] CGColor];
@@ -341,7 +342,7 @@
     NSDictionary *metrics = @{@"BVH": @(self.boundaryViewHeight)};
     NSMutableArray *constraints = [NSMutableArray array];
     // Full width
-    [constraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-0-[bv]-0-|"
+    [constraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|[bv]|"
                                                                              options:0
                                                                              metrics:metrics
                                                                                views:views]];
@@ -449,15 +450,6 @@
 
 - (CGFloat)shadowViewHeight {
     return 3.0;
-}
-
-
-#pragma mark - Properties (overrides)
-
-- (void)setFrame:(CGRect)frame {
-    [super setFrame:frame];
-    [self.chooserWidthConstraint setConstant:frame.size.width];
-    [self.chooserHeightConstraint setConstant:frame.size.height];
 }
 
 

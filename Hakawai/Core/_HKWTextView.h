@@ -78,7 +78,7 @@
 
 #pragma mark - Accessory view
 
-@property (nonatomic) BOOL disableAutolayoutForAccessoryViews;
+@property (nonatomic, copy) void(^onAccessoryViewAttachmentBlock)(UIView *, BOOL);
 
 /// An array holding on to a list of Auto Layout constraints for an accessory view.
 @property (nonatomic, strong) NSMutableArray *accessoryViewConstraints;
@@ -97,6 +97,8 @@
 
 
 #pragma mark - AutoX overrides
+
+@property (nonatomic) BOOL shouldRejectAutocorrectInsertions;
 
 @property (nonatomic) UITextAutocapitalizationType originalAutocapitalization;
 @property (nonatomic) UITextAutocorrectionType originalAutocorrection;

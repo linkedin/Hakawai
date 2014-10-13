@@ -23,7 +23,7 @@
         return CGRectNull;
     }
     // Get the bottom-most rect
-    NSRange range = [self rangeForWordPrecedingCursor];
+    NSRange range = [self rangeForWordPrecedingLocation:self.selectedRange.location searchToEnd:NO];
     UITextPosition *start = [self positionFromPosition:self.beginningOfDocument
                                                 offset:range.location];
     UITextPosition *end = [self positionFromPosition:self.beginningOfDocument
@@ -47,33 +47,41 @@
 }
 
 - (NSRange)rangeForWordPrecedingCursor {
-    NSUInteger selectedLocation = self.selectedRange.location;
+    return [self rangeForWordPrecedingLocation:self.selectedRange.location searchToEnd:YES];
+}
+
+- (NSRange)rangeForWordPrecedingLocation:(NSInteger)location searchToEnd:(BOOL)toEnd {
     NSCharacterSet *whitespaceNewlineSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     if (!self.inInsertionMode
-        || selectedLocation == 0
-        || [whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:selectedLocation]]) {
+        || location == 0
+        || location >= [self.text length]
+        || [whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:location]]) {
         return NSMakeRange(NSNotFound, 0);
     }
     // Walk backwards through the string to find the first delimiter.
-    NSInteger location = 0;
-    for (NSInteger i=selectedLocation - 1; i>=0; i--) {
+    NSInteger firstLocation = 0;
+    for (NSInteger i=location - 1; i>=0; i--) {
         if (i > 0) {
             unichar c = [self.text characterAtIndex:i];
             if ([whitespaceNewlineSet characterIsMember:c]) {
-                location = i + 1;
+                firstLocation = i + 1;
                 break;
             }
         }
     }
+    if (!toEnd) {
+        NSInteger length = location - firstLocation;
+        return NSMakeRange(firstLocation, length);
+    }
     NSInteger length;
-    if (selectedLocation == [self.text length]
-        || [whitespaceNewlineSet characterIsMember:[self.text characterAtIndex:selectedLocation]]) {
+    if (location == [self.text length]
+        || [whitespaceNewlineSet characterIsMember:[self.text characterAtIndex:location]]) {
         // We're at the end of a word, or the end of the text field in general
-        length = selectedLocation - location;
+        length = location - firstLocation;
     }
     else {
         // Walk forward through the string to find the end, or the next whitespace/newline
-        NSInteger cursor = location;
+        NSInteger cursor = firstLocation;
         while (cursor < [self.text length]) {
             cursor++;
             if ([whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:cursor]]) {
@@ -83,7 +91,7 @@
         }
         length = cursor - location;
     }
-    return NSMakeRange(location, length);
+    return NSMakeRange(firstLocation, length);
 }
 
 - (unichar)characterPrecedingLocation:(NSInteger)location {

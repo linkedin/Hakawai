@@ -311,15 +311,10 @@ typedef enum {
 @property (nonatomic) BOOL resumeMentionsCreationEnabled;
 
 /*!
- Set the chooser view's frame. This frame should be relative to the top-level view of the current view controller. If
- the chooser view hasn't been instantiated, the frame will be used to instantiate the chooser view. If the plug-in is
- not set to display the chooser view in a custom position, invoking this method does nothing.
-
- \param frame           the new frame
- \param topLevelView    an optional view to use as the top-level view; set to nil to have the text view try to
-                        automatically figure out the top-level view
+ If the plug-in is set to display the chooser view in a custom position, set the top level view and a block to be called
+ after the view is attached to its superview (intended to be used to set up layout constraints).
  */
-- (void)setChooserViewFrame:(CGRect)frame topLevelView:(UIView *)topLevelView;
+- (void)setChooserTopLevelView:(UIView *)topLevelView attachmentBlock:(void(^)(UIView *))block;
 
 /*!
  Return a rect describing the frame that would be assigned to the chooser view if in one of the preset modes, or

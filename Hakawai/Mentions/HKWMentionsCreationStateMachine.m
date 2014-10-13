@@ -105,10 +105,6 @@ typedef enum {
 
 @property (nonatomic) NSUInteger startingLocation;
 
-/// The user is allowed to specify a custom frame for the chooser view before the chooser view has been instantiated.
-/// This property stores the custom frame until it is time to instantiate the chooser.
-@property (nonatomic) CGRect frameForChooserCreation;
-
 /// What the last relevant action the user took within the text view was.
 @property (nonatomic) HKWMentionsCreationAction lastTriggerAction;
 
@@ -146,7 +142,6 @@ typedef enum {
     sm.sequenceNumber = 0;
     sm.delegate = delegate;
     sm.state = HKWMentionsCreationStateQuiescent;
-    sm.frameForChooserCreation = CGRectNull;
     sm.chooserViewEdgeInsets = UIEdgeInsetsZero;
     return sm;
 }
@@ -446,27 +441,6 @@ typedef enum {
     return (mode != HKWMentionsChooserPositionModeEnclosedTop && mode != HKWMentionsChooserPositionModeEnclosedBottom);
 }
 
-- (void)setChooserViewFrame:(CGRect)frame {
-    HKWMentionsChooserPositionMode mode = [self.delegate chooserPositionMode];
-    if (mode == HKWMentionsChooserPositionModeEnclosedTop || mode == HKWMentionsChooserPositionModeEnclosedBottom) {
-        // Cannot set custom frame for 'enclosed top' or 'enclosed bottom' modes
-        HKWLOG(@"WARNING! Setting the chooser view frame when the chooser view is set to display within the text view \
-                will do nothing.");
-        return;
-    }
-    if (!_entityChooserView) {
-        // No chooser view yet. Save the frame for when the chooser view is created.
-        HKWLOG(@"Chooser view has not been instantiated yet. Saving frame (origin: (%f, %f), size: (%f, %f)",
-                frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
-        self.frameForChooserCreation = frame;
-    }
-    else {
-        HKWLOG(@"Chooser view has already been instantiated. Setting frame (origin: (%f, %f), size: (%f, %f)",
-                frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
-        self.entityChooserView.frame = frame;
-    }
-}
-
 - (CGRect)chooserViewFrame {
     if (!_entityChooserView) {
         return CGRectNull;
@@ -537,13 +511,11 @@ typedef enum {
     CGRect chooserFrame = [self frameForMode:mode];
     // Handle the case where the chooser frame is completely custom
     if ([HKWMentionsCreationStateMachine modeRequiresCustomFrame:mode]) {
-        if (CGRectIsNull(self.frameForChooserCreation)) {
-            HKWLOG(@"WARNING: Using custom chooser position, but no frame was set. Using placeholder frame.");
-            chooserFrame = CGRectMake(0, 0, [UIApplication sharedApplication].keyWindow.bounds.size.width, 100);
-        }
-        else {
-            chooserFrame = self.frameForChooserCreation;
-        }
+        // Placeholder frame; used until the constraints are properly applied
+        chooserFrame = CGRectMake(0,
+                                  0,
+                                  [UIApplication sharedApplication].keyWindow.bounds.size.width,
+                                  100);
     }
     NSAssert(!CGRectIsNull(chooserFrame), @"Logic error: got a null rect for the chooser view's frame");
     HKWAbstractChooserView *chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame

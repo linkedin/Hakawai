@@ -133,13 +133,14 @@ typedef enum {
  */
 @property (nonatomic) unichar characterForAdvanceStateForCharacterInsertion;
 
-
 // Properties for resuming mentions creation
 @property (nonatomic) BOOL shouldResumeMentionsCreation;
 @property (nonatomic) unichar resumeMentionsControlCharacter;   // 0 if implicit mention
 @property (nonatomic) NSInteger resumeMentionsPriorTextLength;
 @property (nonatomic) NSInteger resumeMentionsPriorPosition;
 @property (nonatomic) NSString *resumeMentionsPriorString;
+
+@property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
 
 @end
 
@@ -388,8 +389,8 @@ typedef enum {
     }
 }
 
-- (void)setChooserViewFrame:(CGRect)frame topLevelView:(UIView *)topLevelView {
-    [self.creationStateMachine setChooserViewFrame:frame];
+- (void)setChooserTopLevelView:(UIView *)topLevelView attachmentBlock:(void(^)(UIView *))block {
+    self.customModeAttachmentBlock = block;
     [self.parentTextView setTopLevelViewForAccessoryViewPositioning:topLevelView];
 }
 
@@ -616,7 +617,7 @@ typedef enum {
 
 - (HKWMentionsAttribute *)mentionAttributePrecedingLocation:(NSInteger)location
                                                        range:(NSRangePointer)range {
-    if (location < 1) {
+    if (location < 1 || location > [self.parentTextView.attributedText length]) {
         // No mention can precede the beginning of the text view.
         return nil;
     }
@@ -631,6 +632,48 @@ typedef enum {
     }
     NSAssert(value == nil, @"The value for a LIMentionAttribute must be an HKWMentionsAttribute object.");
     return nil;
+}
+
+/*!
+ Return YES if the given range touches at least one mention attribute.
+ */
+- (BOOL)rangeTouchesMentions:(NSRange)range {
+    // EXAMPLES: (| = insertion point; { } = selection range)
+    // |Mention1 --> YES
+    // Ment|ion1 --> YES
+    // Mention1| --> YES
+    // NotAMention| Mention1 --> NO
+    // Mention1{ some text} --> YES
+    // {Mention1 some text} --> YES
+    // Ment{ion1 some text} --> YES
+    // {some text}Mention1 --> YES
+    // {some text} Mention1 --> NO
+
+    if (range.location == NSNotFound) {
+        return NO;
+    }
+    // CASE 1: zero-length range (e.g. insertion point)
+    if (range.length == 0) {
+        if ([self mentionAttributePrecedingLocation:range.location range:NULL]
+            || ((range.location + 1) <= [self.parentTextView.text length] && [self mentionAttributePrecedingLocation:(range.location + 1) range:NULL])) {
+            // Mention exists either before the location, or right after the location
+            return YES;
+        }
+        return NO;
+    }
+    // CASE 2: selection range
+    NSInteger currentLocation = range.location;
+    for (NSInteger i = 0; i < range.length + 1; i++) {
+        currentLocation = range.location + i;
+        if (currentLocation > [self.parentTextView.text length]) {
+            // Out of bounds
+            return NO;
+        }
+        if ([self mentionAttributePrecedingLocation:currentLocation range:NULL] != nil) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 - (void)assertMentionsDataExists {
@@ -665,6 +708,20 @@ typedef enum {
     [self resetCurrentMentionsData];
 }
 
+- (void)toggleAutocorrectAsRequiredForRange:(NSRange)range {
+    // PROVISIONAL FIX: Determine whether or not a mention exists, and disable or enable autocorrect
+    if (self.state == HKWMentionsPluginStateCreatingMention) {
+        return;
+    }
+    BOOL shouldDisable = [self rangeTouchesMentions:range] || self.parentTextView.selectedRange.length > 0;
+    if (shouldDisable) {
+        [self.parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
+    }
+    else {
+        [self.parentTextView restoreOriginalAutocorrection:YES];
+    }
+}
+
 
 #pragma mark - State machine
 
@@ -678,6 +735,7 @@ typedef enum {
 - (BOOL)advanceStateForCharacterInsertion:(unichar)newChar
                        precedingCharacter:(unichar)precedingChar
                                  location:(NSUInteger)location {
+    BOOL returnValue = YES;
     self.characterForAdvanceStateForCharacterInsertion = newChar;
     // In certain situations, the double space --> period behavior is suppressed in order to prevent undesired behavior
     BOOL isSecondSpace = (location > 1) && (precedingChar == ' ' && newChar == ' ');
@@ -692,7 +750,7 @@ typedef enum {
             if (isSecondSpace && shouldSuppress) {
                 [self manuallyInsertCharacter:newChar atLocation:location inTextView:self.parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-                return NO;
+                returnValue = NO;
             }
             break;
         }
@@ -703,7 +761,7 @@ typedef enum {
             if (isSecondSpace) {
                 [self manuallyInsertCharacter:newChar atLocation:location inTextView:self.parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-                return NO;
+                returnValue = NO;
             }
             break;
         case HKWMentionsStateAboutToSelectMention:
@@ -715,7 +773,7 @@ typedef enum {
             if (isSecondSpace) {
                 [self manuallyInsertCharacter:newChar atLocation:location inTextView:self.parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-                return NO;
+                returnValue = NO;
             }
             break;
         case HKWMentionsStateSelectedMention:
@@ -734,13 +792,21 @@ typedef enum {
             self.state = HKWMentionsStateQuiescent;
             self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
             [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES];
-            return NO;
+            returnValue = NO;
+            break;
         case HKWMentionsStateLosingFocus:
             NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
             break;
     }
-    self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-    return YES;
+    if (returnValue) {
+        self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
+    }
+    NSRange searchRange = [self.parentTextView rangeForWordPrecedingLocation:location searchToEnd:NO];
+    if (searchRange.location == NSNotFound) {
+        searchRange = NSMakeRange(location, 0);
+    }
+    [self toggleAutocorrectAsRequiredForRange:searchRange];
+    return returnValue;
 }
 
 /*!
@@ -749,6 +815,7 @@ typedef enum {
 - (BOOL)advanceStateForCharacterDeletion:(unichar)precedingChar
                         deletedCharacter:(unichar)deletedChar
                                 location:(NSUInteger)location {
+    BOOL returnValue = YES;
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
             // Look for a mention
@@ -789,7 +856,8 @@ typedef enum {
             [self assertMentionsDataExists];
             [self toggleMentionsFormattingAtRange:self.currentlySelectedMentionRange selected:YES];
             self.state = HKWMentionsStateSelectedMention;
-            return NO;
+            returnValue = NO;
+            break;
         }
         case HKWMentionsStateSelectedMention: {
             // Trim or delete the currently selected mention
@@ -810,6 +878,7 @@ typedef enum {
                 // Move the cursor into position.
                 self.parentTextView.selectedRange = NSMakeRange(self.currentlySelectedMentionRange.location + [trimmedString length],
                                                                 0);
+                location = self.parentTextView.selectedRange.location;
             }
             else {
                 // Delete mention entirely
@@ -844,15 +913,22 @@ typedef enum {
                         self.currentlySelectedMentionRange = mentionRange;
                         self.state = HKWMentionsStateAboutToSelectMention;
                     }
+                    location = locationAfterDeletion;
                 }
             }
-            return NO;
+            returnValue = NO;
+            break;
         }
         case HKWMentionsStateLosingFocus:
             NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
             break;
     }
-    return YES;
+    NSRange searchRange = [self.parentTextView rangeForWordPrecedingLocation:location searchToEnd:NO];
+    if (searchRange.location == NSNotFound) {
+        searchRange = NSMakeRange(location, 0);
+    }
+    [self toggleAutocorrectAsRequiredForRange:searchRange];
+    return returnValue;
 }
 
 /*!
@@ -868,7 +944,14 @@ typedef enum {
         self.parentTextView.selectedRange = originalSelectedRange;
     }
 
-    NSDictionary *typingAttrs = self.parentTextView.typingAttributes;
+    NSMutableDictionary *mutableTypingAttrs = [self.parentTextView.typingAttributes mutableCopy];
+    // PROVISIONAL FIX: remove the color attribute
+    // This prevents text pasted in right before or after a mention from accreting the blue color
+    // We need to change this eventually to allow for use when custom attributes that aren't colors are specified, or
+    //  there is a legitimate need for colors for non-mentions text
+    [mutableTypingAttrs removeObjectForKey:NSForegroundColorAttributeName];
+    NSDictionary *typingAttrs = [mutableTypingAttrs copy];
+
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
             if ([text length] == 1) {
@@ -956,6 +1039,7 @@ typedef enum {
             NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
             break;
     }
+    [self toggleAutocorrectAsRequiredForRange:range];
     return YES;
 }
 
@@ -1015,6 +1099,7 @@ typedef enum {
             return;
     }
     self.state = HKWMentionsStateQuiescent;
+    [self toggleAutocorrectAsRequiredForRange:range];
 }
 
 /*!
@@ -1102,6 +1187,11 @@ typedef enum {
             NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
             break;
     }
+    NSRange searchRange = [self.parentTextView rangeForWordPrecedingLocation:location searchToEnd:NO];
+    if (searchRange.location == NSNotFound) {
+        searchRange = NSMakeRange(location, 0);
+    }
+    [self toggleAutocorrectAsRequiredForRange:searchRange];
 }
 
 
@@ -1149,7 +1239,7 @@ typedef enum {
             textView.selectedRange = range;
         }
     }
-    else if (range.length > 0 && [text length] > 0) {
+    else if ([text length] > 1) {
         // Inserting text (e.g. pasting)
         returnValue = [self advanceStateForStringInsertionAtRange:range text:text];
     }
@@ -1395,12 +1485,14 @@ typedef enum {
     // Note that if the mention was cancelled because the user typed a whitespace and caused no search results to return
     //  as a result, the desired behavior is to allow the start detection state machine to immediately begin searching
     //  (without waiting for a second space).
+    self.parentTextView.shouldRejectAutocorrectInsertions = NO;
     NSInteger currentLocation = self.parentTextView.selectedRange.location;
     NSCharacterSet *whitespaces = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     BOOL canRestart = ([whitespaces characterIsMember:[self.parentTextView characterPrecedingLocation:currentLocation]]
                        || (self.characterForAdvanceStateForCharacterInsertion != 0
                            && [whitespaces characterIsMember:self.characterForAdvanceStateForCharacterInsertion]));
     [self performMentionCreationEndCleanup:canRestart];
+    [self.parentTextView restoreOriginalAutocorrection:(self.state != HKWMentionsStateLosingFocus)];
 }
 
 - (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)location {
@@ -1443,21 +1535,117 @@ typedef enum {
     self.currentlySelectedMention = mention;
     self.currentlySelectedMentionRange = NSMakeRange(location, [mentionText length]);
     self.state = HKWMentionsStateAboutToSelectMention;
+    // Toggle autocorrect. This is because we don't want the user to be able to alter the mention text using autocorrect
+    //  (since the cursor will be located immediately after the location of the mention once it's created)
+    [self toggleAutocorrectAsRequiredForRange:NSMakeRange(location, 0)];
+    self.parentTextView.shouldRejectAutocorrectInsertions = NO;
+}
+
+/// A private method that handles attaching the chooser view when it's enclosed within the text view.
+- (void)attachEnclosedChooserView:(UIView *)accessoryView origin:(CGPoint)origin {
+    // The chooser view is attached to the text view. Add constraints appropriately.
+    UIEdgeInsets insets = self.chooserViewEdgeInsets;
+    __weak typeof(self) __self = self;
+    __weak HKWTextView *parentTextView = self.parentTextView;
+    CGFloat gapHeight = [self.parentTextView rectForSingleLineViewportInMode:HKWViewportModeTop].size.height;
+    self.parentTextView.onAccessoryViewAttachmentBlock = ^(UIView *view, BOOL isFreeFloating) {
+        typeof(self) strongSelf = __self;
+        if (!strongSelf) {
+            return;
+        }
+        // Attach side constraints
+        [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                             attribute:NSLayoutAttributeLeft
+                                                                             relatedBy:NSLayoutRelationEqual
+                                                                                toItem:parentTextView
+                                                                             attribute:NSLayoutAttributeLeft
+                                                                            multiplier:1.0
+                                                                              constant:insets.left]];
+        [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                             attribute:NSLayoutAttributeRight
+                                                                             relatedBy:NSLayoutRelationEqual
+                                                                                toItem:parentTextView
+                                                                             attribute:NSLayoutAttributeRight
+                                                                            multiplier:1.0
+                                                                              constant:-insets.right]];
+
+        // Attach top/bottom constraints
+        switch (strongSelf.chooserPositionMode) {
+            case HKWMentionsChooserPositionModeEnclosedTop: {
+                // Gap is at top
+                [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                     attribute:NSLayoutAttributeTop
+                                                                                     relatedBy:NSLayoutRelationEqual
+                                                                                        toItem:parentTextView
+                                                                                     attribute:NSLayoutAttributeTop
+                                                                                    multiplier:1.0
+                                                                                      constant:gapHeight + insets.top]];
+                [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                     attribute:NSLayoutAttributeBottom
+                                                                                     relatedBy:NSLayoutRelationEqual
+                                                                                        toItem:parentTextView
+                                                                                     attribute:NSLayoutAttributeBottom
+                                                                                    multiplier:1.0
+                                                                                      constant:-insets.bottom]];
+                break;
+            }
+            case HKWMentionsChooserPositionModeEnclosedBottom: {
+                // Gap is at bottom
+                [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                     attribute:NSLayoutAttributeTop
+                                                                                     relatedBy:NSLayoutRelationEqual
+                                                                                        toItem:parentTextView
+                                                                                     attribute:NSLayoutAttributeTop
+                                                                                    multiplier:1.0
+                                                                                      constant:insets.top]];
+                [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                     attribute:NSLayoutAttributeBottom
+                                                                                     relatedBy:NSLayoutRelationEqual
+                                                                                        toItem:parentTextView
+                                                                                     attribute:NSLayoutAttributeBottom
+                                                                                    multiplier:1.0
+                                                                                      constant:-gapHeight - insets.bottom]];
+                break;
+            }
+            case HKWMentionsChooserPositionModeCustomLockBottomArrowPointingDown:
+            case HKWMentionsChooserPositionModeCustomLockBottomArrowPointingUp:
+            case HKWMentionsChooserPositionModeCustomLockBottomNoArrow:
+            case HKWMentionsChooserPositionModeCustomLockTopArrowPointingDown:
+            case HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp:
+            case HKWMentionsChooserPositionModeCustomLockTopNoArrow:
+            case HKWMentionsChooserPositionModeCustomNoLockArrowPointingDown:
+            case HKWMentionsChooserPositionModeCustomNoLockArrowPointingUp:
+            case HKWMentionsChooserPositionModeCustomNoLockNoArrow:
+                NSAssert(NO, @"Internal error");
+        }
+
+    };
+    [self.parentTextView attachSiblingAccessoryView:accessoryView position:origin];
 }
 
 - (void)attachViewToParentEditor:(UIView *)view origin:(CGPoint)origin mode:(HKWAccessoryViewMode)mode {
     switch (mode) {
-        case HKWAccessoryViewModeFreeFloating:
+        case HKWAccessoryViewModeFreeFloating: {
+            // The chooser view is attached to the top level view. Add constraints appropriately.
+            self.parentTextView.onAccessoryViewAttachmentBlock = ^(UIView *view, BOOL ignored) {
+                if (self.customModeAttachmentBlock) {
+                    self.customModeAttachmentBlock(view);
+                }
+            };
             [self.parentTextView attachFreeFloatingAccessoryView:view absolutePosition:origin];
             break;
-        case HKWAccessoryViewModeSibling:
-            [self.parentTextView attachSiblingAccessoryView:view position:origin];
+        }
+        case HKWAccessoryViewModeSibling: {
+            // The chooser view's position is slaved to the text view's positioning. Set up appropriately.
+            [self attachEnclosedChooserView:view origin:origin];
             break;
+        }
     }
 }
 
 - (void)accessoryViewActivated:(BOOL)activated {
     if (activated) {
+        self.parentTextView.shouldRejectAutocorrectInsertions = YES;
         [self.parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
         if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPluginActivatedChooserView:)]) {
             [self.stateChangeDelegate mentionsPluginActivatedChooserView:self];
@@ -1470,7 +1658,6 @@ typedef enum {
         }
     }
     else {
-        [self.parentTextView restoreOriginalAutocorrection:(self.state != HKWMentionsStateLosingFocus)];
         if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
             [self.stateChangeDelegate mentionsPluginDeactivatedChooserView:self];
         }

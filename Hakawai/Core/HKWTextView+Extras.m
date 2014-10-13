@@ -111,14 +111,10 @@ typedef enum {
 #pragma mark - Private
 
 - (void)cycleFirstResponderStatusWithMode:(HKWCycleFirstResponderMode)mode cancelAnimation:(BOOL)cancelAnimation {
-    NSRange originalRange = self.selectedRange;
-    NSAttributedString *originalText = [self.attributedText copy];
-
     BOOL usingAbstraction = self.abstractionLayerEnabled;
     if (usingAbstraction) {
         [self.abstractionLayer pushIgnore];
     }
-
     self.firstResponderIsCycling = YES;
     [self resignFirstResponder];
 
@@ -163,8 +159,6 @@ typedef enum {
     if (cancelAnimation) {
         [self setContentOffset:self.contentOffset animated:NO];
     }
-    self.attributedText = originalText;
-    self.selectedRange = originalRange;
     self.firstResponderIsCycling = NO;
     if (usingAbstraction) {
         [self.abstractionLayer popIgnore];

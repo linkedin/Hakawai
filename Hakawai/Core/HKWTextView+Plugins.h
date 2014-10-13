@@ -150,12 +150,11 @@ typedef enum {
 #pragma mark - API (helper views)
 
 /*!
- If set to YES, the accessory view APIs will not add (or remove) Auto Layout constraints to accessory views in order to
- position them correctly relative to their superviews.
- 
- \note This property is intended only for ensuring compatibility with older code.
+ An optional property containing a block to be run whenever an accessory view is attached. The block should take two
+ parameters: the accessory view and a boolean flag which is YES if the accessory view is free-floating, NO if it is a
+ sibling view.
  */
-@property (nonatomic) BOOL disableAutolayoutForAccessoryViews;
+@property (nonatomic, copy) void(^onAccessoryViewAttachmentBlock)(UIView *, BOOL);
 
 /*!
  Attach an accessory view to the text editor as a sibling view. An accessory view floats 'above' the text editor view

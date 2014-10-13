@@ -149,12 +149,6 @@
 - (void)hideChooserArrow;
 
 /*!
- Set the chooser view frame, or store a frame to be used when the chooser view is created (only if chooser view is
- configured to use a custom frame).
- */
-- (void)setChooserViewFrame:(CGRect)frame;
-
-/*!
  Get the chooser view frame. If the chooser view has not yet been instantiated, returns the nil rectangle.
  */
 - (CGRect)chooserViewFrame;

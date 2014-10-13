@@ -21,6 +21,7 @@
 - (void)textViewDidEnterSingleLineViewportMode:(HKWTextView *)textView;
 - (void)textViewDidExitSingleLineViewportMode:(HKWTextView *)textView;
 - (void)textViewWasTappedInSingleLineViewportMode:(HKWTextView *)textView;
+- (void)textViewDidHaveTextPastedIn:(HKWTextView *)textView;
 - (void)textView:(HKWTextView *)textView didChangeAttributedTextTo:(NSAttributedString *)newText
     originalText:(NSAttributedString *)originalText
    originalRange:(NSRange)originalRange;
