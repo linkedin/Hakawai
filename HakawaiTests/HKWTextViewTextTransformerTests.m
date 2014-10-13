@@ -16,7 +16,7 @@
 #import "Specta.h"
 #import "Expecta.h"
 
-#import "HKWTextView+Plugins.h"
+#import "HKWTextView+TextTransformation.h"
 
 SpecBegin(transformTextAtRange)
 

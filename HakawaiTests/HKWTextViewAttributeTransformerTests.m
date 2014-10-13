@@ -22,7 +22,7 @@
 #import "Specta.h"
 #import "Expecta.h"
 
-#import "HKWTextView+Plugins.h"
+#import "HKWTextView+TextTransformation.h"
 
 @interface HKWTextView ()
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)replacementText;

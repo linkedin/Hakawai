@@ -312,16 +312,6 @@
     if (self.firstResponderIsCycling) {
         return NO;
     }
-    if ([replacementText length] > 1
-        && ![replacementText isEqualToString:[[UIPasteboard generalPasteboard] string]]) {
-        // PROVISIONAL FIX
-        // We need a way to distinguish predictive text insertions from pasting in text. Disabiling Autocorrect has a similar
-        // issue but that hack is further protected by the shouldRejectAutocorrectInsertions flag. Just like for autocorrect we
-        // can check against the pasteboard to validate that the string being inserted was not pasted by the user. When a text
-        // sugestion is selected, Apple will call this method once for the word being inserted, and then a second time for a
-        // space that is added after the word.
-        return YES;
-    }
     // Inform plug-in
     BOOL customValue = YES;
     BOOL shouldUseCustomValue = NO;

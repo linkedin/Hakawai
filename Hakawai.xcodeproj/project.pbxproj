@@ -35,8 +35,8 @@
 		E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9677019A2A66000A4AA93 /* UIKit.framework */; };
 		E1C9677419A2A66000A4AA93 /* libHakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675C19A2A66000A4AA93 /* libHakawai.a */; };
 		E1C9677A19A2A66000A4AA93 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E1C9677819A2A66000A4AA93 /* InfoPlist.strings */; };
-		E1D5501719A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501619A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m */; };
-		E1D5501A19A2F479001DCF1F /* HKWTextViewExtrasTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501919A2F479001DCF1F /* HKWTextViewExtrasTests.m */; };
+		E1D5501719A2EDF9001DCF1F /* HKWTextViewExtrasTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501619A2EDF9001DCF1F /* HKWTextViewExtrasTests.m */; };
+		E1D5501A19A2F479001DCF1F /* HKWTextViewAutoXTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501919A2F479001DCF1F /* HKWTextViewAutoXTests.m */; };
 		E1D5501D19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */; };
 		E1DC1F8D19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */; };
 /* End PBXBuildFile section */
@@ -121,8 +121,8 @@
 		E1C9677019A2A66000A4AA93 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		E1C9677719A2A66000A4AA93 /* HakawaiTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "HakawaiTests-Info.plist"; sourceTree = "<group>"; };
 		E1C9677919A2A66000A4AA93 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		E1D5501619A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewUtilitiesTests.m; sourceTree = "<group>"; };
-		E1D5501919A2F479001DCF1F /* HKWTextViewExtrasTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewExtrasTests.m; sourceTree = "<group>"; };
+		E1D5501619A2EDF9001DCF1F /* HKWTextViewExtrasTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewExtrasTests.m; sourceTree = "<group>"; };
+		E1D5501919A2F479001DCF1F /* HKWTextViewAutoXTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewAutoXTests.m; sourceTree = "<group>"; };
 		E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewAccessoryViewTests.m; sourceTree = "<group>"; };
 		E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewTextTransformerTests.m; sourceTree = "<group>"; };
 		F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.xcconfig"; path = "Pods/Pods-HakawaiTests.xcconfig"; sourceTree = "<group>"; };
@@ -304,8 +304,8 @@
 			isa = PBXGroup;
 			children = (
 				E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */,
-				E1D5501919A2F479001DCF1F /* HKWTextViewExtrasTests.m */,
-				E1D5501619A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m */,
+				E1D5501919A2F479001DCF1F /* HKWTextViewAutoXTests.m */,
+				E1D5501619A2EDF9001DCF1F /* HKWTextViewExtrasTests.m */,
 				E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */,
 				E1233C0819A3C6680052217A /* HKWTextViewAttributeTransformerTests.m */,
 				E1233C0519A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m */,
@@ -471,11 +471,11 @@
 			files = (
 				E1233C0919A3C6680052217A /* HKWTextViewAttributeTransformerTests.m in Sources */,
 				E1DC1F8D19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m in Sources */,
-				E1D5501719A2EDF9001DCF1F /* HKWTextViewUtilitiesTests.m in Sources */,
+				E1D5501719A2EDF9001DCF1F /* HKWTextViewExtrasTests.m in Sources */,
 				E1233BFC19A303620052217A /* HKWTextViewPluginTests.m in Sources */,
 				E1D5501D19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m in Sources */,
 				E1233C0019A3089B0052217A /* HKWTBasicDummyPlugin.m in Sources */,
-				E1D5501A19A2F479001DCF1F /* HKWTextViewExtrasTests.m in Sources */,
+				E1D5501A19A2F479001DCF1F /* HKWTextViewAutoXTests.m in Sources */,
 				E1233C0619A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m in Sources */,
 				E1233C0319A3090B0052217A /* HKWTControlFlowDummyPlugin.m in Sources */,
 			);

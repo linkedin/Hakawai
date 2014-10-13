@@ -18,9 +18,9 @@
 
 #import "HKWTextView+Extras.h"
 
-SpecBegin(overrideAutocapitalization)
+SpecBegin(rangeForWordPrecedingCursor)
 
-describe(@"autocapitalization overriding", ^{
+describe(@"rangeForWordPrecedingCursor", ^{
     NSString *baseString = @"The quick brown fox jumps over the lazy dog";
     __block HKWTextView *textView;
 
@@ -29,49 +29,86 @@ describe(@"autocapitalization overriding", ^{
         textView.attributedText = [[NSAttributedString alloc] initWithString:baseString];
     });
 
-    it(@"should override autocapitalization correctly", ^{
-        textView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeSentences);
-        [textView overrideAutocapitalizationWith:UITextAutocapitalizationTypeAllCharacters];
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeAllCharacters);
-        [textView restoreOriginalAutocapitalization:NO];
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeSentences);
+    it(@"should properly return ranges for a valid word ('The') preceding the cursor", ^{
+        textView.selectedRange = NSMakeRange(3, 0);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.length).to.equal(3);
+        expect(r.location).to.equal(0);
     });
 
-    it(@"should override autocapitalization correctly when the modes are the same", ^{
-        textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeNone);
-        [textView overrideAutocapitalizationWith:UITextAutocapitalizationTypeNone];
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeNone);
-        [textView restoreOriginalAutocapitalization:NO];
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeNone);
+    it(@"should properly return ranges for a valid word ('brown') preceding the cursor", ^{
+        textView.selectedRange = NSMakeRange(15, 0);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.length).to.equal(5);
+        expect(r.location).to.equal(10);
     });
 
-    it(@"should gracefully ignore spurious override calls", ^{
-        textView.autocapitalizationType = UITextAutocapitalizationTypeWords;
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeWords);
-        [textView overrideAutocapitalizationWith:UITextAutocapitalizationTypeAllCharacters];
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeAllCharacters);
-        [textView overrideAutocapitalizationWith:UITextAutocapitalizationTypeNone];
-        // Prior call should be ignored
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeAllCharacters);
-        [textView restoreOriginalAutocapitalization:NO];
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeWords);
+    it(@"should properly return ranges for a valid word ('dog') preceding the cursor", ^{
+        textView.selectedRange = NSMakeRange(43, 0);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.length).to.equal(3);
+        expect(r.location).to.equal(40);
     });
 
-    it(@"should gracefully ignore spurious restore calls", ^{
-        textView.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeAllCharacters);
-        [textView restoreOriginalAutocapitalization:NO];
-        expect(textView.autocapitalizationType).to.equal(UITextAutocapitalizationTypeAllCharacters);
+    it(@"should properly return ranges when the cursor is in the middle of a word at the beginning of the text view", ^{
+        textView.selectedRange = NSMakeRange(1, 0);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.length).to.equal(3);
+        expect(r.location).to.equal(0);
+    });
+
+    it(@"should properly return ranges when the cursor is in the middle of a word in the middle of the text view", ^{
+        textView.selectedRange = NSMakeRange(6, 0);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.length).to.equal(5);
+        expect(r.location).to.equal(4);
+    });
+
+    it(@"should properly return ranges when the cursor is in the middle of a word at the end of the text view", ^{
+        textView.selectedRange = NSMakeRange(41, 0);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.length).to.equal(3);
+        expect(r.location).to.equal(40);
+    });
+
+    it(@"should properly return NSNotFound when the cursor is at the beginning", ^{
+        textView.selectedRange = NSMakeRange(0, 0);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.location).to.equal(NSNotFound);
+    });
+
+    it(@"should properly return NSNotFound when there are no words preceding the cursor (1)", ^{
+        textView.text = @"     ";
+        textView.selectedRange = NSMakeRange(0, 3);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.location).to.equal(NSNotFound);
+    });
+
+    it(@"should properly return NSNotFound when there are no words preceding the cursor (2)", ^{
+        textView.text = @"     ";
+        textView.selectedRange = NSMakeRange(0, 3);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.location).to.equal(NSNotFound);
+    });
+
+    it(@"should properly return NSNotFound when the cursor is before a whitespace", ^{
+        textView.selectedRange = NSMakeRange(4, 0);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.location).to.equal(NSNotFound);
+    });
+
+    it(@"should properly return NSNotFound when the cursor is not in insertion mode", ^{
+        textView.selectedRange = NSMakeRange(3, 10);
+        NSRange r = [textView rangeForWordPrecedingCursor];
+        expect(r.location).to.equal(NSNotFound);
     });
 });
 
 SpecEnd
 
-SpecBegin(overrideAutocorrection)
+SpecBegin(characterPrecedingLocation)
 
-describe(@"autocorrection overriding", ^{
+describe(@"characterPrecedingLocation", ^{
     NSString *baseString = @"The quick brown fox jumps over the lazy dog";
     __block HKWTextView *textView;
 
@@ -80,92 +117,29 @@ describe(@"autocorrection overriding", ^{
         textView.attributedText = [[NSAttributedString alloc] initWithString:baseString];
     });
 
-    it(@"should override autocorrection correctly", ^{
-        textView.autocorrectionType = UITextAutocorrectionTypeDefault;
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeDefault);
-        [textView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeNo);
-        [textView restoreOriginalAutocorrection:NO];
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeDefault);
+    it(@"should properly return the character preceding a location", ^{
+        unichar character = [textView characterPrecedingLocation:7];
+        expect(character).to.equal('i');
     });
 
-    it(@"should override autocorrection correctly when the modes are the same", ^{
-        textView.autocorrectionType = UITextAutocorrectionTypeNo;
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeNo);
-        [textView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeNo);
-        [textView restoreOriginalAutocorrection:NO];
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeNo);
+    it(@"should properly return 0 when location = 0", ^{
+        unichar character = [textView characterPrecedingLocation:0];
+        expect(character).to.equal((unichar)0);
     });
 
-    it(@"should gracefully ignore spurious override calls", ^{
-        textView.autocorrectionType = UITextAutocorrectionTypeYes;
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeYes);
-        [textView overrideAutocorrectionWith:UITextAutocorrectionTypeDefault];
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeDefault);
-        [textView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
-        // Prior call should be ignored
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeDefault);
-        [textView restoreOriginalAutocorrection:NO];
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeYes);
+    it(@"should properly return 0 when location is negative", ^{
+        unichar character = [textView characterPrecedingLocation:-10];
+        expect(character).to.equal((unichar)0);
     });
 
-    it(@"should gracefully ignore spurious restore calls", ^{
-        textView.autocorrectionType = UITextAutocorrectionTypeYes;
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeYes);
-        [textView restoreOriginalAutocorrection:NO];
-        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeYes);
-    });
-});
-
-SpecEnd
-
-SpecBegin(overrideSpellCheck)
-
-describe(@"spell check overriding", ^{
-    NSString *baseString = @"The quick brown fox jumps over the lazy dog";
-    __block HKWTextView *textView;
-
-    beforeEach(^{
-        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-        textView.attributedText = [[NSAttributedString alloc] initWithString:baseString];
+    it(@"should properly return 0 when location is just out of range", ^{
+        unichar character = [textView characterPrecedingLocation:[baseString length] + 1];
+        expect(character).to.equal((unichar)0);
     });
 
-    it(@"should override spell check correctly", ^{
-        textView.spellCheckingType = UITextSpellCheckingTypeDefault;
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeDefault);
-        [textView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeNo);
-        [textView restoreOriginalSpellChecking:NO];
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeDefault);
-    });
-
-    it(@"should override spell check correctly when the modes are the same", ^{
-        textView.spellCheckingType = UITextSpellCheckingTypeNo;
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeNo);
-        [textView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeNo);
-        [textView restoreOriginalSpellChecking:NO];
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeNo);
-    });
-
-    it(@"should gracefully ignore spurious override calls", ^{
-        textView.spellCheckingType = UITextSpellCheckingTypeYes;
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeYes);
-        [textView overrideSpellCheckingWith:UITextSpellCheckingTypeDefault];
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeDefault);
-        [textView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
-        // Prior call should be ignored
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeDefault);
-        [textView restoreOriginalSpellChecking:NO];
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeYes);
-    });
-
-    it(@"should gracefully ignore spurious restore calls", ^{
-        textView.spellCheckingType = UITextSpellCheckingTypeYes;
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeYes);
-        [textView restoreOriginalSpellChecking:NO];
-        expect(textView.spellCheckingType).to.equal(UITextSpellCheckingTypeYes);
+    it(@"should properly return 0 when location is out of range", ^{
+        unichar character = [textView characterPrecedingLocation:1000];
+        expect(character).to.equal((unichar)0);
     });
 });
 

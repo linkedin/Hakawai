@@ -24,6 +24,7 @@
 #import "Expecta.h"
 
 #import "HKWTextView.h"
+#import "HKWTextView+Extras.h"
 #import "HKWTBasicDummyPlugin.h"
 #import "HKWTControlFlowDummyPlugin.h"
 

@@ -117,6 +117,12 @@ If the user enters or deletes characters to the point where there are no results
 If an annotation is created, the creation process is canceled, or the cursor is moved to a location where the preceding character is neither a whitespace or a newline, the plug-in is considered to be *stalled*. The annotation creation process will not be allowed to start again until the user types a whitespace or newline character, or moves the cursor to precede a whitespace or newline character (or the very beginning of the text).
 
 
+Testing
+-------
+
+Hakawai includes an almost-comprehensive unit test suite for the main text view powered by the Specta and Expecta libraries (https://github.com/specta/specta). We hope to have test coverage for the abstraction layer and mentions plug-in in the future, although unit tests are probably not sufficient for testing these components. 
+
+
 Contributions
 -------------
 

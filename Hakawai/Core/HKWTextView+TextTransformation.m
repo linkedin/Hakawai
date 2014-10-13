@@ -34,7 +34,9 @@
         if (usingAbstraction) {
             [self.abstractionLayer pushIgnore];
         }
+        self.shouldRejectAutocorrectInsertions = YES;
         self.attributedText = transformer(nil);
+        self.shouldRejectAutocorrectInsertions = NO;
         if (usingAbstraction) {
             [self.abstractionLayer popIgnore];
         }
@@ -65,7 +67,13 @@
     NSMutableAttributedString *buffer = [[NSMutableAttributedString alloc] initWithAttributedString:prefixString];
     if (infixString) [buffer appendAttributedString:infixString];
     if (postfixString) [buffer appendAttributedString:postfixString];
+
+    // We turn on 'autocorrect insertion rejection' before we set the text in order to reject a spurious additional
+    //  call to the shouldChange... method in the text view delegate
+    self.shouldRejectAutocorrectInsertions = YES;
     self.attributedText = buffer;
+    self.shouldRejectAutocorrectInsertions = NO;
+
     if (shouldRestore && range.length == [infixString length]) {
         // If the replacement text and the original text are the same length, restore the insertion cursor to its
         //  original position.
@@ -101,7 +109,11 @@
         if (usingAbstraction) {
             [self.abstractionLayer pushIgnore];
         }
-        if (location == 0) self.attributedText = [NSAttributedString attributedStringWithAttachment:attachment];
+        if (location == 0) {
+            self.shouldRejectAutocorrectInsertions = YES;
+            self.attributedText = [NSAttributedString attributedStringWithAttachment:attachment];
+            self.shouldRejectAutocorrectInsertions = NO;
+        }
         if (usingAbstraction) {
             [self.abstractionLayer popIgnore];
         }

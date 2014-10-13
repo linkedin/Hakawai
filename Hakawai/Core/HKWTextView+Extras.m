@@ -27,7 +27,7 @@
         return CGRectNull;
     }
     // Get the bottom-most rect
-    NSRange range = [self rangeForWordPrecedingLocation:self.selectedRange.location searchToEnd:NO];
+    NSRange range = [self rangeForWordPrecedingLocation:self.selectedRange.location searchToEnd:YES];
     UITextPosition *start = [self positionFromPosition:self.beginningOfDocument
                                                 offset:range.location];
     UITextPosition *end = [self positionFromPosition:self.beginningOfDocument
@@ -58,7 +58,7 @@
     NSCharacterSet *whitespaceNewlineSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     if (!self.inInsertionMode
         || location == 0
-        || location >= [self.text length]
+        || location > [self.text length]
         || [whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:location]]) {
         return NSMakeRange(NSNotFound, 0);
     }
@@ -73,13 +73,10 @@
             }
         }
     }
-    if (!toEnd) {
-        NSInteger length = location - firstLocation;
-        return NSMakeRange(firstLocation, length);
-    }
     NSInteger length;
     if (location == [self.text length]
-        || [whitespaceNewlineSet characterIsMember:[self.text characterAtIndex:location]]) {
+        || [whitespaceNewlineSet characterIsMember:[self.text characterAtIndex:location]]
+        || !toEnd) {
         // We're at the end of a word, or the end of the text field in general
         length = location - firstLocation;
     }
@@ -93,7 +90,7 @@
                 break;
             }
         }
-        length = cursor - location;
+        length = cursor - firstLocation;
     }
     return NSMakeRange(firstLocation, length);
 }
