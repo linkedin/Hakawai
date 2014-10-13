@@ -14,190 +14,107 @@
 
 #import "_HKWTextView.h"
 
-typedef enum {
-    HKWCycleFirstResponderModeNone,
-    HKWCycleFirstResponderModeAutocapitalizationNone,
-    HKWCycleFirstResponderModeAutocapitalizationWords,
-    HKWCycleFirstResponderModeAutocapitalizationSentences,
-    HKWCycleFirstResponderModeAutocapitalizationAllCharacters,
-    HKWCycleFirstResponderModeAutocorrectionDefault,
-    HKWCycleFirstResponderModeAutocorrectionNo,
-    HKWCycleFirstResponderModeAutocorrectionYes,
-    HKWCycleFirstResponderModeSpellCheckingDefault,
-    HKWCycleFirstResponderModeSpellCheckingNo,
-    HKWCycleFirstResponderModeSpellCheckingYes
-} HKWCycleFirstResponderMode;
+@interface HKWTextView ()
+@property (nonatomic, readonly) BOOL inInsertionMode;
+@end
 
 @implementation HKWTextView (Extras)
 
-- (void)dismissAutocorrectSuggestion {
-    [self cycleFirstResponderStatusWithMode:HKWCycleFirstResponderModeNone
-                            cancelAnimation:YES];
+#pragma mark - API (word utilities)
+
+- (CGRect)rectForWordPrecedingCursor {
+    if (!self.inInsertionMode || self.selectedRange.location == 0) {
+        return CGRectNull;
+    }
+    // Get the bottom-most rect
+    NSRange range = [self rangeForWordPrecedingLocation:self.selectedRange.location searchToEnd:NO];
+    UITextPosition *start = [self positionFromPosition:self.beginningOfDocument
+                                                offset:range.location];
+    UITextPosition *end = [self positionFromPosition:self.beginningOfDocument
+                                              offset:range.location + range.length - 1];
+    UITextRange *textRange = [self textRangeFromPosition:start toPosition:end];
+    NSArray *rects = [self selectionRectsForRange:textRange];
+    NSAssert([rects count] > 0, @"Internal error: no selection rects for range.");
+    // Go through all the rects and find the one placed the lowest
+    CGRect lowestRect = CGRectMake(0, FLT_MAX, 0, 0);
+    BOOL gotAtLeastOneRect = NO;
+    for (UITextSelectionRect *selectionRect in rects) {
+        if (selectionRect.rect.origin.y < lowestRect.origin.y && !HKW_rectIsDegenerate(selectionRect.rect)) {
+            lowestRect = selectionRect.rect;
+            gotAtLeastOneRect = YES;
+        }
+    }
+    if (!gotAtLeastOneRect) {
+        return CGRectNull;
+    }
+    return lowestRect;
 }
 
-- (void)overrideAutocapitalizationWith:(UITextAutocapitalizationType)override {
-    if (self.overridingAutocapitalization) {
-        return;
-    }
-    self.overridingAutocapitalization = YES;
-    self.originalAutocapitalization = self.autocapitalizationType;
-    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:override]
-                            cancelAnimation:YES];
+- (NSRange)rangeForWordPrecedingCursor {
+    return [self rangeForWordPrecedingLocation:self.selectedRange.location searchToEnd:YES];
 }
 
-- (void)restoreOriginalAutocapitalization:(BOOL)shouldCycle {
-    if (!self.overridingAutocapitalization) {
-        return;
+- (NSRange)rangeForWordPrecedingLocation:(NSInteger)location searchToEnd:(BOOL)toEnd {
+    NSCharacterSet *whitespaceNewlineSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    if (!self.inInsertionMode
+        || location == 0
+        || location >= [self.text length]
+        || [whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:location]]) {
+        return NSMakeRange(NSNotFound, 0);
     }
-    if (shouldCycle) {
-        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:self.originalAutocapitalization]
-                                cancelAnimation:YES];
+    // Walk backwards through the string to find the first delimiter.
+    NSInteger firstLocation = 0;
+    for (NSInteger i=location - 1; i>=0; i--) {
+        if (i > 0) {
+            unichar c = [self.text characterAtIndex:i];
+            if ([whitespaceNewlineSet characterIsMember:c]) {
+                firstLocation = i + 1;
+                break;
+            }
+        }
+    }
+    if (!toEnd) {
+        NSInteger length = location - firstLocation;
+        return NSMakeRange(firstLocation, length);
+    }
+    NSInteger length;
+    if (location == [self.text length]
+        || [whitespaceNewlineSet characterIsMember:[self.text characterAtIndex:location]]) {
+        // We're at the end of a word, or the end of the text field in general
+        length = location - firstLocation;
     }
     else {
-        self.autocapitalizationType = self.originalAutocapitalization;
+        // Walk forward through the string to find the end, or the next whitespace/newline
+        NSInteger cursor = firstLocation;
+        while (cursor < [self.text length]) {
+            cursor++;
+            if ([whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:cursor]]) {
+                cursor--;
+                break;
+            }
+        }
+        length = cursor - location;
     }
-    self.overridingSpellChecking = NO;
+    return NSMakeRange(firstLocation, length);
 }
 
-- (void)overrideAutocorrectionWith:(UITextAutocorrectionType)override {
-    if (self.overridingAutocorrection) {
-        return;
+- (unichar)characterPrecedingLocation:(NSInteger)location {
+    unichar character = (unichar)0;
+    if (location > 0 && location <= [self.text length]) {
+        character = [self.text characterAtIndex:(location - 1)];
     }
-    self.overridingAutocorrection = YES;
-    self.originalAutocorrection = self.autocorrectionType;
-    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:override]
-                            cancelAnimation:YES];
+    return character;
 }
 
-- (void)restoreOriginalAutocorrection:(BOOL)shouldCycle {
-    if (!self.overridingAutocorrection) {
-        return;
-    }
-    if (shouldCycle) {
-        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:self.originalAutocorrection]
-                                cancelAnimation:YES];
-    }
-    else {
-        self.autocorrectionType = self.originalAutocorrection;
-    }
-    self.overridingAutocorrection = NO;
+- (BOOL)inInsertionMode {
+    return (self.selectedRange.length == 0);
 }
 
-- (void)overrideSpellCheckingWith:(UITextSpellCheckingType)override {
-    if (self.overridingSpellChecking) {
-        return;
-    }
-    self.overridingSpellChecking = YES;
-    self.originalSpellChecking = self.spellCheckingType;
-    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:override]
-                            cancelAnimation:YES];
-}
-
-- (void)restoreOriginalSpellChecking:(BOOL)shouldCycle {
-    if (!self.overridingSpellChecking) {
-        return;
-    }
-    if (shouldCycle) {
-        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:self.originalSpellChecking]
-                                cancelAnimation:YES];
-    }
-    else {
-        self.spellCheckingType = self.originalSpellChecking;
-    }
-    self.overridingSpellChecking = NO;
-}
-
-
-#pragma mark - Private
-
-- (void)cycleFirstResponderStatusWithMode:(HKWCycleFirstResponderMode)mode cancelAnimation:(BOOL)cancelAnimation {
-    BOOL usingAbstraction = self.abstractionLayerEnabled;
-    if (usingAbstraction) {
-        [self.abstractionLayer pushIgnore];
-    }
-    self.firstResponderIsCycling = YES;
-    [self resignFirstResponder];
-
-    switch (mode) {
-        case HKWCycleFirstResponderModeAutocapitalizationNone:
-            self.autocapitalizationType = UITextAutocapitalizationTypeNone;
-            break;
-        case HKWCycleFirstResponderModeAutocapitalizationAllCharacters:
-            self.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
-            break;
-        case HKWCycleFirstResponderModeAutocapitalizationSentences:
-            self.autocapitalizationType = UITextAutocapitalizationTypeSentences;
-            break;
-        case HKWCycleFirstResponderModeAutocapitalizationWords:
-            self.autocapitalizationType = UITextAutocapitalizationTypeWords;
-            break;
-        case HKWCycleFirstResponderModeAutocorrectionDefault:
-            self.autocorrectionType = UITextAutocorrectionTypeDefault;
-            break;
-        case HKWCycleFirstResponderModeAutocorrectionNo:
-            self.autocorrectionType = UITextAutocorrectionTypeNo;
-            break;
-        case HKWCycleFirstResponderModeAutocorrectionYes:
-            self.autocorrectionType = UITextAutocorrectionTypeYes;
-            break;
-        case HKWCycleFirstResponderModeNone:
-            break;
-        case HKWCycleFirstResponderModeSpellCheckingDefault:
-            self.spellCheckingType = UITextSpellCheckingTypeDefault;
-            break;
-        case HKWCycleFirstResponderModeSpellCheckingNo:
-            self.spellCheckingType = UITextSpellCheckingTypeNo;
-            break;
-        case HKWCycleFirstResponderModeSpellCheckingYes:
-            self.spellCheckingType = UITextSpellCheckingTypeYes;
-            break;
-    }
-
-    [self becomeFirstResponder];
-    // The following cancels any animation that is automatically triggered as part of rejecting an autocorrect
-    //  suggestion
-    if (cancelAnimation) {
-        [self setContentOffset:self.contentOffset animated:NO];
-    }
-    self.firstResponderIsCycling = NO;
-    if (usingAbstraction) {
-        [self.abstractionLayer popIgnore];
-    }
-}
-
-+ (HKWCycleFirstResponderMode)modeForAutocapitalization:(UITextAutocapitalizationType)type {
-    switch (type) {
-        case UITextAutocapitalizationTypeNone:
-            return HKWCycleFirstResponderModeAutocapitalizationNone;
-        case UITextAutocapitalizationTypeWords:
-            return HKWCycleFirstResponderModeAutocapitalizationWords;
-        case UITextAutocapitalizationTypeSentences:
-            return HKWCycleFirstResponderModeAutocapitalizationSentences;
-        case UITextAutocapitalizationTypeAllCharacters:
-            return HKWCycleFirstResponderModeAutocapitalizationAllCharacters;
-    }
-}
-
-+ (HKWCycleFirstResponderMode)modeForAutocorrection:(UITextAutocorrectionType)type {
-    switch (type) {
-        case UITextAutocorrectionTypeDefault:
-            return HKWCycleFirstResponderModeAutocorrectionDefault;
-        case UITextAutocorrectionTypeNo:
-            return HKWCycleFirstResponderModeAutocorrectionNo;
-        case UITextAutocorrectionTypeYes:
-            return HKWCycleFirstResponderModeAutocorrectionYes;
-    }
-}
-
-+ (HKWCycleFirstResponderMode)modeForSpellChecking:(UITextSpellCheckingType)type {
-    switch (type) {
-        case UITextSpellCheckingTypeDefault:
-            return HKWCycleFirstResponderModeSpellCheckingDefault;
-        case UITextSpellCheckingTypeNo:
-            return HKWCycleFirstResponderModeSpellCheckingNo;
-        case UITextSpellCheckingTypeYes:
-            return HKWCycleFirstResponderModeSpellCheckingYes;
-    }
+/*!
+ Return NO if and only if both size dimensions of the \c CGRect argument are nonzero.
+ */
+BOOL HKW_rectIsDegenerate(CGRect rect) {
+    return (rect.size.width == 0 || rect.size.height == 0);
 }
 
 @end

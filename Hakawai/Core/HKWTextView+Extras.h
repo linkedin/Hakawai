@@ -12,6 +12,9 @@
 
 #import "HKWTextView.h"
 
+/*!
+ This category provides a number of (hopefully) useful extra capabilities which may be used directly or by plug-ins.
+ */
 @interface HKWTextView (Extras)
 
 /*!
@@ -20,56 +23,34 @@
 @property (nonatomic) BOOL disableVerticalScrolling;
 
 
-#pragma mark - Autoediting-related APIs
+#pragma mark - API (word utilities)
 
 /*!
- A property allowing a plug-in to inform the text view as to whether or not attempts by the autocorrect/predictive text
- system should be ignored.
-
- \warning This property is ignored if the abstraction layer is in use. The abstraction layer uses a different mechanism
- to accept or ignore attempted changes to the text view.
+ Return the rectangle corresponding to the word immediately preceding the cursor. If there is no word preceding the
+ cursor, the null rectangle is returned. The return value is relative to the coordinates of the parent text view.
  */
-@property (nonatomic) BOOL shouldRejectAutocorrectInsertions;
+- (CGRect)rectForWordPrecedingCursor;
 
 /*!
- If an autocorrect suggestion is currently being proposed, reject it. Otherwise, this method does nothing.
+ Return the range for the word immediately preceding the location. If there is no word preceding the location, the
+ range's location will be marked as the \c NSNotFound constant.
+
+ \param location    the location from where to begin searching
+ \param toEnd       whether or not the reported range should encompass the entire word, not just the length from the
+ beginning of the word to \c location
  */
-- (void)dismissAutocorrectSuggestion;
+- (NSRange)rangeForWordPrecedingLocation:(NSInteger)location searchToEnd:(BOOL)toEnd;
 
 /*!
- Temporarily override the text view's autocapitalization mode.
+ Return the range for the word immediately preceding the current selection range's start location. If there is no word
+ preceding the location, this method returns the \c NSNotFound constant.
  */
-- (void)overrideAutocapitalizationWith:(UITextAutocapitalizationType)override;
+- (NSRange)rangeForWordPrecedingCursor;
 
 /*!
- If the text view's autocapitalization mode was previously overriden, restore the original mode.
- \param shouldCycle    whether or not the first responder status should be cycled or not; set to NO if the text view is
-                       in the process of losing its first responder status
+ Return the character preceding the given location. If the location is 0 or invalid, this method returns 0 (the null
+ character).
  */
-- (void)restoreOriginalAutocapitalization:(BOOL)shouldCycle;
-
-/*!
- Temporarily override the text view's autocorrection mode.
- */
-- (void)overrideAutocorrectionWith:(UITextAutocorrectionType)override;
-
-/*!
- If the text view's autocorrection mode was previously overriden, restore the original mode.
- \param shouldCycle    whether or not the first responder status should be cycled or not; set to NO if the text view is
-                       in the process of losing its first responder status
- */
-- (void)restoreOriginalAutocorrection:(BOOL)shouldCycle;
-
-/*!
- Temporarily override the text view's spell checking mode.
- */
-- (void)overrideSpellCheckingWith:(UITextSpellCheckingType)override;
-
-/*!
- If the text view's spell checking mode was previously overriden, restore the original mode.
- \param shouldCycle    whether or not the first responder status should be cycled or not; set to NO if the text view is
-                       in the process of losing its first responder status
- */
-- (void)restoreOriginalSpellChecking:(BOOL)shouldCycle;
+- (unichar)characterPrecedingLocation:(NSInteger)location;
 
 @end

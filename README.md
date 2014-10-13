@@ -29,6 +29,12 @@ Hakawai uses class extensions, and as a result you should add the -ObjC linker f
 
 The primary Hakawai entity is the ``HKWTextView``, which takes the place of a vanilla ``UITextView``. Use it the same way as you would a ``UITextView``, with one important exception: **never** set the ``HKWTextView``'s ``delegate`` property. Instead, if you need the functionality of the ``UITextViewDelegate``, set the ``externalDelegate`` or ``simpleDelegate`` properties instead.
 
+Hakawai's functionality is divided up into three main categories:
+
+- ``HKWTextView+TextTransformation`` contains methods for working with and altering text and attributes within the text view
+- ``HKWTextView+Extras`` contains miscellaneous utilities
+- ``HKWTextView+Plugins`` contains an API intended for consumption by plug-ins; you may use these features directly as well, but doing so may or may not cause conflicts with any active plug-ins
+
 
 Plug-ins
 --------

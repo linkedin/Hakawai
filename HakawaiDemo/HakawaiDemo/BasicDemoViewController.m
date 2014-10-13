@@ -13,7 +13,7 @@
 #import "BasicDemoViewController.h"
 
 #import "HKWTextView.h"
-#import "HKWTextView+Plugins.h"
+#import "HKWTextView+TextTransformation.h"
 
 @interface BasicDemoViewController ()
 @property (weak, nonatomic) IBOutlet HKWTextView *textView;

@@ -16,9 +16,9 @@
 #import "HKWRoundedRectBackgroundAttributeValue.h"
 
 #import "HKWTextView.h"
+#import "HKWTextView+TextTransformation.h"
 #import "HKWTextView+Extras.h"
 #import "HKWTextView+Plugins.h"
-#import "HKWTextView+Utilities.h"
 
 #import "HKWMentionsAttribute.h"
 

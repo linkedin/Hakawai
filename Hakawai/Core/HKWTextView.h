@@ -37,6 +37,9 @@
  */
 @interface HKWTextView : UITextView
 
+
+#pragma mark - API (text view delegate)
+
 /*!
  An optional delegate object implementing the \c HKWTextViewDelegate protocol.
  
@@ -49,20 +52,8 @@
  */
 @property (nonatomic) id<UITextViewDelegate> simpleDelegate;
 
-/*!
- A readonly reference to an attached accessory view.
- */
-@property (nonatomic, weak, readonly) UIView *attachedAccessoryView;
 
-/*!
- A readonly reference to a view designated as the 'top-level view' for purposes of placing accessory views.
- */
-@property (nonatomic, weak, readonly) UIView *customTopLevelView;
-
-/*!
- Return whether or not the text view is in 'single line viewport' mode.
- */
-@property (nonatomic, readonly) BOOL inSingleLineViewportMode;
+#pragma mark - API (plug-ins)
 
 /// An array containing references to the simple plug-ins registered with the text view
 @property (nonatomic, readonly) NSArray *simplePlugins;
@@ -94,5 +85,23 @@
  Unregister a simple plug-in with the editor.
  */
 - (void)removeSimplePluginNamed:(NSString *)name;
+
+
+#pragma mark - API (plug-in status)
+
+/*!
+ A readonly reference to an attached accessory view.
+ */
+@property (nonatomic, weak, readonly) UIView *attachedAccessoryView;
+
+/*!
+ A readonly reference to a view designated as the 'top-level view' for purposes of placing accessory views.
+ */
+@property (nonatomic, weak, readonly) UIView *customTopLevelView;
+
+/*!
+ Return whether or not the text view is in 'single line viewport' mode.
+ */
+@property (nonatomic, readonly) BOOL inSingleLineViewportMode;
 
 @end

@@ -15,165 +15,21 @@
 
 #import "_HKWPrivateConstants.h"
 
+typedef enum {
+    HKWCycleFirstResponderModeNone,
+    HKWCycleFirstResponderModeAutocapitalizationNone,
+    HKWCycleFirstResponderModeAutocapitalizationWords,
+    HKWCycleFirstResponderModeAutocapitalizationSentences,
+    HKWCycleFirstResponderModeAutocapitalizationAllCharacters,
+    HKWCycleFirstResponderModeAutocorrectionDefault,
+    HKWCycleFirstResponderModeAutocorrectionNo,
+    HKWCycleFirstResponderModeAutocorrectionYes,
+    HKWCycleFirstResponderModeSpellCheckingDefault,
+    HKWCycleFirstResponderModeSpellCheckingNo,
+    HKWCycleFirstResponderModeSpellCheckingYes
+} HKWCycleFirstResponderMode;
+
 @implementation HKWTextView (Plugins)
-
-#pragma mark - API (text)
-
-- (void)transformSelectedTextWithTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
-    NSRange selectedRange = self.selectedRange;
-    if (!transformer || selectedRange.location == NSNotFound) {
-        return;
-    }
-    [self transformTextAtRange:selectedRange withTransformer:transformer];
-}
-
-- (void)transformTextAtRange:(NSRange)range
-             withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
-    BOOL usingAbstraction = self.abstractionLayerEnabled;
-    if (transformer && [self.attributedText length] == 0 && range.location == 0) {
-        // Special case: text view text is empty; beginning is valid
-        if (usingAbstraction) {
-            [self.abstractionLayer pushIgnore];
-        }
-        self.attributedText = transformer(nil);
-        if (usingAbstraction) {
-            [self.abstractionLayer popIgnore];
-        }
-        return;
-    }
-    if (!transformer
-        || range.location == NSNotFound
-        || range.location > [self.attributedText length]) {
-        return;
-    }
-
-    if (usingAbstraction) {
-        [self.abstractionLayer pushIgnore];
-    }
-    BOOL shouldRestore = self.selectedRange.length == 0 && self.selectedRange.location != NSNotFound;
-    NSRange originalSelectedRange = self.selectedRange;
-    self.transformInProgress = YES;
-    NSUInteger end = range.length + range.location;
-    if (end > [self.attributedText length]) {
-        // Trim the range if it extends past the end of the string.
-        end = [self.attributedText length];
-        range.length = [self.attributedText length] - range.location;
-    }
-    NSAttributedString *originalInfix = [self.attributedText attributedSubstringFromRange:range];
-    NSAttributedString *prefixString = [self.attributedText attributedSubstringFromRange:NSMakeRange(0, range.location)];
-    NSAttributedString *infixString = transformer(originalInfix);
-    NSAttributedString *postfixString = [self.attributedText attributedSubstringFromRange:NSMakeRange(end, [self.attributedText length] - end)];
-    NSMutableAttributedString *buffer = [[NSMutableAttributedString alloc] initWithAttributedString:prefixString];
-    if (infixString) [buffer appendAttributedString:infixString];
-    if (postfixString) [buffer appendAttributedString:postfixString];
-    self.attributedText = buffer;
-    if (shouldRestore && range.length == [infixString length]) {
-        // If the replacement text and the original text are the same length, restore the insertion cursor to its
-        //  original position.
-        self.selectedRange = originalSelectedRange;
-    }
-    self.transformInProgress = NO;
-    if ([self.externalDelegate respondsToSelector:@selector(textView:didChangeAttributedTextTo:originalText:originalRange:)]) {
-        [self.externalDelegate textView:self didChangeAttributedTextTo:infixString originalText:originalInfix originalRange:range];
-    }
-    if (usingAbstraction) {
-        [self.abstractionLayer popIgnore];
-    }
-}
-
-- (void)insertPlainText:(NSString *)text location:(NSUInteger)location {
-    [self insertAttributedText:[[NSAttributedString alloc] initWithString:text attributes:self.typingAttributes]
-                      location:location];
-}
-
-- (void)insertAttributedText:(NSAttributedString *)text location:(NSUInteger)location {
-    if ([text length] == 0) return;
-    NSAttributedString *(^transformer)(NSAttributedString *) = ^(NSAttributedString *input) {
-        return text;
-    };
-    [self transformTextAtRange:NSMakeRange(location, 0) withTransformer:transformer];
-}
-
-- (void)insertTextAttachment:(NSTextAttachment *)attachment location:(NSUInteger)location {
-    if (!attachment) return;
-    BOOL usingAbstraction = self.abstractionLayerEnabled;
-    if ([self.attributedText length] == 0) {
-        // Special case: text view text is empty; index is valid
-        if (usingAbstraction) {
-            [self.abstractionLayer pushIgnore];
-        }
-        if (location == 0) self.attributedText = [NSAttributedString attributedStringWithAttachment:attachment];
-        if (usingAbstraction) {
-            [self.abstractionLayer popIgnore];
-        }
-        return;
-    }
-    if (usingAbstraction) {
-        [self.abstractionLayer pushIgnore];
-    }
-    if (location >= [self.attributedText length]) {
-        location = [self.attributedText length] - 1;
-    }
-    [self insertAttributedText:[NSAttributedString attributedStringWithAttachment:attachment] location:location];
-    if ([self.externalDelegate respondsToSelector:@selector(textView:didReceiveNewTextAttachment:)]) {
-        [self.externalDelegate textView:self didReceiveNewTextAttachment:attachment];
-    }
-    if (usingAbstraction) {
-        [self.abstractionLayer popIgnore];
-    }
-}
-
-- (void)removeTextForRange:(NSRange)range {
-    if ([self.attributedText length] == 0
-        || range.location == NSNotFound
-        || range.location >= [self.attributedText length]
-        || range.length == 0) {
-        return;
-    }
-    NSAttributedString *(^transformer)(NSAttributedString *) = ^(NSAttributedString *input) {
-        return (NSAttributedString *)nil;
-    };
-    [self transformTextAtRange:range withTransformer:transformer];
-}
-
-
-#pragma mark - API (attributes)
-
-- (void)activateCustomAttributeWithName:(NSString *)name value:(id)value {
-    if ([name length] == 0 || !value) {
-        return;
-    }
-    self.customTypingAttributes[name] = value;
-}
-
-- (void)deactivateCustomAttributeWithName:(NSString *)name {
-    if ([name length] == 0) {
-        return;
-    }
-    [self.customTypingAttributes removeObjectForKey:name];
-}
-
-- (void)deactivateAllCustomAttributes {
-    [self.customTypingAttributes removeAllObjects];
-}
-
-- (void)stripAttributeFromTextAtRange:(NSRange)range attributeName:(NSString *)attributeName {
-    if (range.length == 0 || range.location == NSNotFound || [attributeName length] == 0) {
-        return;
-    }
-    NSAttributedString *(^transformer)(NSAttributedString *) = ^(NSAttributedString *input) {
-        NSMutableAttributedString *buffer = [input mutableCopy];
-        [buffer removeAttribute:attributeName range:NSMakeRange(0, [input length])];
-        return [buffer copy];
-    };
-    [self transformTextAtRange:range withTransformer:transformer];
-}
-
-- (void)transformTypingAttributesWithTransformer:(NSDictionary *(^)(NSDictionary *currentAttributes))transformer {
-    if (!transformer) return;
-    self.typingAttributes = transformer(self.typingAttributes);
-}
-
 
 #pragma mark - API (viewport)
 
@@ -372,6 +228,176 @@
 
 - (void)setTopLevelViewForAccessoryViewPositioning:(UIView *)view {
     self.customTopLevelView = view;
+}
+
+
+#pragma mark - API (autocorrect)
+
+- (void)dismissAutocorrectSuggestion {
+    [self cycleFirstResponderStatusWithMode:HKWCycleFirstResponderModeNone
+                            cancelAnimation:YES];
+}
+
+- (void)overrideAutocapitalizationWith:(UITextAutocapitalizationType)override {
+    if (self.overridingAutocapitalization) {
+        return;
+    }
+    self.overridingAutocapitalization = YES;
+    self.originalAutocapitalization = self.autocapitalizationType;
+    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:override]
+                            cancelAnimation:YES];
+}
+
+- (void)restoreOriginalAutocapitalization:(BOOL)shouldCycle {
+    if (!self.overridingAutocapitalization) {
+        return;
+    }
+    if (shouldCycle) {
+        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:self.originalAutocapitalization]
+                                cancelAnimation:YES];
+    }
+    else {
+        self.autocapitalizationType = self.originalAutocapitalization;
+    }
+    self.overridingSpellChecking = NO;
+}
+
+- (void)overrideAutocorrectionWith:(UITextAutocorrectionType)override {
+    if (self.overridingAutocorrection) {
+        return;
+    }
+    self.overridingAutocorrection = YES;
+    self.originalAutocorrection = self.autocorrectionType;
+    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:override]
+                            cancelAnimation:YES];
+}
+
+- (void)restoreOriginalAutocorrection:(BOOL)shouldCycle {
+    if (!self.overridingAutocorrection) {
+        return;
+    }
+    if (shouldCycle) {
+        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:self.originalAutocorrection]
+                                cancelAnimation:YES];
+    }
+    else {
+        self.autocorrectionType = self.originalAutocorrection;
+    }
+    self.overridingAutocorrection = NO;
+}
+
+- (void)overrideSpellCheckingWith:(UITextSpellCheckingType)override {
+    if (self.overridingSpellChecking) {
+        return;
+    }
+    self.overridingSpellChecking = YES;
+    self.originalSpellChecking = self.spellCheckingType;
+    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:override]
+                            cancelAnimation:YES];
+}
+
+- (void)restoreOriginalSpellChecking:(BOOL)shouldCycle {
+    if (!self.overridingSpellChecking) {
+        return;
+    }
+    if (shouldCycle) {
+        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:self.originalSpellChecking]
+                                cancelAnimation:YES];
+    }
+    else {
+        self.spellCheckingType = self.originalSpellChecking;
+    }
+    self.overridingSpellChecking = NO;
+}
+
+- (void)cycleFirstResponderStatusWithMode:(HKWCycleFirstResponderMode)mode cancelAnimation:(BOOL)cancelAnimation {
+    BOOL usingAbstraction = self.abstractionLayerEnabled;
+    if (usingAbstraction) {
+        [self.abstractionLayer pushIgnore];
+    }
+    self.firstResponderIsCycling = YES;
+    [self resignFirstResponder];
+
+    switch (mode) {
+        case HKWCycleFirstResponderModeAutocapitalizationNone:
+            self.autocapitalizationType = UITextAutocapitalizationTypeNone;
+            break;
+        case HKWCycleFirstResponderModeAutocapitalizationAllCharacters:
+            self.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
+            break;
+        case HKWCycleFirstResponderModeAutocapitalizationSentences:
+            self.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+            break;
+        case HKWCycleFirstResponderModeAutocapitalizationWords:
+            self.autocapitalizationType = UITextAutocapitalizationTypeWords;
+            break;
+        case HKWCycleFirstResponderModeAutocorrectionDefault:
+            self.autocorrectionType = UITextAutocorrectionTypeDefault;
+            break;
+        case HKWCycleFirstResponderModeAutocorrectionNo:
+            self.autocorrectionType = UITextAutocorrectionTypeNo;
+            break;
+        case HKWCycleFirstResponderModeAutocorrectionYes:
+            self.autocorrectionType = UITextAutocorrectionTypeYes;
+            break;
+        case HKWCycleFirstResponderModeNone:
+            break;
+        case HKWCycleFirstResponderModeSpellCheckingDefault:
+            self.spellCheckingType = UITextSpellCheckingTypeDefault;
+            break;
+        case HKWCycleFirstResponderModeSpellCheckingNo:
+            self.spellCheckingType = UITextSpellCheckingTypeNo;
+            break;
+        case HKWCycleFirstResponderModeSpellCheckingYes:
+            self.spellCheckingType = UITextSpellCheckingTypeYes;
+            break;
+    }
+
+    [self becomeFirstResponder];
+    // The following cancels any animation that is automatically triggered as part of rejecting an autocorrect
+    //  suggestion
+    if (cancelAnimation) {
+        [self setContentOffset:self.contentOffset animated:NO];
+    }
+    self.firstResponderIsCycling = NO;
+    if (usingAbstraction) {
+        [self.abstractionLayer popIgnore];
+    }
+}
+
++ (HKWCycleFirstResponderMode)modeForAutocapitalization:(UITextAutocapitalizationType)type {
+    switch (type) {
+        case UITextAutocapitalizationTypeNone:
+            return HKWCycleFirstResponderModeAutocapitalizationNone;
+        case UITextAutocapitalizationTypeWords:
+            return HKWCycleFirstResponderModeAutocapitalizationWords;
+        case UITextAutocapitalizationTypeSentences:
+            return HKWCycleFirstResponderModeAutocapitalizationSentences;
+        case UITextAutocapitalizationTypeAllCharacters:
+            return HKWCycleFirstResponderModeAutocapitalizationAllCharacters;
+    }
+}
+
++ (HKWCycleFirstResponderMode)modeForAutocorrection:(UITextAutocorrectionType)type {
+    switch (type) {
+        case UITextAutocorrectionTypeDefault:
+            return HKWCycleFirstResponderModeAutocorrectionDefault;
+        case UITextAutocorrectionTypeNo:
+            return HKWCycleFirstResponderModeAutocorrectionNo;
+        case UITextAutocorrectionTypeYes:
+            return HKWCycleFirstResponderModeAutocorrectionYes;
+    }
+}
+
++ (HKWCycleFirstResponderMode)modeForSpellChecking:(UITextSpellCheckingType)type {
+    switch (type) {
+        case UITextSpellCheckingTypeDefault:
+            return HKWCycleFirstResponderModeSpellCheckingDefault;
+        case UITextSpellCheckingTypeNo:
+            return HKWCycleFirstResponderModeSpellCheckingNo;
+        case UITextSpellCheckingTypeYes:
+            return HKWCycleFirstResponderModeSpellCheckingYes;
+    }
 }
 
 @end
