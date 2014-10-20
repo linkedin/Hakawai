@@ -15,6 +15,7 @@ Features
 - Programmatically dismiss autocorrect suggestions, and temporarily override the autocorrect, autocorrection, and spell checking modes.
 - Extend functionality by registering or unregistering plug-ins.
 - Custom 'rounded rect background' attribute, and a custom layout manager allowing additional attributes to be defined.
+- The fact that this text view implements a custom layout manager and text container fixes several ``UITextView`` bugs by default.
 - *EXPERIMENTAL* - Easily monitor user changes to the text view's contents using the optional Abstraction Layer; two-stage insertion for Chinese and Japanese keyboards is also properly handled. The Abstraction Layer is built into the text view; it can also be pulled out and used independently if you desire.
 
 
@@ -34,6 +35,17 @@ Hakawai's functionality is divided up into three main categories:
 - ``HKWTextView+TextTransformation`` contains methods for working with and altering text and attributes within the text view
 - ``HKWTextView+Extras`` contains miscellaneous utilities
 - ``HKWTextView+Plugins`` contains an API intended for consumption by plug-ins; you may use these features directly as well, but doing so may or may not cause conflicts with any active plug-ins
+
+
+### Sample App
+
+The ``HakawaiDemo`` sample app demonstrates some of Hakawai's features.
+
+The first tab contains a simple text entry field with buttons to reverse or perform a [ROT13](http://en.wikipedia.org/wiki/ROT13) transformation on the selected text.
+
+The second tab demonstrates control flow plug-ins and the Abstraction Layer, and contains a 'console' which will display the user's actions as they type in or delete text.
+
+The third tab demonstrates the mentions plug-in. You can type in ``@`` or ``+`` to see a list of entities (for demonstration's sake, the [25 earliest Turing Award winners](http://amturing.acm.org/byyear.cfm)) that you can select. You can also type in three characters of the name to bring up the chooser.
 
 
 Plug-ins
@@ -99,6 +111,15 @@ There are three required delegate methods in ``HKWMentionsDelegate``:
 - ``heightForCellForMentionsEntity:tableView:`` is how the plug-in asks your app for the height of the table view cell returned by the previous API method.
 
 
+### Positioning
+
+There are several positioning modes, all of which are described by the ``HKWMentionsChooserPositionMode`` enum. One of these modes must be passed in when the mentions plug-in is created. A comprehensive description of each mode can be found in the ``HKWMentionsPlugin.h`` header file.
+
+The ``EnclosedTop`` and ``EnclosedBottom`` modes automatically position the chooser UI completely within the text view, leaving a gap at the top or the bottom respectively for user input.
+
+The 'custom' modes allow the chooser view to be positioned arbitrarily relative to other UI elements on the current screen. The custom modes rely upon a block which you provide, called when the chooser view is first added to the view hierarchy. This block allows you to set up Auto Layout constraints as you see fit. In particular, call the ``setChooserTopLevelView:attachmentBlock:`` method before the chooser UI appears. The block takes one argument, which is a ``UIView`` representing the chooser view.
+
+
 ### Behavior
 
 A brief discussion of the state machine architecture and its implications follows.
@@ -120,7 +141,7 @@ If an annotation is created, the creation process is canceled, or the cursor is 
 Testing
 -------
 
-Hakawai includes an almost-comprehensive unit test suite for the main text view powered by the Specta and Expecta libraries (https://github.com/specta/specta). We hope to have test coverage for the abstraction layer and mentions plug-in in the future, although unit tests are probably not sufficient for testing these components. 
+Hakawai includes an almost-comprehensive unit test suite for the main text view powered by the [Specta and Expecta libraries](https://github.com/specta/specta). We hope to have test coverage for the abstraction layer and mentions plug-in in the future, although unit tests are probably not sufficient for testing these components. 
 
 
 Contributions
