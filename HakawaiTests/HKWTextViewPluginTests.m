@@ -46,7 +46,7 @@ describe(@"basic plugin API", ^{
     __block HKWTextView *textView;
 
     beforeEach(^{
-        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];\
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
     });
 
     it(@"should properly register and unregister basic plug-ins", ^{

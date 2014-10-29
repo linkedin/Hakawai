@@ -662,9 +662,8 @@ typedef enum {
         return NO;
     }
     // CASE 2: selection range
-    NSInteger currentLocation = range.location;
     for (NSInteger i = 0; i < range.length + 1; i++) {
-        currentLocation = range.location + i;
+        NSInteger currentLocation = range.location + i;
         if (currentLocation > [self.parentTextView.text length]) {
             // Out of bounds
             return NO;

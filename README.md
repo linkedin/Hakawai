@@ -149,9 +149,10 @@ Contributions
 
 Bug reports, feature requests, pull requests, comments, criticism, and honest feedback are all welcome. Please email austinzheng (at) gmail (dot) com.
 
-Plans for this library include:
+Plans/known issues for this library include:
 
 - Verifying proper functionality and integration of Abstraction Layer
+- Proper handling of non-period punctuation inserted after a predictive suggestion is selected (right now, implicit deletion of space is not registered).
 - Abstraction Layer support for Korean text input
 - Automated testing
 

@@ -483,8 +483,7 @@ typedef enum : NSUInteger {
             }
             else if (currentlyMarked) {
                 BOOL textWasPreviouslySelected = self.selectedRangeWhenTextWasLastSelected.location != NSNotFound;
-                NSRange markedRange = [self markedTextRange];
-                NSAssert(markedRange.length > 0,
+                NSAssert([self markedTextRange].length > 0,
                          @"Internal error: text cannot be currently marked with a mark range length of 0");
                 if (textWasPreviouslySelected) {
                     // The user selected text and has chosen replacement CJK text using an IME keyboard.

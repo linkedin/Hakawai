@@ -1,669 +1,1922 @@
-// !$*UTF8*$!
-{
-	archiveVersion = 1;
-	classes = {
-	};
-	objectVersion = 46;
-	objects = {
-
-/* Begin PBXBuildFile section */
-		D923C7A86BAE4140B98CE674 /* libPods-HakawaiTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA135592875A450893230734 /* libPods-HakawaiTests.a */; };
-		E11DF8D119EC8DA30072F4AD /* HKWTextView+TextTransformation.m in Sources */ = {isa = PBXBuildFile; fileRef = E11DF8D019EC8DA30072F4AD /* HKWTextView+TextTransformation.m */; };
-		E1233BFC19A303620052217A /* HKWTextViewPluginTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */; };
-		E1233C0019A3089B0052217A /* HKWTBasicDummyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233BFF19A3089B0052217A /* HKWTBasicDummyPlugin.m */; };
-		E1233C0319A3090B0052217A /* HKWTControlFlowDummyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233C0219A3090B0052217A /* HKWTControlFlowDummyPlugin.m */; };
-		E1233C0619A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233C0519A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m */; };
-		E1233C0919A3C6680052217A /* HKWTextViewAttributeTransformerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233C0819A3C6680052217A /* HKWTextViewAttributeTransformerTests.m */; };
-		E187EE5E19E62F9100AF163A /* HKWAbstractionLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = E187EE5D19E62F9100AF163A /* HKWAbstractionLayer.m */; };
-		E1B3088119A2C0D60096DE0E /* HKWAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087019A2C0D60096DE0E /* HKWAttribute.m */; };
-		E1B3088219A2C0D60096DE0E /* HKWTextView+Extras.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087419A2C0D60096DE0E /* HKWTextView+Extras.m */; };
-		E1B3088319A2C0D60096DE0E /* HKWTextView+Plugins.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087619A2C0D60096DE0E /* HKWTextView+Plugins.m */; };
-		E1B3088519A2C0D60096DE0E /* HKWTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087A19A2C0D60096DE0E /* HKWTextView.m */; };
-		E1B3088619A2C0D60096DE0E /* HKWLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */; };
-		E1B3088719A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */; };
-		E1B3089319A2C1890096DE0E /* HKWMentionsAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */; };
-		E1B3089419A2C1890096DE0E /* HKWMentionsCreationStateMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachine.m */; };
-		E1B3089519A2C1890096DE0E /* HKWMentionsPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */; };
-		E1B3089619A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */; };
-		E1B308A419A2C21A0096DE0E /* HKWDefaultChooserArrowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */; };
-		E1B308A519A2C21A0096DE0E /* HKWDefaultChooserBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */; };
-		E1B308A719A2C21A0096DE0E /* HKWDefaultChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */; };
-		E1B308A819A2C21A0096DE0E /* HKWAbstractChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */; };
-		E1C9676019A2A66000A4AA93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675F19A2A66000A4AA93 /* Foundation.framework */; };
-		E1C9676E19A2A66000A4AA93 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9676D19A2A66000A4AA93 /* XCTest.framework */; };
-		E1C9676F19A2A66000A4AA93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675F19A2A66000A4AA93 /* Foundation.framework */; };
-		E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9677019A2A66000A4AA93 /* UIKit.framework */; };
-		E1C9677419A2A66000A4AA93 /* libHakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675C19A2A66000A4AA93 /* libHakawai.a */; };
-		E1C9677A19A2A66000A4AA93 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E1C9677819A2A66000A4AA93 /* InfoPlist.strings */; };
-		E1D5501719A2EDF9001DCF1F /* HKWTextViewExtrasTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501619A2EDF9001DCF1F /* HKWTextViewExtrasTests.m */; };
-		E1D5501A19A2F479001DCF1F /* HKWTextViewAutoXTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501919A2F479001DCF1F /* HKWTextViewAutoXTests.m */; };
-		E1D5501D19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */; };
-		E1DC1F8D19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */; };
-/* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		E1C9677219A2A66000A4AA93 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E1C9675419A2A66000A4AA93 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E1C9675B19A2A66000A4AA93;
-			remoteInfo = Hakawai;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		E1C9675A19A2A66000A4AA93 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
-/* Begin PBXFileReference section */
-		DA135592875A450893230734 /* libPods-HakawaiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HakawaiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E11DF8CF19EC8DA30072F4AD /* HKWTextView+TextTransformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+TextTransformation.h"; sourceTree = "<group>"; };
-		E11DF8D019EC8DA30072F4AD /* HKWTextView+TextTransformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HKWTextView+TextTransformation.m"; sourceTree = "<group>"; };
-		E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewPluginTests.m; sourceTree = "<group>"; };
-		E1233BFE19A3089B0052217A /* HKWTBasicDummyPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTBasicDummyPlugin.h; path = "Supporting Classes/HKWTBasicDummyPlugin.h"; sourceTree = "<group>"; };
-		E1233BFF19A3089B0052217A /* HKWTBasicDummyPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTBasicDummyPlugin.m; path = "Supporting Classes/HKWTBasicDummyPlugin.m"; sourceTree = "<group>"; };
-		E1233C0119A3090B0052217A /* HKWTControlFlowDummyPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTControlFlowDummyPlugin.h; path = "Supporting Classes/HKWTControlFlowDummyPlugin.h"; sourceTree = "<group>"; };
-		E1233C0219A3090B0052217A /* HKWTControlFlowDummyPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTControlFlowDummyPlugin.m; path = "Supporting Classes/HKWTControlFlowDummyPlugin.m"; sourceTree = "<group>"; };
-		E1233C0519A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewSingleLineViewportModeTests.m; sourceTree = "<group>"; };
-		E1233C0819A3C6680052217A /* HKWTextViewAttributeTransformerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewAttributeTransformerTests.m; sourceTree = "<group>"; };
-		E187EE5C19E62F9100AF163A /* HKWAbstractionLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWAbstractionLayer.h; path = AbstractionLayer/HKWAbstractionLayer.h; sourceTree = "<group>"; };
-		E187EE5D19E62F9100AF163A /* HKWAbstractionLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWAbstractionLayer.m; path = AbstractionLayer/HKWAbstractionLayer.m; sourceTree = "<group>"; };
-		E1B3086C19A2C0D60096DE0E /* _HKWPrivateConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWPrivateConstants.h; sourceTree = "<group>"; };
-		E1B3086D19A2C0D60096DE0E /* _HKWTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWTextView.h; sourceTree = "<group>"; };
-		E1B3086F19A2C0D60096DE0E /* HKWAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWAttribute.h; sourceTree = "<group>"; };
-		E1B3087019A2C0D60096DE0E /* HKWAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWAttribute.m; sourceTree = "<group>"; };
-		E1B3087119A2C0D60096DE0E /* HKWControlFlowPluginProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWControlFlowPluginProtocols.h; sourceTree = "<group>"; };
-		E1B3087219A2C0D60096DE0E /* HKWSimplePluginProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWSimplePluginProtocol.h; sourceTree = "<group>"; };
-		E1B3087319A2C0D60096DE0E /* HKWTextView+Extras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+Extras.h"; sourceTree = "<group>"; };
-		E1B3087419A2C0D60096DE0E /* HKWTextView+Extras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HKWTextView+Extras.m"; sourceTree = "<group>"; };
-		E1B3087519A2C0D60096DE0E /* HKWTextView+Plugins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+Plugins.h"; sourceTree = "<group>"; };
-		E1B3087619A2C0D60096DE0E /* HKWTextView+Plugins.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HKWTextView+Plugins.m"; sourceTree = "<group>"; };
-		E1B3087919A2C0D60096DE0E /* HKWTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWTextView.h; sourceTree = "<group>"; };
-		E1B3087A19A2C0D60096DE0E /* HKWTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextView.m; sourceTree = "<group>"; };
-		E1B3087C19A2C0D60096DE0E /* HKWCustomAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWCustomAttributes.h; sourceTree = "<group>"; };
-		E1B3087D19A2C0D60096DE0E /* _HKWLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWLayoutManager.h; sourceTree = "<group>"; };
-		E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManager.m; sourceTree = "<group>"; };
-		E1B3087F19A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWRoundedRectBackgroundAttributeValue.h; sourceTree = "<group>"; };
-		E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWRoundedRectBackgroundAttributeValue.m; sourceTree = "<group>"; };
-		E1B3088919A2C1890096DE0E /* _HKWMentionsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsPlugin.h; path = Mentions/_HKWMentionsPlugin.h; sourceTree = "<group>"; };
-		E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsAttribute.h; path = Mentions/HKWMentionsAttribute.h; sourceTree = "<group>"; };
-		E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsAttribute.m; path = Mentions/HKWMentionsAttribute.m; sourceTree = "<group>"; };
-		E1B3088C19A2C1890096DE0E /* _HKWMentionsCreationStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsCreationStateMachine.h; path = Mentions/_HKWMentionsCreationStateMachine.h; sourceTree = "<group>"; };
-		E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsCreationStateMachine.m; path = Mentions/HKWMentionsCreationStateMachine.m; sourceTree = "<group>"; };
-		E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsEntityProtocol.h; path = Mentions/HKWMentionsEntityProtocol.h; sourceTree = "<group>"; };
-		E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsPlugin.h; path = Mentions/HKWMentionsPlugin.h; sourceTree = "<group>"; };
-		E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsPlugin.m; path = Mentions/HKWMentionsPlugin.m; sourceTree = "<group>"; };
-		E1B3089119A2C1890096DE0E /* _HKWMentionsStartDetectionStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsStartDetectionStateMachine.h; path = Mentions/_HKWMentionsStartDetectionStateMachine.h; sourceTree = "<group>"; };
-		E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsStartDetectionStateMachine.m; path = Mentions/HKWMentionsStartDetectionStateMachine.m; sourceTree = "<group>"; };
-		E1B3089919A2C21A0096DE0E /* _HKWDefaultChooserArrowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWDefaultChooserArrowView.h; sourceTree = "<group>"; };
-		E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserArrowView.m; sourceTree = "<group>"; };
-		E1B3089B19A2C21A0096DE0E /* _HKWDefaultChooserBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWDefaultChooserBorderView.h; sourceTree = "<group>"; };
-		E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserBorderView.m; sourceTree = "<group>"; };
-		E1B3089F19A2C21A0096DE0E /* _HKWDefaultChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWDefaultChooserView.h; sourceTree = "<group>"; };
-		E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserView.m; sourceTree = "<group>"; };
-		E1B308A119A2C21A0096DE0E /* HKWAbstractChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWAbstractChooserView.h; sourceTree = "<group>"; };
-		E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWAbstractChooserView.m; sourceTree = "<group>"; };
-		E1B308A319A2C21A0096DE0E /* HKWChooserViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWChooserViewProtocol.h; sourceTree = "<group>"; };
-		E1B308A919A2CC0F0096DE0E /* _HKWMentionsPrivateConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsPrivateConstants.h; path = Mentions/_HKWMentionsPrivateConstants.h; sourceTree = "<group>"; };
-		E1C9675C19A2A66000A4AA93 /* libHakawai.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHakawai.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		E1C9675F19A2A66000A4AA93 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		E1C9676319A2A66000A4AA93 /* Hakawai-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Hakawai-Prefix.pch"; sourceTree = "<group>"; };
-		E1C9676C19A2A66000A4AA93 /* HakawaiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HakawaiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E1C9676D19A2A66000A4AA93 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		E1C9677019A2A66000A4AA93 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		E1C9677719A2A66000A4AA93 /* HakawaiTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "HakawaiTests-Info.plist"; sourceTree = "<group>"; };
-		E1C9677919A2A66000A4AA93 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		E1D5501619A2EDF9001DCF1F /* HKWTextViewExtrasTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewExtrasTests.m; sourceTree = "<group>"; };
-		E1D5501919A2F479001DCF1F /* HKWTextViewAutoXTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewAutoXTests.m; sourceTree = "<group>"; };
-		E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewAccessoryViewTests.m; sourceTree = "<group>"; };
-		E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewTextTransformerTests.m; sourceTree = "<group>"; };
-		F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.xcconfig"; path = "Pods/Pods-HakawaiTests.xcconfig"; sourceTree = "<group>"; };
-/* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		E1C9675919A2A66000A4AA93 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E1C9676019A2A66000A4AA93 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E1C9676919A2A66000A4AA93 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E1C9677419A2A66000A4AA93 /* libHakawai.a in Frameworks */,
-				E1C9676E19A2A66000A4AA93 /* XCTest.framework in Frameworks */,
-				E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */,
-				E1C9676F19A2A66000A4AA93 /* Foundation.framework in Frameworks */,
-				D923C7A86BAE4140B98CE674 /* libPods-HakawaiTests.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
-/* Begin PBXGroup section */
-		E1233BFD19A308790052217A /* Supporting Classes */ = {
-			isa = PBXGroup;
-			children = (
-				E1233BFE19A3089B0052217A /* HKWTBasicDummyPlugin.h */,
-				E1233BFF19A3089B0052217A /* HKWTBasicDummyPlugin.m */,
-				E1233C0119A3090B0052217A /* HKWTControlFlowDummyPlugin.h */,
-				E1233C0219A3090B0052217A /* HKWTControlFlowDummyPlugin.m */,
-			);
-			name = "Supporting Classes";
-			sourceTree = "<group>";
-		};
-		E187EE5B19E62F6B00AF163A /* AbstractionLayer */ = {
-			isa = PBXGroup;
-			children = (
-				E187EE5C19E62F9100AF163A /* HKWAbstractionLayer.h */,
-				E187EE5D19E62F9100AF163A /* HKWAbstractionLayer.m */,
-			);
-			name = AbstractionLayer;
-			sourceTree = "<group>";
-		};
-		E1B3086B19A2C0D60096DE0E /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				E1B3086C19A2C0D60096DE0E /* _HKWPrivateConstants.h */,
-				E1B3087219A2C0D60096DE0E /* HKWSimplePluginProtocol.h */,
-				E1B3087119A2C0D60096DE0E /* HKWControlFlowPluginProtocols.h */,
-				E1B3087919A2C0D60096DE0E /* HKWTextView.h */,
-				E1B3086D19A2C0D60096DE0E /* _HKWTextView.h */,
-				E1B3087A19A2C0D60096DE0E /* HKWTextView.m */,
-				E11DF8CF19EC8DA30072F4AD /* HKWTextView+TextTransformation.h */,
-				E11DF8D019EC8DA30072F4AD /* HKWTextView+TextTransformation.m */,
-				E1B3087319A2C0D60096DE0E /* HKWTextView+Extras.h */,
-				E1B3087419A2C0D60096DE0E /* HKWTextView+Extras.m */,
-				E1B3087519A2C0D60096DE0E /* HKWTextView+Plugins.h */,
-				E1B3087619A2C0D60096DE0E /* HKWTextView+Plugins.m */,
-				E1B3086F19A2C0D60096DE0E /* HKWAttribute.h */,
-				E1B3087019A2C0D60096DE0E /* HKWAttribute.m */,
-				E187EE5B19E62F6B00AF163A /* AbstractionLayer */,
-				E1B3087B19A2C0D60096DE0E /* TextKit */,
-			);
-			path = Core;
-			sourceTree = "<group>";
-		};
-		E1B3087B19A2C0D60096DE0E /* TextKit */ = {
-			isa = PBXGroup;
-			children = (
-				E1B3087C19A2C0D60096DE0E /* HKWCustomAttributes.h */,
-				E1B3087D19A2C0D60096DE0E /* _HKWLayoutManager.h */,
-				E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */,
-				E1B3087F19A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.h */,
-				E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */,
-			);
-			path = TextKit;
-			sourceTree = "<group>";
-		};
-		E1B3088819A2C1140096DE0E /* Mentions */ = {
-			isa = PBXGroup;
-			children = (
-				E1B308A919A2CC0F0096DE0E /* _HKWMentionsPrivateConstants.h */,
-				E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */,
-				E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */,
-				E1B3088919A2C1890096DE0E /* _HKWMentionsPlugin.h */,
-				E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */,
-				E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */,
-				E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */,
-				E1B3089119A2C1890096DE0E /* _HKWMentionsStartDetectionStateMachine.h */,
-				E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */,
-				E1B3088C19A2C1890096DE0E /* _HKWMentionsCreationStateMachine.h */,
-				E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachine.m */,
-			);
-			name = Mentions;
-			sourceTree = "<group>";
-		};
-		E1B3089719A2C1DB0096DE0E /* ChooserView */ = {
-			isa = PBXGroup;
-			children = (
-				E1B3089819A2C21A0096DE0E /* Default */,
-				E1B308A319A2C21A0096DE0E /* HKWChooserViewProtocol.h */,
-				E1B308A119A2C21A0096DE0E /* HKWAbstractChooserView.h */,
-				E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */,
-			);
-			name = ChooserView;
-			path = Core;
-			sourceTree = "<group>";
-		};
-		E1B3089819A2C21A0096DE0E /* Default */ = {
-			isa = PBXGroup;
-			children = (
-				E1B3089F19A2C21A0096DE0E /* _HKWDefaultChooserView.h */,
-				E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */,
-				E1B3089919A2C21A0096DE0E /* _HKWDefaultChooserArrowView.h */,
-				E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */,
-				E1B3089B19A2C21A0096DE0E /* _HKWDefaultChooserBorderView.h */,
-				E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */,
-			);
-			path = Default;
-			sourceTree = "<group>";
-		};
-		E1C9675319A2A66000A4AA93 = {
-			isa = PBXGroup;
-			children = (
-				E1C9676119A2A66000A4AA93 /* Hakawai */,
-				E1C9677519A2A66000A4AA93 /* HakawaiTests */,
-				E1C9675E19A2A66000A4AA93 /* Frameworks */,
-				E1C9675D19A2A66000A4AA93 /* Products */,
-				F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */,
-			);
-			sourceTree = "<group>";
-		};
-		E1C9675D19A2A66000A4AA93 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				E1C9675C19A2A66000A4AA93 /* libHakawai.a */,
-				E1C9676C19A2A66000A4AA93 /* HakawaiTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		E1C9675E19A2A66000A4AA93 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				E1C9675F19A2A66000A4AA93 /* Foundation.framework */,
-				E1C9676D19A2A66000A4AA93 /* XCTest.framework */,
-				E1C9677019A2A66000A4AA93 /* UIKit.framework */,
-				DA135592875A450893230734 /* libPods-HakawaiTests.a */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		E1C9676119A2A66000A4AA93 /* Hakawai */ = {
-			isa = PBXGroup;
-			children = (
-				E1B3088819A2C1140096DE0E /* Mentions */,
-				E1B3086B19A2C0D60096DE0E /* Core */,
-				E1B3089719A2C1DB0096DE0E /* ChooserView */,
-				E1C9676219A2A66000A4AA93 /* Supporting Files */,
-			);
-			path = Hakawai;
-			sourceTree = "<group>";
-		};
-		E1C9676219A2A66000A4AA93 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				E1C9676319A2A66000A4AA93 /* Hakawai-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		E1C9677519A2A66000A4AA93 /* HakawaiTests */ = {
-			isa = PBXGroup;
-			children = (
-				E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */,
-				E1D5501919A2F479001DCF1F /* HKWTextViewAutoXTests.m */,
-				E1D5501619A2EDF9001DCF1F /* HKWTextViewExtrasTests.m */,
-				E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */,
-				E1233C0819A3C6680052217A /* HKWTextViewAttributeTransformerTests.m */,
-				E1233C0519A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m */,
-				E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */,
-				E1233BFD19A308790052217A /* Supporting Classes */,
-				E1C9677619A2A66000A4AA93 /* Supporting Files */,
-			);
-			path = HakawaiTests;
-			sourceTree = "<group>";
-		};
-		E1C9677619A2A66000A4AA93 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				E1C9677719A2A66000A4AA93 /* HakawaiTests-Info.plist */,
-				E1C9677819A2A66000A4AA93 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-/* End PBXGroup section */
-
-/* Begin PBXNativeTarget section */
-		E1C9675B19A2A66000A4AA93 /* Hakawai */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E1C9677F19A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "Hakawai" */;
-			buildPhases = (
-				E1C9675819A2A66000A4AA93 /* Sources */,
-				E1C9675919A2A66000A4AA93 /* Frameworks */,
-				E1C9675A19A2A66000A4AA93 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Hakawai;
-			productName = Hakawai;
-			productReference = E1C9675C19A2A66000A4AA93 /* libHakawai.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		E1C9676B19A2A66000A4AA93 /* HakawaiTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E1C9678219A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "HakawaiTests" */;
-			buildPhases = (
-				D955317DCA2B4C8697710DD2 /* Check Pods Manifest.lock */,
-				E1C9676819A2A66000A4AA93 /* Sources */,
-				E1C9676919A2A66000A4AA93 /* Frameworks */,
-				E1C9676A19A2A66000A4AA93 /* Resources */,
-				78EF1E9F7A6348EBBC9EC13B /* Copy Pods Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				E1C9677319A2A66000A4AA93 /* PBXTargetDependency */,
-			);
-			name = HakawaiTests;
-			productName = HakawaiTests;
-			productReference = E1C9676C19A2A66000A4AA93 /* HakawaiTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-/* End PBXNativeTarget section */
-
-/* Begin PBXProject section */
-		E1C9675419A2A66000A4AA93 /* Project object */ = {
-			isa = PBXProject;
-			attributes = {
-				LastUpgradeCheck = 0510;
-				ORGANIZATIONNAME = LinkedIn;
-				TargetAttributes = {
-					E1C9676B19A2A66000A4AA93 = {
-						TestTargetID = E1C9675B19A2A66000A4AA93;
-					};
-				};
-			};
-			buildConfigurationList = E1C9675719A2A66000A4AA93 /* Build configuration list for PBXProject "Hakawai" */;
-			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
-			hasScannedForEncodings = 0;
-			knownRegions = (
-				en,
-			);
-			mainGroup = E1C9675319A2A66000A4AA93;
-			productRefGroup = E1C9675D19A2A66000A4AA93 /* Products */;
-			projectDirPath = "";
-			projectRoot = "";
-			targets = (
-				E1C9675B19A2A66000A4AA93 /* Hakawai */,
-				E1C9676B19A2A66000A4AA93 /* HakawaiTests */,
-			);
-		};
-/* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		E1C9676A19A2A66000A4AA93 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E1C9677A19A2A66000A4AA93 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		78EF1E9F7A6348EBBC9EC13B /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-HakawaiTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D955317DCA2B4C8697710DD2 /* Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		E1C9675819A2A66000A4AA93 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E1B3089619A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m in Sources */,
-				E187EE5E19E62F9100AF163A /* HKWAbstractionLayer.m in Sources */,
-				E1B3088519A2C0D60096DE0E /* HKWTextView.m in Sources */,
-				E1B308A819A2C21A0096DE0E /* HKWAbstractChooserView.m in Sources */,
-				E1B3088719A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m in Sources */,
-				E1B3088119A2C0D60096DE0E /* HKWAttribute.m in Sources */,
-				E1B308A519A2C21A0096DE0E /* HKWDefaultChooserBorderView.m in Sources */,
-				E11DF8D119EC8DA30072F4AD /* HKWTextView+TextTransformation.m in Sources */,
-				E1B3088619A2C0D60096DE0E /* HKWLayoutManager.m in Sources */,
-				E1B3089419A2C1890096DE0E /* HKWMentionsCreationStateMachine.m in Sources */,
-				E1B3089519A2C1890096DE0E /* HKWMentionsPlugin.m in Sources */,
-				E1B3088219A2C0D60096DE0E /* HKWTextView+Extras.m in Sources */,
-				E1B308A719A2C21A0096DE0E /* HKWDefaultChooserView.m in Sources */,
-				E1B3088319A2C0D60096DE0E /* HKWTextView+Plugins.m in Sources */,
-				E1B308A419A2C21A0096DE0E /* HKWDefaultChooserArrowView.m in Sources */,
-				E1B3089319A2C1890096DE0E /* HKWMentionsAttribute.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E1C9676819A2A66000A4AA93 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E1233C0919A3C6680052217A /* HKWTextViewAttributeTransformerTests.m in Sources */,
-				E1DC1F8D19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m in Sources */,
-				E1D5501719A2EDF9001DCF1F /* HKWTextViewExtrasTests.m in Sources */,
-				E1233BFC19A303620052217A /* HKWTextViewPluginTests.m in Sources */,
-				E1D5501D19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m in Sources */,
-				E1233C0019A3089B0052217A /* HKWTBasicDummyPlugin.m in Sources */,
-				E1D5501A19A2F479001DCF1F /* HKWTextViewAutoXTests.m in Sources */,
-				E1233C0619A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m in Sources */,
-				E1233C0319A3090B0052217A /* HKWTControlFlowDummyPlugin.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		E1C9677319A2A66000A4AA93 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E1C9675B19A2A66000A4AA93 /* Hakawai */;
-			targetProxy = E1C9677219A2A66000A4AA93 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		E1C9677819A2A66000A4AA93 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E1C9677919A2A66000A4AA93 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
-/* Begin XCBuildConfiguration section */
-		E1C9677D19A2A66000A4AA93 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-			};
-			name = Debug;
-		};
-		E1C9677E19A2A66000A4AA93 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				SDKROOT = iphoneos;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		E1C9678019A2A66000A4AA93 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/Hakawai.dst;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		E1C9678119A2A66000A4AA93 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DSTROOT = /tmp/Hakawai.dst;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
-		E1C9678319A2A66000A4AA93 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "HakawaiTests/HakawaiTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		E1C9678419A2A66000A4AA93 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = F3D6B37A6EFA4C1283B759BF /* Pods-HakawaiTests.xcconfig */;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
-				INFOPLIST_FILE = "HakawaiTests/HakawaiTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
-/* End XCBuildConfiguration section */
-
-/* Begin XCConfigurationList section */
-		E1C9675719A2A66000A4AA93 /* Build configuration list for PBXProject "Hakawai" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E1C9677D19A2A66000A4AA93 /* Debug */,
-				E1C9677E19A2A66000A4AA93 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E1C9677F19A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "Hakawai" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E1C9678019A2A66000A4AA93 /* Debug */,
-				E1C9678119A2A66000A4AA93 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E1C9678219A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "HakawaiTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E1C9678319A2A66000A4AA93 /* Debug */,
-				E1C9678419A2A66000A4AA93 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-/* End XCConfigurationList section */
-	};
-	rootObject = E1C9675419A2A66000A4AA93 /* Project object */;
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>archiveVersion</key>
+	<string>1</string>
+	<key>classes</key>
+	<dict/>
+	<key>objectVersion</key>
+	<string>46</string>
+	<key>objects</key>
+	<dict>
+		<key>78EF1E9F7A6348EBBC9EC13B</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array/>
+			<key>inputPaths</key>
+			<array/>
+			<key>isa</key>
+			<string>PBXShellScriptBuildPhase</string>
+			<key>name</key>
+			<string>Copy Pods Resources</string>
+			<key>outputPaths</key>
+			<array/>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+			<key>shellPath</key>
+			<string>/bin/sh</string>
+			<key>shellScript</key>
+			<string>"${SRCROOT}/Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests-resources.sh"
+</string>
+			<key>showEnvVarsInLog</key>
+			<string>0</string>
+		</dict>
+		<key>ADAD3A835F36586553D39C04</key>
+		<dict>
+			<key>includeInIndex</key>
+			<string>1</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text.xcconfig</string>
+			<key>name</key>
+			<string>Pods-HakawaiTests.debug.xcconfig</string>
+			<key>path</key>
+			<string>Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.debug.xcconfig</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>C6EA852D0C609CF4B630BAD3</key>
+		<dict>
+			<key>includeInIndex</key>
+			<string>1</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text.xcconfig</string>
+			<key>name</key>
+			<string>Pods-HakawaiTests.release.xcconfig</string>
+			<key>path</key>
+			<string>Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.release.xcconfig</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>D923C7A86BAE4140B98CE674</key>
+		<dict>
+			<key>fileRef</key>
+			<string>DA135592875A450893230734</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>D955317DCA2B4C8697710DD2</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array/>
+			<key>inputPaths</key>
+			<array/>
+			<key>isa</key>
+			<string>PBXShellScriptBuildPhase</string>
+			<key>name</key>
+			<string>Check Pods Manifest.lock</string>
+			<key>outputPaths</key>
+			<array/>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+			<key>shellPath</key>
+			<string>/bin/sh</string>
+			<key>shellScript</key>
+			<string>diff "${PODS_ROOT}/../Podfile.lock" "${PODS_ROOT}/Manifest.lock" &gt; /dev/null
+if [[ $? != 0 ]] ; then
+    cat &lt;&lt; EOM
+error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.
+EOM
+    exit 1
+fi
+</string>
+			<key>showEnvVarsInLog</key>
+			<string>0</string>
+		</dict>
+		<key>DA135592875A450893230734</key>
+		<dict>
+			<key>explicitFileType</key>
+			<string>archive.ar</string>
+			<key>includeInIndex</key>
+			<string>0</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>path</key>
+			<string>libPods-HakawaiTests.a</string>
+			<key>sourceTree</key>
+			<string>BUILT_PRODUCTS_DIR</string>
+		</dict>
+		<key>E11DF8CF19EC8DA30072F4AD</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWTextView+TextTransformation.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E11DF8D019EC8DA30072F4AD</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextView+TextTransformation.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E11DF8D119EC8DA30072F4AD</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E11DF8D019EC8DA30072F4AD</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1233BFB19A303620052217A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextViewPluginTests.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1233BFC19A303620052217A</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1233BFB19A303620052217A</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1233BFD19A308790052217A</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1233BFE19A3089B0052217A</string>
+				<string>E1233BFF19A3089B0052217A</string>
+				<string>E1233C0119A3090B0052217A</string>
+				<string>E1233C0219A3090B0052217A</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Supporting Classes</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1233BFE19A3089B0052217A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>HKWTBasicDummyPlugin.h</string>
+			<key>path</key>
+			<string>Supporting Classes/HKWTBasicDummyPlugin.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1233BFF19A3089B0052217A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>name</key>
+			<string>HKWTBasicDummyPlugin.m</string>
+			<key>path</key>
+			<string>Supporting Classes/HKWTBasicDummyPlugin.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1233C0019A3089B0052217A</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1233BFF19A3089B0052217A</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1233C0119A3090B0052217A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>HKWTControlFlowDummyPlugin.h</string>
+			<key>path</key>
+			<string>Supporting Classes/HKWTControlFlowDummyPlugin.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1233C0219A3090B0052217A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>name</key>
+			<string>HKWTControlFlowDummyPlugin.m</string>
+			<key>path</key>
+			<string>Supporting Classes/HKWTControlFlowDummyPlugin.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1233C0319A3090B0052217A</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1233C0219A3090B0052217A</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1233C0519A30EC80052217A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextViewSingleLineViewportModeTests.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1233C0619A30EC80052217A</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1233C0519A30EC80052217A</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1233C0819A3C6680052217A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextViewAttributeTransformerTests.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1233C0919A3C6680052217A</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1233C0819A3C6680052217A</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E187EE5B19E62F6B00AF163A</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E187EE5C19E62F9100AF163A</string>
+				<string>E187EE5D19E62F9100AF163A</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>AbstractionLayer</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E187EE5C19E62F9100AF163A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>HKWAbstractionLayer.h</string>
+			<key>path</key>
+			<string>AbstractionLayer/HKWAbstractionLayer.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E187EE5D19E62F9100AF163A</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>name</key>
+			<string>HKWAbstractionLayer.m</string>
+			<key>path</key>
+			<string>AbstractionLayer/HKWAbstractionLayer.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E187EE5E19E62F9100AF163A</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E187EE5D19E62F9100AF163A</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3086B19A2C0D60096DE0E</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1B3086C19A2C0D60096DE0E</string>
+				<string>E1B3087219A2C0D60096DE0E</string>
+				<string>E1B3087119A2C0D60096DE0E</string>
+				<string>E1B3087919A2C0D60096DE0E</string>
+				<string>E1B3086D19A2C0D60096DE0E</string>
+				<string>E1B3087A19A2C0D60096DE0E</string>
+				<string>E11DF8CF19EC8DA30072F4AD</string>
+				<string>E11DF8D019EC8DA30072F4AD</string>
+				<string>E1B3087319A2C0D60096DE0E</string>
+				<string>E1B3087419A2C0D60096DE0E</string>
+				<string>E1B3087519A2C0D60096DE0E</string>
+				<string>E1B3087619A2C0D60096DE0E</string>
+				<string>E1B3086F19A2C0D60096DE0E</string>
+				<string>E1B3087019A2C0D60096DE0E</string>
+				<string>E187EE5B19E62F6B00AF163A</string>
+				<string>E1B3087B19A2C0D60096DE0E</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>path</key>
+			<string>Core</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3086C19A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>_HKWPrivateConstants.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3086D19A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>_HKWTextView.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3086F19A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWAttribute.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087019A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWAttribute.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087119A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWControlFlowPluginProtocols.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087219A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWSimplePluginProtocol.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087319A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWTextView+Extras.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087419A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextView+Extras.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087519A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWTextView+Plugins.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087619A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextView+Plugins.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087919A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWTextView.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087A19A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextView.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087B19A2C0D60096DE0E</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1B3087C19A2C0D60096DE0E</string>
+				<string>E1B3087D19A2C0D60096DE0E</string>
+				<string>E1B3087E19A2C0D60096DE0E</string>
+				<string>E1B3087F19A2C0D60096DE0E</string>
+				<string>E1B3088019A2C0D60096DE0E</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>path</key>
+			<string>TextKit</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087C19A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWCustomAttributes.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087D19A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>_HKWLayoutManager.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087E19A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWLayoutManager.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3087F19A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWRoundedRectBackgroundAttributeValue.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088019A2C0D60096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWRoundedRectBackgroundAttributeValue.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088119A2C0D60096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3087019A2C0D60096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3088219A2C0D60096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3087419A2C0D60096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3088319A2C0D60096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3087619A2C0D60096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3088519A2C0D60096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3087A19A2C0D60096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3088619A2C0D60096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3087E19A2C0D60096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3088719A2C0D60096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3088019A2C0D60096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3088819A2C1140096DE0E</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1B308A919A2CC0F0096DE0E</string>
+				<string>E1B3088E19A2C1890096DE0E</string>
+				<string>E1B3088F19A2C1890096DE0E</string>
+				<string>E1B3088919A2C1890096DE0E</string>
+				<string>E1B3089019A2C1890096DE0E</string>
+				<string>E1B3088A19A2C1890096DE0E</string>
+				<string>E1B3088B19A2C1890096DE0E</string>
+				<string>E1B3089119A2C1890096DE0E</string>
+				<string>E1B3089219A2C1890096DE0E</string>
+				<string>E1B3088C19A2C1890096DE0E</string>
+				<string>E1B3088D19A2C1890096DE0E</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Mentions</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088919A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>_HKWMentionsPlugin.h</string>
+			<key>path</key>
+			<string>Mentions/_HKWMentionsPlugin.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088A19A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>HKWMentionsAttribute.h</string>
+			<key>path</key>
+			<string>Mentions/HKWMentionsAttribute.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088B19A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>name</key>
+			<string>HKWMentionsAttribute.m</string>
+			<key>path</key>
+			<string>Mentions/HKWMentionsAttribute.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088C19A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>_HKWMentionsCreationStateMachine.h</string>
+			<key>path</key>
+			<string>Mentions/_HKWMentionsCreationStateMachine.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088D19A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>name</key>
+			<string>HKWMentionsCreationStateMachine.m</string>
+			<key>path</key>
+			<string>Mentions/HKWMentionsCreationStateMachine.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088E19A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>HKWMentionsEntityProtocol.h</string>
+			<key>path</key>
+			<string>Mentions/HKWMentionsEntityProtocol.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3088F19A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>HKWMentionsPlugin.h</string>
+			<key>path</key>
+			<string>Mentions/HKWMentionsPlugin.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089019A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>name</key>
+			<string>HKWMentionsPlugin.m</string>
+			<key>path</key>
+			<string>Mentions/HKWMentionsPlugin.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089119A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>_HKWMentionsStartDetectionStateMachine.h</string>
+			<key>path</key>
+			<string>Mentions/_HKWMentionsStartDetectionStateMachine.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089219A2C1890096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>name</key>
+			<string>HKWMentionsStartDetectionStateMachine.m</string>
+			<key>path</key>
+			<string>Mentions/HKWMentionsStartDetectionStateMachine.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089319A2C1890096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3088B19A2C1890096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3089419A2C1890096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3088D19A2C1890096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3089519A2C1890096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3089019A2C1890096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3089619A2C1890096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3089219A2C1890096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B3089719A2C1DB0096DE0E</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1B3089819A2C21A0096DE0E</string>
+				<string>E1B308A319A2C21A0096DE0E</string>
+				<string>E1B308A119A2C21A0096DE0E</string>
+				<string>E1B308A219A2C21A0096DE0E</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>ChooserView</string>
+			<key>path</key>
+			<string>Core</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089819A2C21A0096DE0E</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1B3089F19A2C21A0096DE0E</string>
+				<string>E1B308A019A2C21A0096DE0E</string>
+				<string>E1B3089919A2C21A0096DE0E</string>
+				<string>E1B3089A19A2C21A0096DE0E</string>
+				<string>E1B3089B19A2C21A0096DE0E</string>
+				<string>E1B3089C19A2C21A0096DE0E</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>path</key>
+			<string>Default</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089919A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>_HKWDefaultChooserArrowView.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089A19A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWDefaultChooserArrowView.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089B19A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>_HKWDefaultChooserBorderView.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089C19A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWDefaultChooserBorderView.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B3089F19A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>_HKWDefaultChooserView.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B308A019A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWDefaultChooserView.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B308A119A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWAbstractChooserView.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B308A219A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWAbstractChooserView.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B308A319A2C21A0096DE0E</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>HKWChooserViewProtocol.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1B308A419A2C21A0096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3089A19A2C21A0096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B308A519A2C21A0096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B3089C19A2C21A0096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B308A719A2C21A0096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B308A019A2C21A0096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B308A819A2C21A0096DE0E</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1B308A219A2C21A0096DE0E</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1B308A919A2CC0F0096DE0E</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>name</key>
+			<string>_HKWMentionsPrivateConstants.h</string>
+			<key>path</key>
+			<string>Mentions/_HKWMentionsPrivateConstants.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9675319A2A66000A4AA93</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1C9676119A2A66000A4AA93</string>
+				<string>E1C9677519A2A66000A4AA93</string>
+				<string>E1C9675E19A2A66000A4AA93</string>
+				<string>E1C9675D19A2A66000A4AA93</string>
+				<string>F7DB70E8EF6448CBE34D48FE</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9675419A2A66000A4AA93</key>
+		<dict>
+			<key>attributes</key>
+			<dict>
+				<key>LastUpgradeCheck</key>
+				<string>0510</string>
+				<key>ORGANIZATIONNAME</key>
+				<string>LinkedIn</string>
+				<key>TargetAttributes</key>
+				<dict>
+					<key>E1C9676B19A2A66000A4AA93</key>
+					<dict>
+						<key>TestTargetID</key>
+						<string>E1C9675B19A2A66000A4AA93</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>buildConfigurationList</key>
+			<string>E1C9675719A2A66000A4AA93</string>
+			<key>compatibilityVersion</key>
+			<string>Xcode 3.2</string>
+			<key>developmentRegion</key>
+			<string>English</string>
+			<key>hasScannedForEncodings</key>
+			<string>0</string>
+			<key>isa</key>
+			<string>PBXProject</string>
+			<key>knownRegions</key>
+			<array>
+				<string>en</string>
+			</array>
+			<key>mainGroup</key>
+			<string>E1C9675319A2A66000A4AA93</string>
+			<key>productRefGroup</key>
+			<string>E1C9675D19A2A66000A4AA93</string>
+			<key>projectDirPath</key>
+			<string></string>
+			<key>projectReferences</key>
+			<array/>
+			<key>projectRoot</key>
+			<string></string>
+			<key>targets</key>
+			<array>
+				<string>E1C9675B19A2A66000A4AA93</string>
+				<string>E1C9676B19A2A66000A4AA93</string>
+			</array>
+		</dict>
+		<key>E1C9675719A2A66000A4AA93</key>
+		<dict>
+			<key>buildConfigurations</key>
+			<array>
+				<string>E1C9677D19A2A66000A4AA93</string>
+				<string>E1C9677E19A2A66000A4AA93</string>
+			</array>
+			<key>defaultConfigurationIsVisible</key>
+			<string>0</string>
+			<key>defaultConfigurationName</key>
+			<string>Release</string>
+			<key>isa</key>
+			<string>XCConfigurationList</string>
+		</dict>
+		<key>E1C9675819A2A66000A4AA93</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array>
+				<string>E1B3089619A2C1890096DE0E</string>
+				<string>E187EE5E19E62F9100AF163A</string>
+				<string>E1B3088519A2C0D60096DE0E</string>
+				<string>E1B308A819A2C21A0096DE0E</string>
+				<string>E1B3088719A2C0D60096DE0E</string>
+				<string>E1B3088119A2C0D60096DE0E</string>
+				<string>E1B308A519A2C21A0096DE0E</string>
+				<string>E11DF8D119EC8DA30072F4AD</string>
+				<string>E1B3088619A2C0D60096DE0E</string>
+				<string>E1B3089419A2C1890096DE0E</string>
+				<string>E1B3089519A2C1890096DE0E</string>
+				<string>E1B3088219A2C0D60096DE0E</string>
+				<string>E1B308A719A2C21A0096DE0E</string>
+				<string>E1B3088319A2C0D60096DE0E</string>
+				<string>E1B308A419A2C21A0096DE0E</string>
+				<string>E1B3089319A2C1890096DE0E</string>
+			</array>
+			<key>isa</key>
+			<string>PBXSourcesBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>E1C9675919A2A66000A4AA93</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array>
+				<string>E1C9676019A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXFrameworksBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>E1C9675A19A2A66000A4AA93</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>dstPath</key>
+			<string>include/$(PRODUCT_NAME)</string>
+			<key>dstSubfolderSpec</key>
+			<string>16</string>
+			<key>files</key>
+			<array/>
+			<key>isa</key>
+			<string>PBXCopyFilesBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>E1C9675B19A2A66000A4AA93</key>
+		<dict>
+			<key>buildConfigurationList</key>
+			<string>E1C9677F19A2A66000A4AA93</string>
+			<key>buildPhases</key>
+			<array>
+				<string>E1C9675819A2A66000A4AA93</string>
+				<string>E1C9675919A2A66000A4AA93</string>
+				<string>E1C9675A19A2A66000A4AA93</string>
+			</array>
+			<key>buildRules</key>
+			<array/>
+			<key>dependencies</key>
+			<array/>
+			<key>isa</key>
+			<string>PBXNativeTarget</string>
+			<key>name</key>
+			<string>Hakawai</string>
+			<key>productName</key>
+			<string>Hakawai</string>
+			<key>productReference</key>
+			<string>E1C9675C19A2A66000A4AA93</string>
+			<key>productType</key>
+			<string>com.apple.product-type.library.static</string>
+		</dict>
+		<key>E1C9675C19A2A66000A4AA93</key>
+		<dict>
+			<key>explicitFileType</key>
+			<string>archive.ar</string>
+			<key>includeInIndex</key>
+			<string>0</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>path</key>
+			<string>libHakawai.a</string>
+			<key>sourceTree</key>
+			<string>BUILT_PRODUCTS_DIR</string>
+		</dict>
+		<key>E1C9675D19A2A66000A4AA93</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1C9675C19A2A66000A4AA93</string>
+				<string>E1C9676C19A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Products</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9675E19A2A66000A4AA93</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1C9675F19A2A66000A4AA93</string>
+				<string>E1C9676D19A2A66000A4AA93</string>
+				<string>E1C9677019A2A66000A4AA93</string>
+				<string>DA135592875A450893230734</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Frameworks</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9675F19A2A66000A4AA93</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>wrapper.framework</string>
+			<key>name</key>
+			<string>Foundation.framework</string>
+			<key>path</key>
+			<string>System/Library/Frameworks/Foundation.framework</string>
+			<key>sourceTree</key>
+			<string>SDKROOT</string>
+		</dict>
+		<key>E1C9676019A2A66000A4AA93</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1C9675F19A2A66000A4AA93</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1C9676119A2A66000A4AA93</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1B3088819A2C1140096DE0E</string>
+				<string>E1B3086B19A2C0D60096DE0E</string>
+				<string>E1B3089719A2C1DB0096DE0E</string>
+				<string>E1C9676219A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>path</key>
+			<string>Hakawai</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9676219A2A66000A4AA93</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1C9676319A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Supporting Files</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9676319A2A66000A4AA93</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>Hakawai-Prefix.pch</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9676819A2A66000A4AA93</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array>
+				<string>E1233C0919A3C6680052217A</string>
+				<string>E1DC1F8D19A2D38B00BCF8C7</string>
+				<string>E1D5501719A2EDF9001DCF1F</string>
+				<string>E1233BFC19A303620052217A</string>
+				<string>E1D5501D19A2F77A001DCF1F</string>
+				<string>E1233C0019A3089B0052217A</string>
+				<string>E1D5501A19A2F479001DCF1F</string>
+				<string>E1233C0619A30EC80052217A</string>
+				<string>E1233C0319A3090B0052217A</string>
+			</array>
+			<key>isa</key>
+			<string>PBXSourcesBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>E1C9676919A2A66000A4AA93</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array>
+				<string>E1C9677419A2A66000A4AA93</string>
+				<string>E1C9676E19A2A66000A4AA93</string>
+				<string>E1C9677119A2A66000A4AA93</string>
+				<string>E1C9676F19A2A66000A4AA93</string>
+				<string>D923C7A86BAE4140B98CE674</string>
+			</array>
+			<key>isa</key>
+			<string>PBXFrameworksBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>E1C9676A19A2A66000A4AA93</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array>
+				<string>E1C9677A19A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXResourcesBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>E1C9676B19A2A66000A4AA93</key>
+		<dict>
+			<key>buildConfigurationList</key>
+			<string>E1C9678219A2A66000A4AA93</string>
+			<key>buildPhases</key>
+			<array>
+				<string>D955317DCA2B4C8697710DD2</string>
+				<string>E1C9676819A2A66000A4AA93</string>
+				<string>E1C9676919A2A66000A4AA93</string>
+				<string>E1C9676A19A2A66000A4AA93</string>
+				<string>78EF1E9F7A6348EBBC9EC13B</string>
+			</array>
+			<key>buildRules</key>
+			<array/>
+			<key>dependencies</key>
+			<array>
+				<string>E1C9677319A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXNativeTarget</string>
+			<key>name</key>
+			<string>HakawaiTests</string>
+			<key>productName</key>
+			<string>HakawaiTests</string>
+			<key>productReference</key>
+			<string>E1C9676C19A2A66000A4AA93</string>
+			<key>productType</key>
+			<string>com.apple.product-type.bundle.unit-test</string>
+		</dict>
+		<key>E1C9676C19A2A66000A4AA93</key>
+		<dict>
+			<key>explicitFileType</key>
+			<string>wrapper.cfbundle</string>
+			<key>includeInIndex</key>
+			<string>0</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>path</key>
+			<string>HakawaiTests.xctest</string>
+			<key>sourceTree</key>
+			<string>BUILT_PRODUCTS_DIR</string>
+		</dict>
+		<key>E1C9676D19A2A66000A4AA93</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>wrapper.framework</string>
+			<key>name</key>
+			<string>XCTest.framework</string>
+			<key>path</key>
+			<string>Library/Frameworks/XCTest.framework</string>
+			<key>sourceTree</key>
+			<string>DEVELOPER_DIR</string>
+		</dict>
+		<key>E1C9676E19A2A66000A4AA93</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1C9676D19A2A66000A4AA93</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1C9676F19A2A66000A4AA93</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1C9675F19A2A66000A4AA93</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1C9677019A2A66000A4AA93</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>wrapper.framework</string>
+			<key>name</key>
+			<string>UIKit.framework</string>
+			<key>path</key>
+			<string>Library/Frameworks/UIKit.framework</string>
+			<key>sourceTree</key>
+			<string>DEVELOPER_DIR</string>
+		</dict>
+		<key>E1C9677119A2A66000A4AA93</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1C9677019A2A66000A4AA93</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1C9677219A2A66000A4AA93</key>
+		<dict>
+			<key>containerPortal</key>
+			<string>E1C9675419A2A66000A4AA93</string>
+			<key>isa</key>
+			<string>PBXContainerItemProxy</string>
+			<key>proxyType</key>
+			<string>1</string>
+			<key>remoteGlobalIDString</key>
+			<string>E1C9675B19A2A66000A4AA93</string>
+			<key>remoteInfo</key>
+			<string>Hakawai</string>
+		</dict>
+		<key>E1C9677319A2A66000A4AA93</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXTargetDependency</string>
+			<key>target</key>
+			<string>E1C9675B19A2A66000A4AA93</string>
+			<key>targetProxy</key>
+			<string>E1C9677219A2A66000A4AA93</string>
+		</dict>
+		<key>E1C9677419A2A66000A4AA93</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1C9675C19A2A66000A4AA93</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1C9677519A2A66000A4AA93</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1233BFB19A303620052217A</string>
+				<string>E1D5501919A2F479001DCF1F</string>
+				<string>E1D5501619A2EDF9001DCF1F</string>
+				<string>E1DC1F8C19A2D38B00BCF8C7</string>
+				<string>E1233C0819A3C6680052217A</string>
+				<string>E1233C0519A30EC80052217A</string>
+				<string>E1D5501C19A2F77A001DCF1F</string>
+				<string>E1233BFD19A308790052217A</string>
+				<string>E1C9677619A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>path</key>
+			<string>HakawaiTests</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9677619A2A66000A4AA93</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1C9677719A2A66000A4AA93</string>
+				<string>E1C9677819A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Supporting Files</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9677719A2A66000A4AA93</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text.plist.xml</string>
+			<key>path</key>
+			<string>HakawaiTests-Info.plist</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9677819A2A66000A4AA93</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E1C9677919A2A66000A4AA93</string>
+			</array>
+			<key>isa</key>
+			<string>PBXVariantGroup</string>
+			<key>name</key>
+			<string>InfoPlist.strings</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9677919A2A66000A4AA93</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text.plist.strings</string>
+			<key>name</key>
+			<string>en</string>
+			<key>path</key>
+			<string>en.lproj/InfoPlist.strings</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1C9677A19A2A66000A4AA93</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1C9677819A2A66000A4AA93</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1C9677D19A2A66000A4AA93</key>
+		<dict>
+			<key>buildSettings</key>
+			<dict>
+				<key>ALWAYS_SEARCH_USER_PATHS</key>
+				<string>NO</string>
+				<key>CLANG_CXX_LANGUAGE_STANDARD</key>
+				<string>gnu++0x</string>
+				<key>CLANG_CXX_LIBRARY</key>
+				<string>libc++</string>
+				<key>CLANG_ENABLE_MODULES</key>
+				<string>YES</string>
+				<key>CLANG_ENABLE_OBJC_ARC</key>
+				<string>YES</string>
+				<key>CLANG_WARN_BOOL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_DIRECT_OBJC_ISA_USAGE</key>
+				<string>YES_ERROR</string>
+				<key>CLANG_WARN_EMPTY_BODY</key>
+				<string>YES</string>
+				<key>CLANG_WARN_ENUM_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_INT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_OBJC_ROOT_CLASS</key>
+				<string>YES_ERROR</string>
+				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
+				<string>YES</string>
+				<key>COPY_PHASE_STRIP</key>
+				<string>NO</string>
+				<key>GCC_C_LANGUAGE_STANDARD</key>
+				<string>gnu99</string>
+				<key>GCC_DYNAMIC_NO_PIC</key>
+				<string>NO</string>
+				<key>GCC_OPTIMIZATION_LEVEL</key>
+				<string>0</string>
+				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+				<array>
+					<string>DEBUG=1</string>
+					<string>$(inherited)</string>
+				</array>
+				<key>GCC_SYMBOLS_PRIVATE_EXTERN</key>
+				<string>NO</string>
+				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
+				<string>YES</string>
+				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
+				<string>YES_ERROR</string>
+				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
+				<string>YES_AGGRESSIVE</string>
+				<key>GCC_WARN_UNUSED_FUNCTION</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNUSED_VARIABLE</key>
+				<string>YES</string>
+				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
+				<string>7.1</string>
+				<key>ONLY_ACTIVE_ARCH</key>
+				<string>YES</string>
+				<key>SDKROOT</key>
+				<string>iphoneos</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Debug</string>
+		</dict>
+		<key>E1C9677E19A2A66000A4AA93</key>
+		<dict>
+			<key>buildSettings</key>
+			<dict>
+				<key>ALWAYS_SEARCH_USER_PATHS</key>
+				<string>NO</string>
+				<key>CLANG_CXX_LANGUAGE_STANDARD</key>
+				<string>gnu++0x</string>
+				<key>CLANG_CXX_LIBRARY</key>
+				<string>libc++</string>
+				<key>CLANG_ENABLE_MODULES</key>
+				<string>YES</string>
+				<key>CLANG_ENABLE_OBJC_ARC</key>
+				<string>YES</string>
+				<key>CLANG_WARN_BOOL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_DIRECT_OBJC_ISA_USAGE</key>
+				<string>YES_ERROR</string>
+				<key>CLANG_WARN_EMPTY_BODY</key>
+				<string>YES</string>
+				<key>CLANG_WARN_ENUM_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_INT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_OBJC_ROOT_CLASS</key>
+				<string>YES_ERROR</string>
+				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
+				<string>YES</string>
+				<key>COPY_PHASE_STRIP</key>
+				<string>YES</string>
+				<key>ENABLE_NS_ASSERTIONS</key>
+				<string>NO</string>
+				<key>GCC_C_LANGUAGE_STANDARD</key>
+				<string>gnu99</string>
+				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
+				<string>YES</string>
+				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
+				<string>YES_ERROR</string>
+				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
+				<string>YES_AGGRESSIVE</string>
+				<key>GCC_WARN_UNUSED_FUNCTION</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNUSED_VARIABLE</key>
+				<string>YES</string>
+				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
+				<string>7.1</string>
+				<key>SDKROOT</key>
+				<string>iphoneos</string>
+				<key>VALIDATE_PRODUCT</key>
+				<string>YES</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Release</string>
+		</dict>
+		<key>E1C9677F19A2A66000A4AA93</key>
+		<dict>
+			<key>buildConfigurations</key>
+			<array>
+				<string>E1C9678019A2A66000A4AA93</string>
+				<string>E1C9678119A2A66000A4AA93</string>
+			</array>
+			<key>defaultConfigurationIsVisible</key>
+			<string>0</string>
+			<key>defaultConfigurationName</key>
+			<string>Release</string>
+			<key>isa</key>
+			<string>XCConfigurationList</string>
+		</dict>
+		<key>E1C9678019A2A66000A4AA93</key>
+		<dict>
+			<key>buildSettings</key>
+			<dict>
+				<key>DSTROOT</key>
+				<string>/tmp/Hakawai.dst</string>
+				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
+				<string>YES</string>
+				<key>GCC_PREFIX_HEADER</key>
+				<string>Hakawai/Hakawai-Prefix.pch</string>
+				<key>OTHER_LDFLAGS</key>
+				<string>-ObjC</string>
+				<key>PRODUCT_NAME</key>
+				<string>$(TARGET_NAME)</string>
+				<key>SKIP_INSTALL</key>
+				<string>YES</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Debug</string>
+		</dict>
+		<key>E1C9678119A2A66000A4AA93</key>
+		<dict>
+			<key>buildSettings</key>
+			<dict>
+				<key>DSTROOT</key>
+				<string>/tmp/Hakawai.dst</string>
+				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
+				<string>YES</string>
+				<key>GCC_PREFIX_HEADER</key>
+				<string>Hakawai/Hakawai-Prefix.pch</string>
+				<key>OTHER_LDFLAGS</key>
+				<string>-ObjC</string>
+				<key>PRODUCT_NAME</key>
+				<string>$(TARGET_NAME)</string>
+				<key>SKIP_INSTALL</key>
+				<string>YES</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Release</string>
+		</dict>
+		<key>E1C9678219A2A66000A4AA93</key>
+		<dict>
+			<key>buildConfigurations</key>
+			<array>
+				<string>E1C9678319A2A66000A4AA93</string>
+				<string>E1C9678419A2A66000A4AA93</string>
+			</array>
+			<key>defaultConfigurationIsVisible</key>
+			<string>0</string>
+			<key>defaultConfigurationName</key>
+			<string>Release</string>
+			<key>isa</key>
+			<string>XCConfigurationList</string>
+		</dict>
+		<key>E1C9678319A2A66000A4AA93</key>
+		<dict>
+			<key>baseConfigurationReference</key>
+			<string>ADAD3A835F36586553D39C04</string>
+			<key>buildSettings</key>
+			<dict>
+				<key>FRAMEWORK_SEARCH_PATHS</key>
+				<array>
+					<string>$(SDKROOT)/Developer/Library/Frameworks</string>
+					<string>$(inherited)</string>
+					<string>$(DEVELOPER_FRAMEWORKS_DIR)</string>
+				</array>
+				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
+				<string>YES</string>
+				<key>GCC_PREFIX_HEADER</key>
+				<string>Hakawai/Hakawai-Prefix.pch</string>
+				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+				<array>
+					<string>DEBUG=1</string>
+					<string>$(inherited)</string>
+				</array>
+				<key>INFOPLIST_FILE</key>
+				<string>HakawaiTests/HakawaiTests-Info.plist</string>
+				<key>PRODUCT_NAME</key>
+				<string>$(TARGET_NAME)</string>
+				<key>WRAPPER_EXTENSION</key>
+				<string>xctest</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Debug</string>
+		</dict>
+		<key>E1C9678419A2A66000A4AA93</key>
+		<dict>
+			<key>baseConfigurationReference</key>
+			<string>C6EA852D0C609CF4B630BAD3</string>
+			<key>buildSettings</key>
+			<dict>
+				<key>FRAMEWORK_SEARCH_PATHS</key>
+				<array>
+					<string>$(SDKROOT)/Developer/Library/Frameworks</string>
+					<string>$(inherited)</string>
+					<string>$(DEVELOPER_FRAMEWORKS_DIR)</string>
+				</array>
+				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
+				<string>YES</string>
+				<key>GCC_PREFIX_HEADER</key>
+				<string>Hakawai/Hakawai-Prefix.pch</string>
+				<key>INFOPLIST_FILE</key>
+				<string>HakawaiTests/HakawaiTests-Info.plist</string>
+				<key>PRODUCT_NAME</key>
+				<string>$(TARGET_NAME)</string>
+				<key>WRAPPER_EXTENSION</key>
+				<string>xctest</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Release</string>
+		</dict>
+		<key>E1D5501619A2EDF9001DCF1F</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextViewExtrasTests.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1D5501719A2EDF9001DCF1F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1D5501619A2EDF9001DCF1F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1D5501919A2F479001DCF1F</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextViewAutoXTests.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1D5501A19A2F479001DCF1F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1D5501919A2F479001DCF1F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1D5501C19A2F77A001DCF1F</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextViewAccessoryViewTests.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1D5501D19A2F77A001DCF1F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1D5501C19A2F77A001DCF1F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>E1DC1F8C19A2D38B00BCF8C7</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>HKWTextViewTextTransformerTests.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>E1DC1F8D19A2D38B00BCF8C7</key>
+		<dict>
+			<key>fileRef</key>
+			<string>E1DC1F8C19A2D38B00BCF8C7</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F7DB70E8EF6448CBE34D48FE</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>ADAD3A835F36586553D39C04</string>
+				<string>C6EA852D0C609CF4B630BAD3</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Pods</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+	</dict>
+	<key>rootObject</key>
+	<string>E1C9675419A2A66000A4AA93</string>
+</dict>
+</plist>
