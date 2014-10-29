@@ -39,7 +39,7 @@ Hakawai's functionality is divided up into three main categories:
 
 ### Sample App
 
-The ``HakawaiDemo`` sample app demonstrates some of Hakawai's features.
+The ``HakawaiDemo`` sample app demonstrates some of Hakawai's features. Get it by using CocoaPods' ``try`` feature: ``pod try Hakawai``, or by manually checking out the repository and running the ``HakawaiDemo`` scheme.
 
 The first tab contains a simple text entry field with buttons to reverse or perform a [ROT13](http://en.wikipedia.org/wiki/ROT13) transformation on the selected text.
 

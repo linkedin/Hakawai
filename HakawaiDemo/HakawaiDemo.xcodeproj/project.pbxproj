@@ -21,6 +21,23 @@
 		E1562BD519E73C4600D68787 /* libHakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1562BD419E73C4600D68787 /* libHakawai.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		E16EBF1A1A01765E008D6A89 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E16EBF151A01765E008D6A89 /* Hakawai.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E1C9675C19A2A66000A4AA93;
+			remoteInfo = Hakawai;
+		};
+		E16EBF1C1A01765E008D6A89 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E16EBF151A01765E008D6A89 /* Hakawai.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E1C9676C19A2A66000A4AA93;
+			remoteInfo = HakawaiTests;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		E11DF8C119E7741D0072F4AD /* MentionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MentionsManager.h; sourceTree = "<group>"; };
 		E11DF8C219E7741D0072F4AD /* MentionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MentionsManager.m; sourceTree = "<group>"; };
@@ -43,6 +60,7 @@
 		E1562BD119E737BB00D68787 /* SampleAbstractionLayerPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleAbstractionLayerPlugin.h; sourceTree = "<group>"; };
 		E1562BD219E737BB00D68787 /* SampleAbstractionLayerPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleAbstractionLayerPlugin.m; sourceTree = "<group>"; };
 		E1562BD419E73C4600D68787 /* libHakawai.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHakawai.a; path = "../../../Library/Developer/Xcode/DerivedData/Hakawai-cjeestplxjjygthexnwbgdlvmstc/Build/Products/Debug-iphoneos/libHakawai.a"; sourceTree = "<group>"; };
+		E16EBF151A01765E008D6A89 /* Hakawai.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Hakawai.xcodeproj; path = ../Hakawai.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +78,7 @@
 		E1562B9219E72A6F00D68787 = {
 			isa = PBXGroup;
 			children = (
+				E16EBF151A01765E008D6A89 /* Hakawai.xcodeproj */,
 				E1562BD419E73C4600D68787 /* libHakawai.a */,
 				E1562B9D19E72A6F00D68787 /* HakawaiDemo */,
 				E1562B9C19E72A6F00D68787 /* Products */,
@@ -132,6 +151,15 @@
 			name = Mentions;
 			sourceTree = "<group>";
 		};
+		E16EBF161A01765E008D6A89 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E16EBF1B1A01765E008D6A89 /* libHakawai.a */,
+				E16EBF1D1A01765E008D6A89 /* HakawaiTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -177,12 +205,35 @@
 			mainGroup = E1562B9219E72A6F00D68787;
 			productRefGroup = E1562B9C19E72A6F00D68787 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = E16EBF161A01765E008D6A89 /* Products */;
+					ProjectRef = E16EBF151A01765E008D6A89 /* Hakawai.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				E1562B9A19E72A6F00D68787 /* HakawaiDemo */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		E16EBF1B1A01765E008D6A89 /* libHakawai.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libHakawai.a;
+			remoteRef = E16EBF1A1A01765E008D6A89 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E16EBF1D1A01765E008D6A89 /* HakawaiTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = HakawaiTests.xctest;
+			remoteRef = E16EBF1C1A01765E008D6A89 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E1562B9919E72A6F00D68787 /* Resources */ = {
