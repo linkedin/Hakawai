@@ -1,7 +1,9 @@
-hakawai-textview
-================
+Hakawai
+=======
 
 A subclass of ``UITextView`` providing extended functionality and support for 'plug-ins'. Hakawai ships with the 'Mentions' plug-in, which provides a powerful and flexible way to easily add social-media-esque 'mentions'-style annotation support to your iOS application.
+
+*For a higher-level overview, check out our [blog post](http://engineering.linkedin.com/ios/introducing-hakawai-powerful-mentions-enabled-text-view-ios) at the LinkedIn engineering blog.*
 
 
 Features
@@ -147,12 +149,12 @@ Hakawai includes an almost-comprehensive unit test suite for the main text view 
 Contributions
 -------------
 
-Bug reports, feature requests, pull requests, comments, criticism, and honest feedback are all welcome. Please email austinzheng (at) gmail (dot) com.
+Bug reports, feature requests, pull requests, comments, criticism, and honest feedback are all welcome. Please file tickets on GitHub.
 
 Plans/known issues for this library include:
 
 - Verifying proper functionality and integration of Abstraction Layer
-- Proper handling of non-period punctuation inserted after a predictive suggestion is selected (right now, implicit deletion of space is not registered).
+- Proper handling of non-period punctuation inserted after a predictive suggestion is selected (right now, implicit deletion of space when it's replaced by the punctuation is not registered).
 - Abstraction Layer support for Korean text input
 - Automated testing
 
