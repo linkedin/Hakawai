@@ -24,7 +24,7 @@ Features
 Get Started
 -----------
 
-Hakawai makes extensive use of TextKit, and requires iOS 7.1 or later. (Unfortunately, there are severe TextKit bugs in 7.0 that break many of the features offered by the library.)
+Hakawai makes extensive use of TextKit, and requires iOS 7.1 or later. (Unfortunately, there are severe TextKit bugs in 7.0 that break many of the features offered by the library.) At your own risk, you may try using Hakawai with iOS 7.0 (this may be a viable option if you only want to use the text transformers).
 
 If you are using CocoaPods, just add ``pod 'Hakawai'`` to your Podfile. Otherwise, check out the project and copy the source files into your own project.
 

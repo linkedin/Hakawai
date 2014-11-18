@@ -16,9 +16,11 @@
 
 #import "HKWTextView.h"
 #import "HKWMentionsPlugin.h"
+#import "_HKWOSVersionMacros.h"
 
 @interface MentionsDemoViewController ()
 @property (nonatomic, weak) IBOutlet HKWTextView *textView;
+@property (nonatomic, weak) IBOutlet UIButton *listMentionsButton;
 @property (nonatomic, strong) HKWMentionsPlugin *plugin;
 @end
 
@@ -30,24 +32,36 @@
     self.textView.layer.borderWidth = 0.5;
     self.textView.layer.borderColor = [UIColor lightGrayColor].CGColor;
 
-    // Set up the mentions system
-    HKWMentionsChooserPositionMode mode = HKWMentionsChooserPositionModeEnclosedTop;
-    // In this demo, the user may explicitly begin a mention with either the '@' or '+' characters
-    NSCharacterSet *controlCharacters = [NSCharacterSet characterSetWithCharactersInString:@"@+"];
-    // The user may also begin a mention by typing three characters (set searchLength to 0 to disable)
-    HKWMentionsPlugin *mentionsPlugin = [HKWMentionsPlugin mentionsPluginWithChooserMode:mode
-                                                                       controlCharacters:controlCharacters
-                                                                            searchLength:3];
-    // If the text view loses focus while the mention chooser is up, and then regains focus, it will automatically put
-    //  the mentions chooser back up
-    mentionsPlugin.resumeMentionsCreationEnabled = YES;
-    // Add edge insets so chooser view doesn't overlap the text view's cosmetic grey border
-    mentionsPlugin.chooserViewEdgeInsets = UIEdgeInsetsMake(0, 0.5, 0.5, 0.5);
-    self.plugin = mentionsPlugin;
-    self.plugin.chooserViewBackgroundColor = LIGHT_GRAY_COLOR;
-    // The mentions plug-in requires a delegate, which provides it with mentions entities in response to a query string
-    mentionsPlugin.delegate = [MentionsManager sharedInstance];
-    self.textView.controlFlowPlugin = mentionsPlugin;
+    if (HKW_SYSTEM_VERSION_LESS_THAN(_iOS_7_1)) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Warning"
+                                                        message:@"The mentions plug-in is only supported on iOS 7.1 and later."
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+        self.textView.editable = NO;
+        self.listMentionsButton.enabled = NO;
+    }
+    else {
+        // Set up the mentions system
+        HKWMentionsChooserPositionMode mode = HKWMentionsChooserPositionModeEnclosedTop;
+        // In this demo, the user may explicitly begin a mention with either the '@' or '+' characters
+        NSCharacterSet *controlCharacters = [NSCharacterSet characterSetWithCharactersInString:@"@+"];
+        // The user may also begin a mention by typing three characters (set searchLength to 0 to disable)
+        HKWMentionsPlugin *mentionsPlugin = [HKWMentionsPlugin mentionsPluginWithChooserMode:mode
+                                                                           controlCharacters:controlCharacters
+                                                                                searchLength:3];
+        // If the text view loses focus while the mention chooser is up, and then regains focus, it will automatically put
+        //  the mentions chooser back up
+        mentionsPlugin.resumeMentionsCreationEnabled = YES;
+        // Add edge insets so chooser view doesn't overlap the text view's cosmetic grey border
+        mentionsPlugin.chooserViewEdgeInsets = UIEdgeInsetsMake(0, 0.5, 0.5, 0.5);
+        self.plugin = mentionsPlugin;
+        self.plugin.chooserViewBackgroundColor = LIGHT_GRAY_COLOR;
+        // The mentions plug-in requires a delegate, which provides it with mentions entities in response to a query string
+        mentionsPlugin.delegate = [MentionsManager sharedInstance];
+        self.textView.controlFlowPlugin = mentionsPlugin;
+    }
 }
 
 

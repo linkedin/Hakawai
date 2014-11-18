@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Hakawai"
-  s.version      = "1.0.4"
+  s.version      = "1.0.5"
   s.summary      = "Hakawai aims to be a more powerful UITextView."
   s.description  = <<-DESC
                    Hakawai is a subclass of UITextView that exposes a number of convenience APIs, and supports further extension via 'plug-ins'. Hakawai ships with an easy-to-use, powerful, and customizable plug-in allowing users to create social media 'mentions'-style annotations.
@@ -19,8 +19,8 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/linkedin/Hakawai/"
   s.license      = { :type => "Apache License, Version 2.0", :file => "LICENSE" }
   s.authors      = "Austin Zheng"
-  s.platform = :ios, "7.1"
-  s.source       = { :git => "https://github.com/linkedin/Hakawai.git", :tag => "1.0.4" }
+  s.platform = :ios, "7.0"
+  s.source       = { :git => "https://github.com/linkedin/Hakawai.git", :tag => "1.0.5" }
   s.framework  = "UIKit"
   s.requires_arc = true
 end
