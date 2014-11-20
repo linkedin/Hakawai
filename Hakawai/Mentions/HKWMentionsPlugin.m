@@ -1441,7 +1441,7 @@ typedef enum {
 - (void)asyncRetrieveEntitiesForKeyString:(NSString *)keyString
                                searchType:(HKWMentionsSearchType)type
                          controlCharacter:(unichar)character
-                               completion:(void (^)(NSArray *, BOOL))completionBlock {
+                               completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
     [self.delegate asyncRetrieveEntitiesForKeyString:keyString
                                           searchType:type
                                     controlCharacter:character

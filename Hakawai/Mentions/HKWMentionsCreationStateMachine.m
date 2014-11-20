@@ -205,12 +205,13 @@ typedef enum {
                 [self.delegate asyncRetrieveEntitiesForKeyString:[self.stringBuffer copy]
                                                       searchType:self.searchType
                                                 controlCharacter:self.explicitSearchControlCharacter
-                                                      completion:^(NSArray *results, BOOL isComplete) {
+                                                      completion:^(NSArray *results, BOOL dedupe, BOOL isComplete) {
                                                           [__self dataReturnedWithResults:results
                                                                            sequenceNumber:sequenceNumber
                                                                             triggerAction:(isWhitespace
                                                                                            ? HKWMentionsCreationActionWhitespaceCharacterInserted
                                                                                            : HKWMentionsCreationActionNormalCharacterInserted)
+                                                                            dedupeResults:dedupe
                                                                       dataFetchIsComplete:isComplete];
                                                       }];
             }
@@ -322,10 +323,11 @@ typedef enum {
             [self.delegate asyncRetrieveEntitiesForKeyString:[self.stringBuffer copy]
                                                   searchType:self.searchType
                                             controlCharacter:self.explicitSearchControlCharacter
-                                                  completion:^(NSArray *results, BOOL isComplete) {
+                                                  completion:^(NSArray *results, BOOL dedupe, BOOL isComplete) {
                                                       [__self dataReturnedWithResults:results
                                                                        sequenceNumber:sequenceNumber
                                                                         triggerAction:HKWMentionsCreationActionCharacterDeleted
+                                                                        dedupeResults:dedupe
                                                                   dataFetchIsComplete:isComplete];
                                                   }];
             break;
@@ -385,10 +387,11 @@ typedef enum {
     [self.delegate asyncRetrieveEntitiesForKeyString:prefix
                                           searchType:self.searchType
                                     controlCharacter:self.explicitSearchControlCharacter
-                                          completion:^(NSArray *results, BOOL isComplete) {
+                                          completion:^(NSArray *results, BOOL dedupe, BOOL isComplete) {
                                               [__self dataReturnedWithResults:results
                                                                sequenceNumber:sequenceNumber
                                                                 triggerAction:HKWMentionsCreationActionNone
+                                                                dedupeResults:dedupe
                                                           dataFetchIsComplete:isComplete];
                                           }];
 }
@@ -596,10 +599,11 @@ typedef enum {
             [self.delegate asyncRetrieveEntitiesForKeyString:[self.stringBuffer copy]
                                                   searchType:self.searchType
                                             controlCharacter:self.explicitSearchControlCharacter
-                                                  completion:^(NSArray *results, BOOL isComplete) {
+                                                  completion:^(NSArray *results, BOOL dedupe, BOOL isComplete) {
                                                       [__self dataReturnedWithResults:results
                                                                        sequenceNumber:sequenceNumber
                                                                         triggerAction:self.lastTriggerAction
+                                                                        dedupeResults:dedupe
                                                                   dataFetchIsComplete:isComplete];
                                                   }];
             break;
@@ -615,6 +619,7 @@ typedef enum {
 - (void)dataReturnedWithResults:(NSArray *)results
                  sequenceNumber:(NSUInteger)sequence
                   triggerAction:(HKWMentionsCreationAction)action
+                  dedupeResults:(BOOL)dedupe
             dataFetchIsComplete:(BOOL)isComplete {
     // Check for error conditions
     if (sequence != self.sequenceNumber) {
@@ -638,7 +643,7 @@ typedef enum {
         else {
             // Append additional data and update the state.
             self.currentQueryIsComplete = isComplete;
-            [self appendAdditionalResults:results previousAction:action];
+            [self appendAdditionalResults:results dedupeResults:dedupe previousAction:action];
         }
         return;
     }
@@ -655,16 +660,31 @@ typedef enum {
 
     // We have at least one response
     self.resultsState = HKWMentionsCreationResultsStateCreatingMentionWithResults;
-#ifdef DEBUG
+
+    NSUInteger numResults = [results count];
+    NSMutableArray *validResults = [NSMutableArray arrayWithCapacity:numResults];
+    NSMutableSet *uniqueIds = [NSMutableSet setWithCapacity:numResults];
     for (id entity in results) {
+#ifdef DEBUG
         // Validate
         NSAssert([entity conformsToProtocol:@protocol(HKWMentionsEntityProtocol)],
                  @"Data results array contained at least one object that didn't conform to the protocol. This is a \
                  serious error. Object: %@",
                  entity);
-    }
 #endif
-    self.entityArray = [results copy];
+        if (dedupe) {
+            // This is the first response; protect against duplicates within this response
+            NSString *uniqueId = [self uniqueIdForEntity:entity];
+            if ([uniqueId length] && ![uniqueIds containsObject:uniqueId]) {
+                [validResults addObject:entity];
+                [uniqueIds addObject:uniqueId];
+            }
+        }
+        else {
+            [validResults addObject:entity];
+        }
+    }
+    self.entityArray = [validResults copy];
 
     // If mentions creation is still active and we haven't shown the chooser view, show it now.
     if (self.state != HKWMentionsCreationStateQuiescent
@@ -673,13 +693,40 @@ typedef enum {
     }
 }
 
-- (void)appendAdditionalResults:(NSArray *)results previousAction:(HKWMentionsCreationAction)previousAction {
+- (void)appendAdditionalResults:(NSArray *)results
+                  dedupeResults:(BOOL)dedupe
+                 previousAction:(HKWMentionsCreationAction)previousAction {
+
     // Append the additional results to the current list of results
     if ([results count] > 0) {
+        // If results should be deduped, create a set containing uniqueIds for all existing entities.
+        NSMutableSet *uniqueIds = [NSMutableSet setWithCapacity:[self.entityArray count]];
+        if (dedupe) {
+            for (id entity in self.entityArray) {
+                if ([entity conformsToProtocol:@protocol(HKWMentionsEntityProtocol)]) {
+                    NSString *uniqueId = [self uniqueIdForEntity:entity];
+                    if ([uniqueId length]) {
+                        [uniqueIds addObject:uniqueId];
+                    }
+                }
+            }
+        }
+
         NSMutableArray *resultsBuffer = [NSMutableArray arrayWithArray:self.entityArray ?: @[]];
         for (id result in results) {
             if ([result conformsToProtocol:@protocol(HKWMentionsEntityProtocol)]) {
-                [resultsBuffer addObject:result];
+                // This is a subsequent response; protect against adding duplicates from previous responses
+                if (dedupe) {
+                    NSString *uniqueId = [self uniqueIdForEntity:result];
+                    if ([uniqueId length] && ![uniqueIds containsObject:uniqueId]) {
+                        [resultsBuffer addObject:result];
+                        // Protect against duplicates within the new data set being appended
+                        [uniqueIds addObject:uniqueId];
+                    }
+                }
+                else {
+                    [resultsBuffer addObject:result];
+                }
             }
         }
         self.entityArray = [resultsBuffer copy];
@@ -703,6 +750,16 @@ typedef enum {
         [self showChooserView];
     }
     [self.entityChooserView reloadData];
+}
+
+- (NSString *)uniqueIdForEntity:(id<HKWMentionsEntityProtocol>)entity {
+    if ([entity respondsToSelector:@selector(uniqueId)]) {
+        return [entity uniqueId];
+    }
+    else {
+        // Default to using the entityId when a uniqueId is not provided
+        return [entity entityId];
+    }
 }
 
 /*!

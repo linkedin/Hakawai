@@ -148,7 +148,7 @@ typedef enum {
 - (void)asyncRetrieveEntitiesForKeyString:(NSString *)keyString
                                searchType:(HKWMentionsSearchType)type
                          controlCharacter:(unichar)character
-                               completion:(void(^)(NSArray *results, BOOL isComplete))completionBlock;
+                               completion:(void(^)(NSArray *results, BOOL dedupe, BOOL isComplete))completionBlock;
 
 /*!
  Return a table view cell to be displayed for a given mention entity in the chooser view.

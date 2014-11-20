@@ -32,4 +32,16 @@
  */
 - (id)valueForCustomKey:(NSString *)customKey;
 
+/*!
+ Return a unique ID describing the mentions entity. This is used for deduping records. Depending on the data set,
+ the entityId might not be unique enough if IDs were to overlap between different data sets.
+
+ Example: You have an entry in your person DB with an ID of 12345. You also have an entry in your company DB with
+          an ID of 12345. A way to differentiate these would be to return a uniqueId that concatenates the type
+          and ID: "person_12345" and "company_12345"
+
+ The deduping logic that checks this value will default to using the entityId if a uniqueId is not provided.
+ */
+- (NSString *)uniqueId;
+
 @end

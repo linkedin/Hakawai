@@ -42,7 +42,7 @@
                       [MentionEntity entityWithName:@"Richard Hamming" entityId:@"3"],
                       [MentionEntity entityWithName:@"Marvin Minsky" entityId:@"4"],
                       [MentionEntity entityWithName:@"James Wilkinson" entityId:@"5"],
-                      [MentionEntity entityWithName:@"John McCarthy" entityId:@"6"],
+                      [MentionEntity entityWithName:@"John McCarthy" entityId:@"6"],  // DupeTesting: First instance
                       [MentionEntity entityWithName:@"Edsger Dijkstra" entityId:@"7"],
                       [MentionEntity entityWithName:@"Charles Bachman" entityId:@"8"],
                       [MentionEntity entityWithName:@"Donald Knuth" entityId:@"9"],
@@ -61,7 +61,9 @@
                       [MentionEntity entityWithName:@"Niklaus Wirth" entityId:@"22"],
                       [MentionEntity entityWithName:@"Richard Karp" entityId:@"23"],
                       [MentionEntity entityWithName:@"John Hopcroft" entityId:@"24"],
-                      [MentionEntity entityWithName:@"Robert Tarjan" entityId:@"25"]];
+                      [MentionEntity entityWithName:@"Robert Tarjan" entityId:@"25"],
+                      [MentionEntity entityWithName:@"John McCarthy" entityId:@"6"],  // DupeTesting: Second instance. New Page.
+                      [MentionEntity entityWithName:@"John McCarthy" entityId:@"6"]]; // DupeTesting: Third instance. Same Page.
 }
 
 
@@ -93,7 +95,7 @@
 - (void)asyncRetrieveEntitiesForKeyString:(NSString *)keyString
                                searchType:(HKWMentionsSearchType)type
                          controlCharacter:(unichar)character
-                               completion:(void (^)(NSArray *, BOOL))completionBlock {
+                               completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
     if (!completionBlock) {
         return;
     }
@@ -116,7 +118,7 @@
             }
         }
     }
-    completionBlock([buffer copy], YES);
+    completionBlock([buffer copy], YES, YES);
 #else
     // Pretend to do a network request.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -125,7 +127,7 @@
             buffer = [data copy];
         }
         else {
-            for (id<LIREMentionsEntityProtocol> entity in data) {
+            for (id<HKWMentionsEntityProtocol> entity in data) {
                 NSString *name = [entity entityName];
                 if ([[self class] string:keyString isPrefixOfString:name]) {
                     [buffer addObject:entity];
@@ -140,17 +142,17 @@
             NSArray *firstBuffer = [buffer objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 3)]];
             NSArray *secondBuffer = [buffer objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(3, 3)]];
             NSArray *finalBuffer = [buffer objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(6, [buffer count] - 6)]];
-            completionBlock(firstBuffer, NO);
+            completionBlock(firstBuffer, YES, NO);
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                completionBlock(secondBuffer, NO);
+                completionBlock(secondBuffer, YES, NO);
             });
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                completionBlock(finalBuffer, YES);
+                completionBlock(finalBuffer, YES, YES);
             });
         }
         else {
             // Normal, load all at once
-            completionBlock([buffer copy], YES);
+            completionBlock([buffer copy], YES, YES);
         }
     });
 #endif
