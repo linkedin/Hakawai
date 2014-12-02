@@ -823,6 +823,10 @@ typedef enum {
     BOOL returnValue = YES;
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
+            [self.startDetectionStateMachine deleteTypedCharacter:deletedChar
+                                  withCharacterNowPrecedingCursor:precedingChar];
+            self.nextSelectionChangeShouldBeIgnored = YES;
+
             // Look for a mention
             if (location > 0) {
                 NSRange mentionRange;
@@ -835,9 +839,44 @@ typedef enum {
                     self.currentlySelectedMentionRange = mentionRange;
                     self.state = HKWMentionsStateAboutToSelectMention;
                 }
+                else {
+                    // Enter mention creation mode when a whitespace character is deleted which puts the cursor
+                    // to the right of a word
+                    NSCharacterSet *whitespaceSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+                    if ([whitespaceSet characterIsMember:deletedChar] && ![whitespaceSet characterIsMember:precedingChar]) {
+                        // Capture the previous word that the cursor has encountered. Start by grabbing the left side of
+                        // the string starting from 0 to the deleted character's index
+                        NSString *leftString = [self.parentTextView.text substringToIndex:location];
+                        if ([leftString length] > 0) {
+                            NSInteger index = [leftString length] - 1;
+                            // Grab the start index of word to the left of the cursor by walking backwards through the string
+                            // until a whitespace char is hit or the beginning of the string
+                            for (; index >= 0; index--) {
+                                unichar c = [leftString characterAtIndex:index];
+                                if ([whitespaceSet characterIsMember:c]) {
+                                    break;
+                                }
+                            }
+                            index++; // Advance the index to avoid capturing the space or -1 when hitting the lower bound
+
+                            NSString *adjacentWord = [leftString substringFromIndex:index];
+                            if ([adjacentWord length] > 0) {
+                                unichar firstChar = [adjacentWord characterAtIndex:0];
+                                BOOL usesControlChar = [self.controlCharacterSet characterIsMember:firstChar];
+                                if (usesControlChar) {
+                                    adjacentWord = [adjacentWord substringFromIndex:1];
+                                }
+                                if ([adjacentWord length] > 0) {
+                                    [self.startDetectionStateMachine validStringInserted:adjacentWord
+                                                                              atLocation:index
+                                                                   usingControlCharacter:usesControlChar
+                                                                        controlCharacter:(usesControlChar ? firstChar : 0)];
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            [self.startDetectionStateMachine deleteTypedWithCharacterNowPrecedingCursor:precedingChar];
-            self.nextSelectionChangeShouldBeIgnored = YES;
             break;
         }
         case HKWMentionsStartDetectionStateCreatingMention: {
@@ -992,7 +1031,11 @@ typedef enum {
                 self.previousSelectionRange = newSelectionRange;
                 self.previousTextLength = [[self.parentTextView text] length];
 
-                [self.startDetectionStateMachine validStringInserted:text alreadyInserted:YES];
+                NSUInteger location = self.parentTextView.selectedRange.location - [text length];
+                [self.startDetectionStateMachine validStringInserted:text
+                                                          atLocation:location
+                                               usingControlCharacter:NO
+                                                    controlCharacter:0];
                 return NO;
             }
             else {
@@ -1396,9 +1439,10 @@ typedef enum {
                         alreadyInserted:(BOOL)alreadyInserted
                   usingControlCharacter:(BOOL)usingControlCharacter
                        controlCharacter:(unichar)character {
-    // Begin mentions creation
-    self.state = HKWMentionsStartDetectionStateCreatingMention;
+
     NSUInteger location = self.parentTextView.selectedRange.location;
+
+    // If a control character is being used, this method assumes that it is next to the cursor
     if (usingControlCharacter) {
         // Beginning an EXPLICIT MENTION by typing a single control character
         if (alreadyInserted) {
@@ -1417,6 +1461,20 @@ typedef enum {
                  @"Logic error: prefixLength would make the location of the mention negative");
         location -= prefixLength;
     }
+
+    [self beginMentionsCreationWithString:prefix
+                               atLocation:location
+                    usingControlCharacter:usingControlCharacter
+                         controlCharacter:character];
+}
+
+- (void)beginMentionsCreationWithString:(NSString *)prefix
+                             atLocation:(NSUInteger)location
+                  usingControlCharacter:(BOOL)usingControlCharacter
+                       controlCharacter:(unichar)character {
+    // Begin mentions creation
+    self.state = HKWMentionsStartDetectionStateCreatingMention;
+
     NSAssert(self.parentTextView.selectedRange.length == 0,
              @"Cannot start a mention unless the cursor is in insertion mode.");
     self.resumeMentionsPriorPosition = location;
