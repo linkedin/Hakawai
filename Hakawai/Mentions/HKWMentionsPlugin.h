@@ -307,8 +307,16 @@ typedef enum {
  */
 @property (nonatomic, readonly) BOOL loadingCellSupported;
 
-/// Whether or not to allow resumption of mentions creation upon resuming editing
+/*!
+ Whether or not to allow resumption of mentions creation upon resuming editing
+ */
 @property (nonatomic) BOOL resumeMentionsCreationEnabled;
+
+/*!
+ Whether or not implicit mentions search is enabled. Implicit mentions do not require a control char such as '@' to
+ initiate a mentions search. The default value is true.
+ */
+@property (nonatomic) BOOL implicitMentionsSearchEnabled;
 
 /*!
  If the plug-in is set to display the chooser view in a custom position, set the top level view and a block to be called

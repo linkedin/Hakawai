@@ -255,7 +255,7 @@ typedef enum {
 }
 
 - (BOOL)implicitMentionsEnabled {
-    return [self.delegate implicitSearchLength] > 0;
+    return [self.delegate implicitMentionsSearchEnabled] && [self.delegate implicitSearchLength] > 0;
 }
 
 

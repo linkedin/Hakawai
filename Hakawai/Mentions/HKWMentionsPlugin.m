@@ -199,6 +199,7 @@ typedef enum {
     plugin.previousSelectionRange = NSMakeRange(NSNotFound, 0);
     plugin.previousTextLength = 0;
     plugin.controlCharacterSet = controlCharacterSet;
+    plugin.implicitMentionsSearchEnabled = true;
     plugin.implicitSearchLength = searchLength;
 
     plugin.characterForAdvanceStateForCharacterInsertion = (unichar)0;

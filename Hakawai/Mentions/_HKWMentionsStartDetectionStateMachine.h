@@ -20,6 +20,11 @@
 - (NSCharacterSet *)controlCharacterSet;
 
 /*!
+ Return boolean indicating if implicit mentions search is enabled or not.
+ */
+- (BOOL)implicitMentionsSearchEnabled;
+
+/*!
  Return the number of characters to wait before beginning an 'implicit' mention. If this is 0 or negative, implicit
  mentions will not be supported.
  */
