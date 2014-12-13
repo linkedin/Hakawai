@@ -51,7 +51,10 @@ typedef enum {
     return sm;
 }
 
-- (void)validStringInserted:(NSString *)string alreadyInserted:(BOOL)inserted {
+- (void)validStringInserted:(NSString *)string
+                 atLocation:(NSUInteger)location
+      usingControlCharacter:(BOOL)usingControlCharacter
+           controlCharacter:(unichar)character {
     NSAssert([string length] > 0, @"Logic error: string is zero-length; it is the responsibility of the caller to \
              perform basic validation.");
     // State transition
@@ -65,9 +68,9 @@ typedef enum {
                     // The user has fired off enough characters to start a mention.
                     self.state = HKWMentionsStartDetectionStateCreatingMention;
                     [self.delegate beginMentionsCreationWithString:[self.stringBuffer copy]
-                                                   alreadyInserted:inserted
-                                             usingControlCharacter:NO
-                                                  controlCharacter:0];
+                                                        atLocation:location
+                                             usingControlCharacter:usingControlCharacter
+                                                  controlCharacter:character];
                 }
             }
             break;
@@ -156,15 +159,19 @@ typedef enum {
     }
 }
 
-- (void)deleteTypedWithCharacterNowPrecedingCursor:(unichar)c {
+- (void)deleteTypedCharacter:(unichar)deletedChar withCharacterNowPrecedingCursor:(unichar)precedingChar {
     NSCharacterSet *whitespaceSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     // Determine the type of the character
     enum CharacterType {
         CharacterTypeWhitespace = 0,
         CharacterTypeNormal
     };
-    enum CharacterType currentCharacterType = CharacterTypeNormal;
-    if ([whitespaceSet characterIsMember:c] || c == 0) currentCharacterType = CharacterTypeWhitespace;
+    enum CharacterType deletedCharacterType = ([whitespaceSet characterIsMember:deletedChar] || deletedChar == 0)
+                                                ? CharacterTypeWhitespace
+                                                : CharacterTypeNormal;
+    enum CharacterType currentCharacterType = ([whitespaceSet characterIsMember:precedingChar] || precedingChar == 0)
+                                                ? CharacterTypeWhitespace
+                                                : CharacterTypeNormal;
 
     switch (self.state) {
         case HKWMentionsStartDetectionStateQuiescentReady: {
@@ -185,7 +192,10 @@ typedef enum {
             }
         }
         case HKWMentionsStartDetectionStateQuiescentStalled: {
-            if (currentCharacterType == CharacterTypeWhitespace) {
+            // Change state to QuiescentReady when either:
+            //   1. A whitespace character is encountered
+            //   2. A NON-whitespace character is encountered and a whitespace character was deleted
+            if (currentCharacterType == CharacterTypeWhitespace || deletedCharacterType == CharacterTypeWhitespace) {
                 self.state = HKWMentionsStartDetectionStateQuiescentReady;
             }
             break;

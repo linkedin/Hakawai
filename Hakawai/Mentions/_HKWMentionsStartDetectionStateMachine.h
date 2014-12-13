@@ -43,6 +43,23 @@
                   usingControlCharacter:(BOOL)usingControlCharacter
                        controlCharacter:(unichar)character;
 
+/*!
+ Activate the mentions creation process, using the provided string as a seed. The string may be zero length (e.g. if the
+ user enters the special control character).
+
+ \param prefix                     if an implicit mention, the characters the user already typed that should form part
+                                   of the completed mention (if one is created)
+ \param location                   the index in the textView which identifies the start of the target string (including
+                                   the control char if present)
+ \param usingControlCharacter      whether the mention was begun by the user typing a special control character
+ \param controlCharacter           if \c usingControlCharacter is NO, ignored; otherwise, the control character used to
+                                   begin the mention
+ */
+- (void)beginMentionsCreationWithString:(NSString *)prefix
+                             atLocation:(NSUInteger)location
+                  usingControlCharacter:(BOOL)usingControlCharacter
+                       controlCharacter:(unichar)character;
+
 @end
 
 /*!
@@ -60,10 +77,18 @@
 
 /*!
  Inform the state machine that a valid string was typed (or pasted, or auto-inserted) by the user into the text view.
- \param inserted    whether the string in question has already been inserted into the text view's buffer before this
-                    method began executing
+ \param string                   the string that is being analyzed in the text view (not including a control character
+                                 if one exists)
+ \param location                 the text view index of the \c controlCharacter if present, or the start index of the
+                                 \c string if a \c controlCharacter is not present
+ \param usingControlCharacter    whether the mention was begun by the user typing a special control character
+ \param controlCharacter         if \c usingControlCharacter is NO, ignored; otherwise, the control character used to
+                                 begin the mention
  */
-- (void)validStringInserted:(NSString *)string alreadyInserted:(BOOL)inserted;
+- (void)validStringInserted:(NSString *)string
+                 atLocation:(NSUInteger)location
+      usingControlCharacter:(BOOL)usingControlCharacter
+           controlCharacter:(unichar)character;
 
 /*!
  Inform the state machine that a character was typed by the user into the text view.
@@ -74,7 +99,7 @@
 /*!
  Inform the state machine that a character was deleted by the user from the text view.
  */
-- (void)deleteTypedWithCharacterNowPrecedingCursor:(unichar)c;
+- (void)deleteTypedCharacter:(unichar)deletedChar withCharacterNowPrecedingCursor:(unichar)precedingChar;
 
 /*!
  Inform the state machine that the cursor was moved from its prior position and is now in insertion mode.
