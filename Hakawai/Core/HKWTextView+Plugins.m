@@ -76,6 +76,8 @@ typedef enum {
                                       caretRect.size.height + self.lineFragmentPadding);
             break;
     }
+    // offsetY can never be negative
+    offsetY = (offsetY < 0.0) ? 0.0 : offsetY;
 
     // Move the viewport to show only the relevant line
     self.viewportContentOffset = CGPointMake(self.contentOffset.x, offsetY);

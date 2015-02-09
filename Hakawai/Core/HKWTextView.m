@@ -402,6 +402,9 @@
                               + self.lineFragmentPadding);
                 break;
         }
+        // newOffsetY can never be negative
+        newOffsetY = (newOffsetY < 0.0) ? 0.0 : newOffsetY;
+
         // Adjust the y-offset if necessary
         if (newOffsetY != self.viewportContentOffset.y) {
             self.viewportContentOffset = CGPointMake(self.viewportContentOffset.x, newOffsetY);
