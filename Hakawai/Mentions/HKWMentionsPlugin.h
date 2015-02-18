@@ -60,7 +60,7 @@ static NSString *const HKWMentionAttributeName = @"HKWMentionAttributeName";
  \c HKWMentionsChooserPositionModeCustomNoLockNoArrow is a custom mode where the chooser is configured with no chrome
  and the text view is never locked.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsChooserPositionMode) {
     HKWMentionsChooserPositionModeEnclosedTop = 0,
     HKWMentionsChooserPositionModeEnclosedBottom,
     HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp,
@@ -72,20 +72,20 @@ typedef enum {
     HKWMentionsChooserPositionModeCustomNoLockArrowPointingUp,
     HKWMentionsChooserPositionModeCustomNoLockArrowPointingDown,
     HKWMentionsChooserPositionModeCustomNoLockNoArrow
-} HKWMentionsChooserPositionMode;
+};
 
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsSearchType) {
     HKWMentionsSearchTypeImplicit,
     HKWMentionsSearchTypeExplicit
-} HKWMentionsSearchType;
+};
 
 /*!
  An enum representing possible states that the mentions plug-in may be in.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
     HKWMentionsPluginStateQuiescent,
     HKWMentionsPluginStateCreatingMention
-} HKWMentionsPluginState;
+};
 
 @class HKWMentionsPlugin;
 /*!
@@ -152,6 +152,10 @@ typedef enum {
 
 /*!
  Return a table view cell to be displayed for a given mention entity in the chooser view.
+
+ \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
+ defined in the \c HKWCustomChooserViewDelegate protocol, you can just return nil. In that case the mentions plug-in
+ defers responsibility for preparing the UI entirely to your custom chooser view.
  */
 - (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
                            withMatchString:(NSString *)matchString
@@ -159,6 +163,10 @@ typedef enum {
 
 /*!
  Return the height of the table view cell for a given mention entity in the chooser view.
+
+ \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
+ defined in the \c HKWCustomChooserViewDelegate protocol, you can just return 0. In that case the mentions plug-in
+ defers responsibility for preparing the UI entirely to your custom chooser view.
  */
 - (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
                                 tableView:(UITableView *)tableView;
@@ -182,18 +190,23 @@ typedef enum {
 
 /*!
  Return a loading cell to be displayed if results still haven't been returned yet.
+
+ \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
+ defined in the \c HKWCustomChooserViewDelegate protocol, this method does nothing.
  */
 - (UITableViewCell *)loadingCellForTableView:(UITableView *)tableView;
 
 /*!
  Return the height of the loading cell; this must be implemented for the loading cell functionality to be enabled.
+
+ \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
+ defined in the \c HKWCustomChooserViewDelegate protocol, this method does nothing.
  */
 - (CGFloat)heightForLoadingCellInTableView:(UITableView *)tableView;
 
 @end
 
 @class HKWMentionsAttribute;
-@class HKWAbstractChooserView;
 
 @interface HKWMentionsPlugin : NSObject <HKWDirectControlFlowPluginProtocol>
 
@@ -248,13 +261,16 @@ typedef enum {
 + (NSArray *)mentionsAttributesInAttributedString:(NSAttributedString *)attributedString;
 
 /*!
- Return an array of \c HKWMentionsAttribute objects corresponding to the mentions attributes which currently exist.
+ Return an array of \c HKWMentionsAttribute objects corresponding to the mentions attributes which currently exist in
+ the plug-in's parent text view.
+
+ \warning This method will return an empty array if the plug-in isn't registered to a text view.
  */
 - (NSArray *)mentions;
 
 /*!
- Add a mention attribute to the text view's text. This method is intended to be called when the text view is first
- being populated with text (for example, when a user decides to edit an existing document containing mentions).
+ Add a mention attribute to the parent text view's text. This method is intended to be called when the text view is
+ first being populated with text (for example, when a user decides to edit an existing document containing mentions).
 
  \param mention    a mention object representing the mention to add. The \c range property on the object must be set
                    properly. In addition, the length of \c range must match the length of the \c mentionText property,
@@ -264,8 +280,8 @@ typedef enum {
 - (void)addMention:(HKWMentionsAttribute *)mention;
 
 /*!
- Add multiple mentions to the text view's text. This is a convenience method that calls the \c addMention: method for
- each element in \c mentions that passes typechecking.
+ Add multiple mentions to the parent text view's text. This is a convenience method that calls the \c addMention: method
+ for each element in \c mentions that passes typechecking.
  */
 - (void)addMentions:(NSArray *)mentions;
 
@@ -273,21 +289,30 @@ typedef enum {
 #pragma mark - Chooser UI Configuration
 
 /*! 
- The class of the chooser view to instantiate. Must be a subclass of the \c HKWAbstractChooserView class. If set to an
- invalid value or nil, defaults to the built-in chooser view. Set this when the mentions plug-in is created; setting it
- will do nothing after the chooser view is instantiated.
+ The class of the chooser view to instantiate. Must be a subclass of the \c UIView class. If set to an invalid value or
+ nil, defaults to the built-in chooser view.
+ 
+ \note Set this when the mentions plug-in is created; setting it will do nothing after the chooser view is instantiated
+ the first time.
+
+ \note Per the definition of \c HKWChooserViewProtocol your custom chooser view class (if any) can either choose to
+ consume the plug-in's \c UITableViewDelegate and \c UITableViewDataSource methods, or its
+ \c HKWCustomChooserViewDelegate methods.
+
+ Use the former if you want to use the API in \c HKWMentionsDelegate to provide table view cells and cell heights, the
+ latter if you want your chooser view to be completely responsible for preparing the UI.
  */
 @property (nonatomic) Class<HKWChooserViewProtocol> chooserViewClass;
 
 /*!
- Return the frame of the chooser view. If the chooser view hasn't been instantiated, the null rect will be returend.
+ Return the frame of the chooser view. If the chooser view hasn't been instantiated, the null rect will be returned.
  */
 - (CGRect)chooserViewFrame;
 
 /*!
  Return a generic reference to the chooser view.
  */
-@property (nonatomic, readonly) HKWAbstractChooserView *chooserView;
+@property (nonatomic, readonly) UIView<HKWChooserViewProtocol> *chooserView;
 
 /*!
  Return the chooser position mode the chooser was configured with.
@@ -312,13 +337,20 @@ typedef enum {
 
 /*!
  If the plug-in is set to display the chooser view in a custom position, set the top level view and a block to be called
- after the view is attached to its superview (intended to be used to set up layout constraints).
+ after the view is attached to its superview (intended to be used to set up layout constraints). The argument to the
+ block is a generic reference to the chooser view.
+
+ \warning Attach the plug-in to a text view before calling this method. Calling this method on a plug-in instance that
+ hasn't been registered to a text view is a no-op.
  */
 - (void)setChooserTopLevelView:(UIView *)topLevelView attachmentBlock:(void(^)(UIView *))block;
 
 /*!
  Return a rect describing the frame that would be assigned to the chooser view if in one of the preset modes, or
  \c CGRectNull otherwise.
+
+ \warning Attach the plug-in to a text view before calling this method. Calling this method on a plug-in instance that
+ hasn't been registered to a text view return the null rect.
  */
 - (CGRect)calculatedChooserFrameForMode:(HKWMentionsChooserPositionMode)mode
                              edgeInsets:(UIEdgeInsets)edgeInsets;

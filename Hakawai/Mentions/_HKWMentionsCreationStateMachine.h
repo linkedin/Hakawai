@@ -18,7 +18,6 @@
 #import "HKWMentionsPlugin.h"
 
 @class HKWMentionsAttribute;
-@class HKWAbstractChooserView;
 
 @protocol HKWMentionsCreationStateMachineProtocol <HKWMentionsDelegate>
 
@@ -88,8 +87,8 @@
 /// The edge insets applied to the chooser view. Only valid if the chooser view isn't using a custom frame.
 @property (nonatomic) UIEdgeInsets chooserViewEdgeInsets;
 
-/// The class of the chooser view to instantiate. Must be a subclass of the \c HKWAbstractChooserView class. If set to
-/// an invalid value or nil, defaults to the built-in chooser view.
+/// The class of the chooser view to instantiate. Must be a subclass of the \c UIView class. If set to an invalid value
+/// or nil, defaults to the built-in chooser view.
 @property (nonatomic) Class<HKWChooserViewProtocol> chooserViewClass;
 
 /*!
@@ -156,7 +155,7 @@
 /*!
  A reference to the entity chooser view, or nil if it hasn't yet been instantiated.
  */
-- (HKWAbstractChooserView *)getEntityChooserView;
+- (UIView<HKWChooserViewProtocol> *)getEntityChooserView;
 
 /*!
  Return a rect describing the frame that would be assigned to the chooser view if in one of the preset modes, or

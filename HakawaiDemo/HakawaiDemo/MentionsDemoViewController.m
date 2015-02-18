@@ -13,6 +13,7 @@
 #import "MentionsDemoViewController.h"
 
 #import "MentionsManager.h"
+#import "HakawaiDemo-Swift.h"
 
 #import "HKWTextView.h"
 #import "HKWMentionsPlugin.h"
@@ -51,11 +52,16 @@
         HKWMentionsPlugin *mentionsPlugin = [HKWMentionsPlugin mentionsPluginWithChooserMode:mode
                                                                            controlCharacters:controlCharacters
                                                                                 searchLength:3];
+
+        // NOTE: If you want to see an example of a custom chooser, uncomment the following line.
+//        mentionsPlugin.chooserViewClass = [SimpleChooserView class];
+
+
         // If the text view loses focus while the mention chooser is up, and then regains focus, it will automatically put
         //  the mentions chooser back up
         mentionsPlugin.resumeMentionsCreationEnabled = YES;
         // Add edge insets so chooser view doesn't overlap the text view's cosmetic grey border
-        mentionsPlugin.chooserViewEdgeInsets = UIEdgeInsetsMake(0, 0.5, 0.5, 0.5);
+        mentionsPlugin.chooserViewEdgeInsets = UIEdgeInsetsMake(2, 0.5, 0.5, 0.5);
         self.plugin = mentionsPlugin;
         self.plugin.chooserViewBackgroundColor = LIGHT_GRAY_COLOR;
         // The mentions plug-in requires a delegate, which provides it with mentions entities in response to a query string

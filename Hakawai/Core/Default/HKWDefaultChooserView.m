@@ -41,6 +41,8 @@
 
 @implementation HKWDefaultChooserView
 
+@synthesize borderMode = _borderMode;
+
 + (instancetype)chooserViewWithFrame:(CGRect)frame
                             delegate:(id<UITableViewDelegate>)delegate
                           dataSource:(id<UITableViewDataSource>)dataSource {
@@ -62,6 +64,11 @@
 
 - (void)reloadData {
     [self.tableView reloadData];
+}
+
+- (void)becomeVisible {
+    self.hidden = NO;
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
 - (void)resetScrollPositionAndHide {
@@ -433,7 +440,6 @@
 
 - (void)setBorderMode:(HKWChooserBorderMode)borderMode {
     [self updateSubviewsForMode:borderMode];
-    [super setBorderMode:borderMode];
 }
 
 @synthesize insertionPointMarkerEnabled = _insertionPointMarkerEnabled;

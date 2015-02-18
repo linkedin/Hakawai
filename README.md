@@ -24,6 +24,8 @@ Features
 Get Started
 -----------
 
+*For more detailed documentation, check out the [wiki](https://github.com/linkedin/Hakawai/wiki).*
+
 Hakawai makes extensive use of TextKit, and requires iOS 7.1 or later. (Unfortunately, there are severe TextKit bugs in 7.0 that break many of the features offered by the library.) At your own risk, you may try using Hakawai with iOS 7.0 (this may be a viable option if you only want to use the text transformers).
 
 If you are using CocoaPods, just add ``pod 'Hakawai'`` to your Podfile. Otherwise, check out the project and copy the source files into your own project.
@@ -65,6 +67,8 @@ Multiple simple plug-ins may be registered at once, but only one control flow pl
 Mentions Plug-in
 ----------------
 
+*For more detailed documentation, check out the [Mentions page on the wiki](https://github.com/linkedin/Hakawai/wiki/Mentions).*
+
 Hakawai/Mentions is a plugin that allows annotations to be created within a ``HKWTextView``. Annotations are portions of text which refer to specific entities, treated as a monolithic unit, and can be styled differently from the rest of the text. Examples of annotations are the 'mentions' feature supported by many popular social media applications.
 
 To see Mentions in action, check out the demo app. Or download the LinkedIn mobile app from the App Store, log in with your LinkedIn account, and mention a connection or company in a comment!
@@ -97,49 +101,6 @@ To see Mentions in action, check out the demo app. Or download the LinkedIn mobi
 See the documentation comments for more information on the relevant classes and methods.
 
 
-### Delegate Methods
-
-There are three required delegate methods in ``HKWMentionsDelegate``:
-
-- ``asyncRetrieveEntitiesForKeyString:searchType:controlCharacter:completion:`` is how the plug-in asks your app to translate some search string into results.
-  - ``keyString`` is a search string containing the text that the user wants to use to create the annotation
-  - ``type`` is an enum describing whether the annotation is an *explicit* annotation (user typed a control character) or an *implicit* annotation (user typed in some number of characters). Your app may wish to return different results for each type of annotation.
-  - ``controlCharacter`` is the character the user typed to start an explicit annotation; it should be ignored otherwise
-  - ``completionBlock`` is a block that your app should call once results are available. It takes an array containing result objects that conform to ``HKWMentionsEntityProtocol``, as well as a boolean indicating whether or not this set of results is the final set of results for the given query. If YES, calling the block again will have no effect. If the results array is empty or ``nil``, the plug-in will ignore the boolean and ignore any further invocations of the block. Otherwise, the block may be called repeatedly in order to append results. Your app does *not* need to worry about whether the search string is still valid when the block is called; the plug-in handles all of this automatically.
-- ``cellForMentionsEntity:withMatchString:tableView:`` is how the plug-in asks your app for a table view cell in which to display a result.
-  - ``entity`` is the entity corresponding to the cell; you returned it earlier as part of the previously described API method
-  - ``matchString`` is the string containing the text the user is currently using to create the annotation; it may be useful for formatting the cell
-  - ``tableView`` is a reference to the table view requesting the cell
-- ``heightForCellForMentionsEntity:tableView:`` is how the plug-in asks your app for the height of the table view cell returned by the previous API method.
-
-
-### Positioning
-
-There are several positioning modes, all of which are described by the ``HKWMentionsChooserPositionMode`` enum. One of these modes must be passed in when the mentions plug-in is created. A comprehensive description of each mode can be found in the ``HKWMentionsPlugin.h`` header file.
-
-The ``EnclosedTop`` and ``EnclosedBottom`` modes automatically position the chooser UI completely within the text view, leaving a gap at the top or the bottom respectively for user input.
-
-The 'custom' modes allow the chooser view to be positioned arbitrarily relative to other UI elements on the current screen. The custom modes rely upon a block which you provide, called when the chooser view is first added to the view hierarchy. This block allows you to set up Auto Layout constraints as you see fit. In particular, call the ``setChooserTopLevelView:attachmentBlock:`` method before the chooser UI appears. The block takes one argument, which is a ``UIView`` representing the chooser view.
-
-
-### Behavior
-
-A brief discussion of the state machine architecture and its implications follows.
-
-The plug-in manages an overall state machine. This state machine in turn manages two subsidiary state machines that govern the plug-in's behavior:
-
-- The *start detection state machine* is responsible for monitoring the user's actions when the annotation creation process is inactive, and determining when to begin the creation process
-- The *creation state machine* is responsible for supervising the annotation creation process, querying the host app, presenting the UI, and completing or canceling the creation process as necessary
-
-If the user is not creating an annotation, the start detection state machine monitors the number of non-whitespace, non-newline characters typed since the previous whitespace or newline, and starts the search process if enough consecutive characters are typed. The search buffer is reset every time a whitespace or newline is typed. The search process is also started immediately if a control character is typed.
-
-When the plug-in is in the annotation creation process, inserting or deleting characters will cause the plug-in to query its delegate for an updated set of search results. If the user deletes all characters, the creation process is canceled; however, even if the annotation was implicitly started, the user may delete all but the last character without canceling the process. For example, if the implicit start threshold is five characters, the user can still delete characters from (e.g.) "Peter" to search on "Pete", "Pet", "Pe", or "P".
-
-If the user enters or deletes characters to the point where there are no results, and then types a whitespace or newline character, the creation process is immediately canceled. If the user taps within the single line viewport, moves the cursor, or tries to cut or paste test, the creation process is canceled.
-
-If an annotation is created, the creation process is canceled, or the cursor is moved to a location where the preceding character is neither a whitespace or a newline, the plug-in is considered to be *stalled*. The annotation creation process will not be allowed to start again until the user types a whitespace or newline character, or moves the cursor to precede a whitespace or newline character (or the very beginning of the text).
-
-
 Testing
 -------
 
@@ -168,4 +129,4 @@ According to Wikipedia, "In Māori mythology, [...] Hakawai is a monstrous bird 
 Copyright & License
 -------------------
 
-Hakawai © 2014 LinkedIn Corp. Licensed under the terms of the Apache License, Version 2.0.
+Hakawai © 2015 LinkedIn Corp. Licensed under the terms of the Apache License, Version 2.0.

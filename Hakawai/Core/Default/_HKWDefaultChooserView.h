@@ -12,10 +12,10 @@
 
 #import <UIKit/UIKit.h>
 
-#import "HKWAbstractChooserView.h"
+#import "HKWChooserViewProtocol.h"
 #import "_HKWDefaultChooserBorderView.h"
 
-@interface HKWDefaultChooserView : HKWAbstractChooserView <HKWDefaultChooserBorderViewProtocol>
+@interface HKWDefaultChooserView : UIView <HKWChooserViewProtocol, HKWDefaultChooserBorderViewProtocol>
 
 @property (nonatomic, readonly) UITableView *tableView;
 @property (nonatomic) BOOL insertionPointMarkerEnabled;

@@ -14,7 +14,7 @@
 
 #import "_HKWPrivateConstants.h"
 
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     // Initial state: the user may be able to create a mention
     HKWMentionsStartDetectionStateQuiescentReady = 0,
 
@@ -25,7 +25,7 @@ typedef enum {
     // The user is currently creating a mention. The host has control and will inform the state machine when the mention
     //  creation process is finished.
     HKWMentionsStartDetectionStateCreatingMention
-} HKWMentionsStartDetectionState;
+};
 
 @interface HKWMentionsStartDetectionStateMachine ()
 

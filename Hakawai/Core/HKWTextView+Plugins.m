@@ -15,7 +15,7 @@
 
 #import "_HKWPrivateConstants.h"
 
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     HKWCycleFirstResponderModeNone,
     HKWCycleFirstResponderModeAutocapitalizationNone,
     HKWCycleFirstResponderModeAutocapitalizationWords,
@@ -27,7 +27,7 @@ typedef enum {
     HKWCycleFirstResponderModeSpellCheckingDefault,
     HKWCycleFirstResponderModeSpellCheckingNo,
     HKWCycleFirstResponderModeSpellCheckingYes
-} HKWCycleFirstResponderMode;
+};
 
 @implementation HKWTextView (Plugins)
 

@@ -19,10 +19,10 @@
 
  \c HKWViewportModeBottom locks the viewport to the bottom line of text.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWViewportMode) {
     HKWViewportModeTop = 0,
     HKWViewportModeBottom
-} HKWViewportMode;
+};
 
 /*!
  An enum describing the way the accessory view should be added to the parent view.
@@ -35,10 +35,10 @@ typedef enum {
  \c setTopLevelViewForAccessoryViewPositioning: method. If the top level view is not specified, the text view tries to
  figure out the top level view at the time the view is attached.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWAccessoryViewMode) {
     HKWAccessoryViewModeSibling = 0,
     HKWAccessoryViewModeFreeFloating
-} HKWAccessoryViewMode;
+};
 
 /*!
  This category provides an API for plug-ins registered to the text view. You are free to use these features outside the

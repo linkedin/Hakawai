@@ -35,7 +35,7 @@
  the IME keyboard bar (e.g. without typing in pinyin), and the user's changes causing prospective text to change when
  using the handwriting keyboard.
  */
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSInteger, HKWAbstractionLayerState) {
     HKWAbstractionLayerStateQuiescent,
     // NOTE: we currently don't handle the case where the delegate rejects the proposed text. There should be a
     //  separate mechanism for rejecting changes to the text.
@@ -43,7 +43,7 @@ typedef enum : NSUInteger {
     HKWAbstractionLayerStateDidChangeSelectionCalled,
     HKWAbstractionLayerStateDidChangeCalled,
     HKWAbstractionLayerStateDidChangePendingUpdate
-} HKWAbstractionLayerState;
+};
 
 /*!
  An enum describing the state of text marking for this particular editing run.
@@ -55,31 +55,31 @@ typedef enum : NSUInteger {
  \c HKWAbstractionLayerMarkStatePreviouslyMarked means the text is not currently marked, but had been marked at some
     point during this run.
  */
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSInteger, HKWAbstractionLayerMarkState) {
     HKWAbstractionLayerMarkStateNone,
     HKWAbstractionLayerMarkStateMarked,
     HKWAbstractionLayerMarkStatePreviouslyMarked
-} HKWAbstractionLayerMarkState;
+};
 
 /*!
  An enum describing potential changes that might be made to the text view's text.
  */
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSInteger, HKWAbstractionLayerChangeType) {
     HKWAbstractionLayerChangeTypeInsertion,
     HKWAbstractionLayerChangeTypeDeletion,
     HKWAbstractionLayerChangeTypeReplacement,
     HKWAbstractionLayerChangeTypeNone
-} HKWAbstractionLayerChangeType;
+};
 
 /*!
  An enum describing the text input mode.
  */
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
     HKWAbstractionLayerInputModeAlphabetical,
     HKWAbstractionLayerInputModeChinese,
     HKWAbstractionLayerInputModeJapanese,
     HKWAbstractionLayerInputModeKorean
-} HKWAbstractionLayerInputMode;
+};
 
 @interface HKWAbstractionLayer ()
 

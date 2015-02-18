@@ -26,12 +26,10 @@
 #import "_HKWMentionsStartDetectionStateMachine.h"
 #import "_HKWMentionsCreationStateMachine.h"
 
-#import "HKWAbstractChooserView.h"
-
 #import "_HKWMentionsPrivateConstants.h"
 
 // Don't confuse this with the public 'HKWMentionsPluginState', which exposes fewer implementation details.
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // The user is not creating a mention and not in any of the following states.
     HKWMentionsStateQuiescent = 0,
 
@@ -50,7 +48,7 @@ typedef enum {
     //  intended to last only as long as textViewDidEndEditing: is running, and allow cleanup code to properly engage
     //  special-case behavior needed for cleanup.
     HKWMentionsStateLosingFocus
-} HKWMentionsState;
+};
 
 @interface HKWMentionsPlugin () <HKWMentionsStartDetectionStateMachineProtocol, HKWMentionsCreationStateMachineProtocol>
 
@@ -1786,7 +1784,7 @@ typedef enum {
             && [self.delegate respondsToSelector:@selector(heightForLoadingCellInTableView:)]);
 }
 
-- (HKWAbstractChooserView *)chooserView {
+- (UIView<HKWChooserViewProtocol> *)chooserView {
     return [self.creationStateMachine getEntityChooserView];
 }
 

@@ -28,7 +28,6 @@
 		E1B308A419A2C21A0096DE0E /* HKWDefaultChooserArrowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */; };
 		E1B308A519A2C21A0096DE0E /* HKWDefaultChooserBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */; };
 		E1B308A719A2C21A0096DE0E /* HKWDefaultChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */; };
-		E1B308A819A2C21A0096DE0E /* HKWAbstractChooserView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */; };
 		E1C9676019A2A66000A4AA93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675F19A2A66000A4AA93 /* Foundation.framework */; };
 		E1C9676E19A2A66000A4AA93 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9676D19A2A66000A4AA93 /* XCTest.framework */; };
 		E1C9676F19A2A66000A4AA93 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1C9675F19A2A66000A4AA93 /* Foundation.framework */; };
@@ -112,8 +111,6 @@
 		E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserBorderView.m; sourceTree = "<group>"; };
 		E1B3089F19A2C21A0096DE0E /* _HKWDefaultChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWDefaultChooserView.h; sourceTree = "<group>"; };
 		E1B308A019A2C21A0096DE0E /* HKWDefaultChooserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWDefaultChooserView.m; sourceTree = "<group>"; };
-		E1B308A119A2C21A0096DE0E /* HKWAbstractChooserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWAbstractChooserView.h; sourceTree = "<group>"; };
-		E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWAbstractChooserView.m; sourceTree = "<group>"; };
 		E1B308A319A2C21A0096DE0E /* HKWChooserViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWChooserViewProtocol.h; sourceTree = "<group>"; };
 		E1B308A919A2CC0F0096DE0E /* _HKWMentionsPrivateConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsPrivateConstants.h; path = Mentions/_HKWMentionsPrivateConstants.h; sourceTree = "<group>"; };
 		E1C9675C19A2A66000A4AA93 /* libHakawai.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHakawai.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -233,8 +230,6 @@
 			children = (
 				E1B3089819A2C21A0096DE0E /* Default */,
 				E1B308A319A2C21A0096DE0E /* HKWChooserViewProtocol.h */,
-				E1B308A119A2C21A0096DE0E /* HKWAbstractChooserView.h */,
-				E1B308A219A2C21A0096DE0E /* HKWAbstractChooserView.m */,
 			);
 			name = ChooserView;
 			path = Core;
@@ -461,7 +456,6 @@
 				E1B3089619A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m in Sources */,
 				E187EE5E19E62F9100AF163A /* HKWAbstractionLayer.m in Sources */,
 				E1B3088519A2C0D60096DE0E /* HKWTextView.m in Sources */,
-				E1B308A819A2C21A0096DE0E /* HKWAbstractChooserView.m in Sources */,
 				E1B3088719A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m in Sources */,
 				E1B3088119A2C0D60096DE0E /* HKWAttribute.m in Sources */,
 				E1B308A519A2C21A0096DE0E /* HKWDefaultChooserBorderView.m in Sources */,

@@ -12,7 +12,7 @@
 
 #import "_HKWMentionsCreationStateMachine.h"
 
-#import "HKWAbstractChooserView.h"
+#import "HKWChooserViewProtocol.h"
 #import "_HKWDefaultChooserView.h"
 #import "HKWMentionsAttribute.h"
 
@@ -21,18 +21,17 @@
 /*!
  States for the master state machine.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsCreationState) {
     // The state machine is currently not creating a mention.
     HKWMentionsCreationStateQuiescent = 0,
-
     // The state machine is currently in the process of creating a mention, or is stalled.
     HKWMentionsCreationStateCreatingMention
-} HKWMentionsCreationState;
+};
 
 /*!
  States for the network state subsidiary state machine.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsCreationNetworkState) {
     // The user is currently quiescent. The host will inform the state machine when mentions creation should start
     //  again. Slaved to HKWMentionsCreationStateQuiescent - DO NOT SET STATE TO THIS DIRECTLY.
     HKWMentionsCreationNetworkStateQuiescent = 0,
@@ -47,12 +46,12 @@ typedef enum {
     // The mentions creation system is ready, the rate-limiting timer is still active, and another request needs to be
     //  made once it expires.
     HKWMentionsCreationNetworkStatePendingRequestAfterCooldown,
-} HKWMentionsCreationNetworkState;
+};
 
 /*!
  States for the mentions suggestion results subsidiary state machine.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsCreationResultsState) {
     // The mentions creation system is not active. Slaved to HKWMentionsCreationStateQuiescent - DO NOT SET STATE TO
     //  THIS DIRECTLY.
     HKWMentionsCreationResultsStateQuiescent = 0,
@@ -67,21 +66,21 @@ typedef enum {
     // The mentions creation system is creating a mention, there are no results for the current query string, and the
     //  user has not typed a whitespace since the first contiguous query that returned no results.
     HKWMentionsCreationResultsStateNoResultsWithoutWhitespace
-} HKWMentionsCreationResultsState;
+};
 
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsCreationChooserState) {
     HKWMentionsCreationChooserStateHidden = 0,
     HKWMentionsCreationChooserStateVisible
-} HKWMentionsCreationChooserState;
+};
 
-typedef enum {
+typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     HKWMentionsCreationActionNone = 0,
     HKWMentionsCreationActionNormalCharacterInserted,
     HKWMentionsCreationActionWhitespaceCharacterInserted,
     HKWMentionsCreationActionCharacterDeleted
-} HKWMentionsCreationAction;
+};
 
-@interface HKWMentionsCreationStateMachine () <UITableViewDelegate, UITableViewDataSource>
+@interface HKWMentionsCreationStateMachine () <HKWCustomChooserViewDelegate>
 
 @property (nonatomic, weak) id<HKWMentionsCreationStateMachineProtocol> delegate;
 
@@ -97,7 +96,7 @@ typedef enum {
 @property (nonatomic) HKWMentionsCreationResultsState resultsState;
 @property (nonatomic) HKWMentionsCreationChooserState chooserState;
 
-@property (nonatomic, strong) HKWAbstractChooserView *entityChooserView;
+@property (nonatomic, strong) UIView<HKWChooserViewProtocol> *entityChooserView;
 
 /// An array serving as a backing store for the chooser table view; it contains objects representing mentions entities
 /// that the user can select from.
@@ -416,7 +415,7 @@ typedef enum {
     }
 }
 
-- (HKWAbstractChooserView *)getEntityChooserView {
+- (UIView<HKWChooserViewProtocol> *)getEntityChooserView {
     if (_entityChooserView) {
         return _entityChooserView;
     }
@@ -509,7 +508,7 @@ typedef enum {
     [self.entityChooserView resetScrollPositionAndHide];
 }
 
-- (HKWAbstractChooserView *)createNewChooserView {
+- (UIView<HKWChooserViewProtocol> *)createNewChooserView {
     HKWMentionsChooserPositionMode mode = [self.delegate chooserPositionMode];
     CGRect chooserFrame = [self frameForMode:mode];
     // Handle the case where the chooser frame is completely custom
@@ -521,17 +520,32 @@ typedef enum {
                                   100);
     }
     NSAssert(!CGRectIsNull(chooserFrame), @"Logic error: got a null rect for the chooser view's frame");
-    HKWAbstractChooserView *chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
-                                                                              delegate:self
-                                                                            dataSource:self];
-    if ([HKWMentionsCreationStateMachine modeConfiguresArrowPointingUp:mode]) {
-        chooserView.borderMode = HKWChooserBorderModeTop;
+
+    // Instantiate the chooser view
+    UIView<HKWChooserViewProtocol> *chooserView = nil;
+    if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:)]) {
+        chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame delegate:self];
     }
-    else if ([HKWMentionsCreationStateMachine modeConfiguresArrowPointingDown:mode]) {
-        chooserView.borderMode = HKWChooserBorderModeBottom;
+    else if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:dataSource:)]) {
+        chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
+                                                         delegate:self
+                                                       dataSource:self];
     }
     else {
-        chooserView.borderMode = HKWChooserBorderModeNone;
+        NSAssert(NO, @"Chooser view class must support one or both of the following methods: \
+                 chooserViewWithFrame:delegate: or chooserViewWithFrame:delegate:dataSource:");
+    }
+
+    if ([chooserView respondsToSelector:@selector(setBorderMode:)]) {
+        if ([HKWMentionsCreationStateMachine modeConfiguresArrowPointingUp:mode]) {
+            chooserView.borderMode = HKWChooserBorderModeTop;
+        }
+        else if ([HKWMentionsCreationStateMachine modeConfiguresArrowPointingDown:mode]) {
+            chooserView.borderMode = HKWChooserBorderModeBottom;
+        }
+        else {
+            chooserView.borderMode = HKWChooserBorderModeNone;
+        }
     }
     return chooserView;
 }
@@ -792,6 +806,30 @@ typedef enum {
 }
 
 
+#pragma mark - Custom chooser view
+
+- (BOOL)shouldDisplayLoadingIndicator {
+    return !self.currentQueryIsComplete;
+}
+
+- (NSInteger)numberOfModelObjects {
+    return [self.entityArray count];
+}
+
+- (id)modelObjectForIndex:(NSInteger)index {
+    return self.entityArray[index];
+}
+
+- (void)modelObjectSelectedAtIndex:(NSInteger)index {
+    id<HKWMentionsEntityProtocol> entity = self.entityArray[index];
+    HKWMentionsAttribute *mention = [HKWMentionsAttribute mentionWithText:[entity entityName]
+                                                               identifier:[entity entityId]];
+    mention.metadata = [entity entityMetadata];
+    self.state = HKWMentionsCreationStateQuiescent;
+    [self.delegate createMention:mention startingLocation:self.startingLocation];
+}
+
+
 #pragma mark - Table view
 // Note: the table view data source and delegate here service the table view embedded within the state machine's
 //  entity chooser view.
@@ -867,8 +905,8 @@ typedef enum {
 
 - (void)setChooserViewBackgroundColor:(UIColor *)chooserViewBackgroundColor {
     _chooserViewBackgroundColor = chooserViewBackgroundColor;
-    if (_entityChooserView) {
-        _entityChooserView.chooserBackgroundColor = chooserViewBackgroundColor;
+    if (_entityChooserView && [_entityChooserView respondsToSelector:@selector(setChooserBackgroundColor:)]) {
+        [_entityChooserView setChooserBackgroundColor:chooserViewBackgroundColor];
     }
 }
 
@@ -961,10 +999,12 @@ typedef enum {
     [self.entityChooserView reloadData];
 }
 
-- (HKWAbstractChooserView *)entityChooserView {
+- (UIView<HKWChooserViewProtocol> *)entityChooserView {
     if (!_entityChooserView) {
         _entityChooserView = [self createNewChooserView];
-        _entityChooserView.chooserBackgroundColor = self.chooserViewBackgroundColor;
+        if ([_entityChooserView respondsToSelector:@selector(setChooserBackgroundColor:)]) {
+            [_entityChooserView setChooserBackgroundColor:self.chooserViewBackgroundColor];
+        }
     }
     return _entityChooserView;
 }
@@ -988,7 +1028,7 @@ typedef enum {
 - (void)setChooserViewClass:(Class)chooserViewClass {
     if (!chooserViewClass
         || ![chooserViewClass conformsToProtocol:@protocol(HKWChooserViewProtocol)]
-        || ![chooserViewClass isSubclassOfClass:[HKWAbstractChooserView class]]) {
+        || ![chooserViewClass isSubclassOfClass:[UIView class]]) {
         return;
     }
     _chooserViewClass = chooserViewClass;
