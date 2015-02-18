@@ -483,7 +483,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 - (void)showChooserView {
     self.chooserState = HKWMentionsCreationChooserStateVisible;
-    self.entityChooserView.hidden = NO;
+    [self.entityChooserView becomeVisible];
     if ([self.entityChooserView respondsToSelector:@selector(setInsertionPointMarkerEnabled:)]) {
         self.entityChooserView.insertionPointMarkerEnabled = YES;
     }
