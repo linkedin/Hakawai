@@ -718,7 +718,7 @@ typedef enum {
     if (self.state == HKWMentionsPluginStateCreatingMention) {
         return;
     }
-    BOOL shouldDisable = [self rangeTouchesMentions:range] || self.parentTextView.selectedRange.length > 0;
+    BOOL shouldDisable = [self rangeTouchesMentions:range] || [self rangeTouchesMentions:self.parentTextView.selectedRange];
     if (shouldDisable) {
         [self.parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
     }
@@ -1147,6 +1147,8 @@ typedef enum {
             return;
     }
     self.state = HKWMentionsStateQuiescent;
+    // TODO: If we can determine whether this method is being called because the selection was changed by the user, or
+    //  because fast delete is happening, we shouldn't toggle autocorrect if fast delete is happening.
     [self toggleAutocorrectAsRequiredForRange:range];
 }
 
