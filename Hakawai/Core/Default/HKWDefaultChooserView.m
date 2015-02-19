@@ -439,6 +439,7 @@
 }
 
 - (void)setBorderMode:(HKWChooserBorderMode)borderMode {
+    _borderMode = borderMode;
     [self updateSubviewsForMode:borderMode];
 }
 

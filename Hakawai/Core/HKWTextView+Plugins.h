@@ -164,4 +164,19 @@ typedef NS_ENUM(NSInteger, HKWAccessoryViewMode) {
  */
 - (void)restoreOriginalSpellChecking:(BOOL)shouldCycle;
 
+
+#pragma mark - API (misc)
+
+/*!
+ If the app explicitly set the text view font, or the text view was initialized from an XIB, return the most recent font
+ set by the app. If the app never set the font, return nil.
+ */
+@property (nonatomic, readonly) UIFont *fontSetByApp;
+
+/*!
+ If the app explicitly set the text view's text color, or the text view was initialized from an XIB, return the most
+ recent text color set by the app. If the app never set the text color, return nil.
+ */
+@property (nonatomic, readonly) UIColor *textColorSetByApp;
+
 @end

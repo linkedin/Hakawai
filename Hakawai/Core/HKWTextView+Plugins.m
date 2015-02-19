@@ -56,9 +56,11 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     }
 
     UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:self.selectedRange.location];
+    NSAssert(p != nil, @"Text position from %@, offset %ld returned nil. This should never happen.",
+             self.beginningOfDocument, self.selectedRange.location);
     CGRect caretRect = [self caretRectForPosition:p];
 
-    CGFloat offsetY;
+    CGFloat offsetY = 0;
     CGRect viewportRect;
     switch (mode) {
         case HKWViewportModeTop:
@@ -76,12 +78,10 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
                                       caretRect.size.height + self.lineFragmentPadding);
             break;
     }
-    // offsetY can never be negative
-    offsetY = (offsetY < 0.0) ? 0.0 : offsetY;
+    NSAssert(!isnan(offsetY), @"Single viewport content y-offset calculated as NaN. This should never happen.");
 
     // Move the viewport to show only the relevant line
     self.viewportContentOffset = CGPointMake(self.contentOffset.x, offsetY);
-
     [self setContentOffset:self.viewportContentOffset animated:NO];
 
     self.inSingleLineViewportMode = YES;

@@ -33,7 +33,7 @@
     HKWLayoutManager *manager = [HKWLayoutManager new];
     NSTextContainer *container = [[NSTextContainer alloc] initWithSize:CGSizeMake(frame.size.width, FLT_MAX)];
     container.widthTracksTextView = YES;
-    container.heightTracksTextView = YES;
+    container.heightTracksTextView = NO;
     [manager addTextContainer:container];
     NSTextStorage *storage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
     [storage addLayoutManager:manager];
@@ -72,6 +72,7 @@
     replacement.backgroundColor = self.backgroundColor;
 
     replacement.font = self.font;
+    replacement.fontSetByApp = self.font;
 
     replacement.clearsOnInsertion = NO;
     replacement.selectable = self.selectable;
@@ -79,6 +80,7 @@
     
     replacement.textAlignment = self.textAlignment;
     replacement.textColor = self.textColor;
+    replacement.textColorSetByApp = self.textColor;
     replacement.autocapitalizationType = self.autocapitalizationType;
     replacement.autocorrectionType = self.autocorrectionType;
     replacement.spellCheckingType = self.spellCheckingType;
@@ -392,7 +394,7 @@
         // Get the new y-offset, based on the current insertion position
         UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:self.selectedRange.location];
         CGRect caretRect = [self caretRectForPosition:p];
-        CGFloat newOffsetY;
+        CGFloat newOffsetY = 0;
         switch (self.viewportMode) {
             case HKWViewportModeTop:
                 newOffsetY = caretRect.origin.y - self.lineFragmentPadding;
@@ -402,12 +404,13 @@
                               + self.lineFragmentPadding);
                 break;
         }
-        // newOffsetY can never be negative
-        newOffsetY = (newOffsetY < 0.0) ? 0.0 : newOffsetY;
 
         // Adjust the y-offset if necessary
-        if (newOffsetY != self.viewportContentOffset.y) {
-            self.viewportContentOffset = CGPointMake(self.viewportContentOffset.x, newOffsetY);
+        CGFloat oldY = self.viewportContentOffset.y;
+        CGFloat oldX = self.viewportContentOffset.x;
+        // Check for NaN (e.g. from caretRectForPosition:)
+        if (!isnan(oldX) && !isnan(newOffsetY) && newOffsetY != oldY) {
+            self.viewportContentOffset = CGPointMake(oldX, newOffsetY);
             [self setContentOffset:self.viewportContentOffset animated:NO];
             if ([self.controlFlowPlugin respondsToSelector:@selector(singleLineViewportChanged)]) {
                 [self.controlFlowPlugin singleLineViewportChanged];
@@ -541,6 +544,20 @@
 
 
 #pragma mark - Properties
+
+- (void)setTextColor:(UIColor *)textColor {
+    [super setTextColor:textColor];
+    if (textColor) {
+        self.textColorSetByApp = textColor;
+    }
+}
+
+- (void)setFont:(UIFont *)font {
+    [super setFont:font];
+    if (font) {
+        self.fontSetByApp = font;
+    }
+}
 
 - (NSMutableDictionary *)simplePluginsDictionary {
     if (!_simplePluginsDictionary) {

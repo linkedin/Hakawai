@@ -108,4 +108,10 @@
 @property (nonatomic) BOOL overridingAutocorrection;
 @property (nonatomic) BOOL overridingSpellChecking;
 
+
+#pragma mark - Other proeprties
+
+@property (nonatomic, strong, readwrite) UIFont *fontSetByApp;
+@property (nonatomic, strong, readwrite) UIColor *textColorSetByApp;
+
 @end

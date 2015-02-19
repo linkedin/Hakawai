@@ -293,7 +293,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         for (NSString *attributeName in mentionAttributes) {
             [buffer addAttribute:attributeName value:mentionAttributes[attributeName] range:HKW_FULL_RANGE(input)];
         }
-        return [buffer copy];
+        return buffer;
     }];
     self.parentTextView.selectedRange = originalRange;
 
@@ -439,15 +439,31 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 /*!
- Remove the mentions-specific foreground color attribute from the parent text view's \c typingAttributes dictionary.
- This is necessary to prevent the color used to denote attributes from 'bleeding' over into newly typed text.
+ Build a new typing attributes dictionary by stripping mentions-specific attributes from an original attributes
+ dictionary and, if applicable, restoring default attributes from the parent text view.
  */
-- (void)stripCustomAttributesFromTypingAttributes {
-    NSMutableDictionary *d = [self.parentTextView.typingAttributes mutableCopy];
+- (NSDictionary *)typingAttributesByStrippingMentionAttributes:(NSDictionary *)originalAttributes {
+    NSMutableDictionary *d = [originalAttributes mutableCopy];
     for (NSString *key in self.mentionUnselectedAttributes) {
         [d removeObjectForKey:key];
     }
-    self.parentTextView.typingAttributes = [d copy];
+    // Restore the font and/or text color, if the app set either explicitly at any point.
+    if (self.parentTextView.fontSetByApp) {
+        d[NSFontAttributeName] = self.parentTextView.fontSetByApp;
+    }
+    if (self.parentTextView.textColorSetByApp) {
+        d[NSForegroundColorAttributeName] = self.parentTextView.textColorSetByApp;
+    }
+    return d;
+}
+
+/*!
+ Remove the mentions-specific attributes from the parent text view's \c typingAttributes dictionary. This is necessary
+ to prevent the color used to denote attributes from 'bleeding' over into newly typed text.
+ */
+- (void)stripCustomAttributesFromTypingAttributes {
+    NSDictionary *oldAttrs = self.parentTextView.typingAttributes;
+    self.parentTextView.typingAttributes = [self typingAttributesByStrippingMentionAttributes:oldAttrs];
 }
 
 /*!
@@ -986,13 +1002,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         self.parentTextView.selectedRange = originalSelectedRange;
     }
 
-    NSMutableDictionary *mutableTypingAttrs = [self.parentTextView.typingAttributes mutableCopy];
-    // PROVISIONAL FIX: remove the color attribute
-    // This prevents text pasted in right before or after a mention from accreting the blue color
-    // We need to change this eventually to allow for use when custom attributes that aren't colors are specified, or
-    //  there is a legitimate need for colors for non-mentions text
-    [mutableTypingAttrs removeObjectForKey:NSForegroundColorAttributeName];
-    NSDictionary *typingAttrs = [mutableTypingAttrs copy];
+    // Strip the mentions-specific typing attributes.
+    NSDictionary *parentTypingAttrs = self.parentTextView.typingAttributes;
+    NSDictionary *typingAttrs = [self typingAttributesByStrippingMentionAttributes:parentTypingAttrs];
 
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
@@ -1570,27 +1582,28 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     NSUInteger currentLocation = self.parentTextView.selectedRange.location;
     NSAssert(self.parentTextView.selectedRange.length == 0,
              @"Cannot create a mention unless cursor is in insertion mode.");
-    UIFont *parentTextViewFont = self.parentTextView.font;
+    UIFont *parentFont = self.parentTextView.fontSetByApp;
+    UIColor *parentColor = self.parentTextView.textColorSetByApp;
     NSAssert(self.mentionUnselectedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     [self.parentTextView transformTextAtRange:NSMakeRange(location, currentLocation - location)
                               withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                                  // Note: if the plug-in ever supports true rich formatting, the font and foreground
-                                  //  color (and other) attributes may need to be sampled from other text, rather than
-                                  //  hardcoded as done here.
                                   NSMutableDictionary *attributes = [unselectedAttributes mutableCopy];
                                   attributes[HKWMentionAttributeName] = mention;
-                                  attributes[NSFontAttributeName] = parentTextViewFont;
+                                  // If the 'unselected attributes' dictionary doesn't contain information on the font
+                                  //  or text color, and the text view has a custom font or text color, use those.
+                                  if (!attributes[NSFontAttributeName] && parentFont) {
+                                      attributes[NSFontAttributeName] = parentFont;
+                                  }
+                                  if (!attributes[NSForegroundColorAttributeName] && parentColor) {
+                                      attributes[NSForegroundColorAttributeName] = parentColor;
+                                  }
                                   return [[NSAttributedString alloc] initWithString:mentionText
                                                                          attributes:attributes];
                               }];
     // Remove the color formatting for subsequently typed characters.
     [self.parentTextView transformTypingAttributesWithTransformer:^NSDictionary *(NSDictionary *currentAttributes) {
-        NSMutableDictionary *buffer = [currentAttributes mutableCopy];
-        for (NSString *key in unselectedAttributes) {
-            [buffer removeObjectForKey:key];
-        }
-        return [buffer copy];
+        return [self typingAttributesByStrippingMentionAttributes:currentAttributes];
     }];
     // Move the cursor
     self.parentTextView.selectedRange = NSMakeRange(location + [mentionText length], 0);
