@@ -55,6 +55,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 // State properties
 @property (nonatomic) HKWMentionsState state;
 
+/// Whether or not initial setup has been performed. If the text view is the first responder already when the plug-in is
+/// set, initial setup should be performed immediately. However, if it's not, setup should be deferred until editing is
+/// going to begin, so that the text view doesn't snatch first-responder status from a different control.
+@property (nonatomic) BOOL initialSetupPerformed;
+
 /*!
  Indicates that all calls to \c textViewDidChangeSelection: should be ignored. This is used when custom transformations
  on the text view's text are desired, which would result in the text view's selection range temporarily changing, but
@@ -193,6 +198,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
     HKWMentionsPlugin *plugin = [[self class] new];
     plugin.state = HKWMentionsStateQuiescent;
+    plugin.initialSetupPerformed = NO;
     plugin.chooserPositionMode = mode;
     plugin.previousSelectionRange = NSMakeRange(NSNotFound, 0);
     plugin.previousTextLength = 0;
@@ -233,6 +239,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     return plugin;
 }
 
+// Return an array of mentions objects corresponding to the mentions currently in the text view.
 - (NSArray *)mentions {
     NSMutableArray *buffer = [NSMutableArray array];
 
@@ -250,6 +257,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     return [buffer copy];
 }
 
+// Programmatically add a mention to the text view's text.
 - (void)addMention:(HKWMentionsAttribute *)mention {
     if (!mention
         || ![mention isKindOfClass:[HKWMentionsAttribute class]]
@@ -304,6 +312,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     [self advanceStateForInsertionChanged:precedingChar location:location];
 }
 
+// Programmatically add a number of mentions to the text view's text.
 - (void)addMentions:(NSArray *)mentions {
     for (id object in mentions) {
         if ([object isKindOfClass:[HKWMentionsAttribute class]]) {
@@ -312,8 +321,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
 }
 
+// Delegate method called when the plug-in is registered to a text view. Actual setup takes place in 'initialSetup'.
 - (void)performInitialSetup {
     NSAssert(self.parentTextView != nil, @"Internal error: parent text view is nil; it should have been set already");
+    if (self.parentTextView.isFirstResponder) {
+        [self initialSetup];
+    }
+}
+
+/// Perform initial setup and put the mentions plug-in into a known good state. This setup takes place the first time
+/// the text view becomes the first responder, or immediately if the text view already is the first responder.
+- (void)initialSetup {
+    self.initialSetupPerformed = YES;
+
     // Disable 'undo'; it doesn't work right with mentions yet
     self.shouldEnableUndoUponUnregistration = [self.parentTextView.undoManager isUndoRegistrationEnabled];
     [self.parentTextView.undoManager disableUndoRegistration];
@@ -327,6 +347,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     [self advanceStateForInsertionChanged:precedingChar location:location];
 }
 
+// Delegate method called when the plug-in is unregistered from a text view. Cleans up the state of the text view.
 - (void)performFinalCleanup {
     // Cancel mentions creation, if it's happening
     if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
@@ -343,6 +364,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
     // Restore the parent text view's spell checking
     [self.parentTextView restoreOriginalSpellChecking:NO];
+
+    self.initialSetupPerformed = NO;
 }
 
 
@@ -1351,6 +1374,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
 }
 
+- (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
+    if (!self.initialSetupPerformed) {
+        [self initialSetup];
+    }
+    return YES;
+}
+
 - (void)textViewDidBeginEditing:(UITextView *)textView {
     // Bring the text view back to a known good state
     NSInteger currentLength = [self.parentTextView.text length];
@@ -1615,6 +1645,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     //  (since the cursor will be located immediately after the location of the mention once it's created)
     [self toggleAutocorrectAsRequiredForRange:NSMakeRange(location, 0)];
     self.parentTextView.shouldRejectAutocorrectInsertions = NO;
+
+    // Inform the delegate (if appropriate)
+    if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:createdMention:atLocation:)]) {
+        [self.stateChangeDelegate mentionsPlugin:self createdMention:mention atLocation:location];
+    }
 }
 
 /// A private method that handles attaching the chooser view when it's enclosed within the text view.

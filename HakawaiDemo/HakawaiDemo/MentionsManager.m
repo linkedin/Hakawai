@@ -189,6 +189,18 @@
 }
 
 
+#pragma mark - State change delegate
+
+// The state-change delegate allows your app to optionally listen in on certain important events that might happen to
+//  the mentions plug-in. For example, implementing the optional method below allows your app to be notified whenever a
+//  new mention is successfully created.
+- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
+        createdMention:(id<HKWMentionsEntityProtocol>)entity
+            atLocation:(NSUInteger)location {
+    NSLog(@"Mentions plug-in created mention named \"%@\" at location %ld", [entity entityName], (long) location);
+}
+
+
 #pragma mark - Utility
 
 + (BOOL)string:(NSString *)testString isPrefixOfString:(NSString *)compareString {

@@ -96,12 +96,21 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
 @optional
 
+/// Inform the delegate that the specified mentions plug-in changed its internal state.
 - (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
         stateChangedTo:(HKWMentionsPluginState)newState
                   from:(HKWMentionsPluginState)oldState;
 
+/// Inform the delegate that the specified mentions plug-in activated and displayed its chooser view.
 - (void)mentionsPluginActivatedChooserView:(HKWMentionsPlugin *)plugin;
+
+/// Inform the delegate that the specified mentions plug-in deactivated and hid its chooser view.
 - (void)mentionsPluginDeactivatedChooserView:(HKWMentionsPlugin *)plugin;
+
+/// Inform the delegate that the specified mentions plug-in created a mention at the given location.
+- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
+        createdMention:(id<HKWMentionsEntityProtocol>)entity
+            atLocation:(NSUInteger)location;
 
 @end
 

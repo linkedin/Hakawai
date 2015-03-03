@@ -66,6 +66,7 @@
         self.plugin.chooserViewBackgroundColor = LIGHT_GRAY_COLOR;
         // The mentions plug-in requires a delegate, which provides it with mentions entities in response to a query string
         mentionsPlugin.delegate = [MentionsManager sharedInstance];
+        mentionsPlugin.stateChangeDelegate = [MentionsManager sharedInstance];
         self.textView.controlFlowPlugin = mentionsPlugin;
     }
 }
