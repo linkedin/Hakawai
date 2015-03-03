@@ -200,18 +200,6 @@
 
 #pragma mark - Miscellaneous
 
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    // Position the tap view
-    if (self.touchCaptureOverlayView.superview != nil) {
-        // 'Fix' the tap capture view
-        CGRect frame = self.touchCaptureOverlayView.frame;
-        frame.origin.x = self.contentOffset.x;
-        frame.origin.y = self.contentOffset.y;
-        self.touchCaptureOverlayView.frame = frame;
-    }
-}
-
 - (void)touchOverlayViewTapped:(UITapGestureRecognizer *)gestureRecognizer {
     // First, give the plug-in a chance to do something
     if ([self.controlFlowPlugin respondsToSelector:@selector(singleLineViewportTapped)]) {
@@ -588,16 +576,6 @@
     return _accessoryViewConstraints;
 }
 
-- (void)setFrame:(CGRect)frame {
-    // Fix the size of the touch capture overlay view
-    CGRect overlayFrame = self.touchCaptureOverlayView.frame;
-    overlayFrame.size.width = frame.size.width;
-    overlayFrame.size.height = frame.size.height;
-    self.touchCaptureOverlayView.frame = overlayFrame;
-
-    [super setFrame:frame];
-}
-
 - (id<UITextViewDelegate>)simpleDelegate {
     return (id<UITextViewDelegate>)self.externalDelegate;
 }
@@ -614,7 +592,8 @@
 - (UIView *)touchCaptureOverlayView {
     if (!_touchCaptureOverlayView) {
         // Unfortunately, using a UIView and adding a gesture recognizer doesn't seem to work.
-        UIControl *control = [[UIControl alloc] initWithFrame:self.bounds];
+        UIControl *control = [[UIControl alloc] init];
+        control.translatesAutoresizingMaskIntoConstraints = NO;
         control.backgroundColor = [UIColor clearColor];
         control.userInteractionEnabled = YES;
         [control addTarget:self action:@selector(touchOverlayViewTapped:) forControlEvents:UIControlEventTouchUpInside];

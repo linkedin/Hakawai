@@ -53,6 +53,9 @@ typedef NS_ENUM(NSInteger, HKWAccessoryViewMode) {
  Order the text view to enter the 'single line viewport mode', where the current line is fixed in a given position and
  scrolling is disabled. If the text view is already in this mode, this method does nothing.
 
+ \warning Do not move the text view to a different superview while the text view is in single-line viewport mode; this
+ will cause problems.
+
  \param captureTouches    if YES, taps on the text view while in single line viewport mode will not be forwarded to the
                           text view; instead they will trigger special events (that the plug-in can respond to)
 

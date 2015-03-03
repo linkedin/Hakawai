@@ -34,11 +34,14 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
 #pragma mark - API (viewport)
 
 - (CGRect)enterSingleLineViewportMode:(HKWViewportMode)mode captureTouches:(BOOL)shouldCaptureTouches {
+    BOOL needConstraints = NO;
     if (self.inSingleLineViewportMode) {
         return CGRectNull;
     }
     if (shouldCaptureTouches) {
-        [self addSubview:self.touchCaptureOverlayView];
+        [self.superview addSubview:self.touchCaptureOverlayView];
+        needConstraints = YES;
+
     }
     self.viewportMode = mode;
     if ([self respondsToSelector:@selector(layoutManager)]) {
@@ -83,6 +86,52 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     // Move the viewport to show only the relevant line
     self.viewportContentOffset = CGPointMake(self.contentOffset.x, offsetY);
     [self setContentOffset:self.viewportContentOffset animated:NO];
+
+    if (needConstraints) {
+        // Add constraints to the touch capture overlay view
+        // Constrain the overlay view to be as wide as its enclosing text view
+        [self.superview addConstraint:[NSLayoutConstraint constraintWithItem:self.touchCaptureOverlayView
+                                                                   attribute:NSLayoutAttributeWidth
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self
+                                                                   attribute:NSLayoutAttributeWidth
+                                                                  multiplier:1
+                                                                    constant:0]];
+        // Constrain the overlay view to be the proper height
+        [self.superview addConstraint:[NSLayoutConstraint constraintWithItem:self.touchCaptureOverlayView
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:nil
+                                                                   attribute:NSLayoutAttributeNotAnAttribute
+                                                                  multiplier:1
+                                                                    constant:caretRect.size.height + self.lineFragmentPadding]];
+        // Constrain the overlay view's leading edge to be fixed to the text view's leading edge
+        [self.superview addConstraint:[NSLayoutConstraint constraintWithItem:self.touchCaptureOverlayView
+                                                                   attribute:NSLayoutAttributeLeft
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self
+                                                                   attribute:NSLayoutAttributeLeft
+                                                                  multiplier:1
+                                                                    constant:0]];
+        NSLayoutAttribute attr;
+        switch (mode) {
+            case HKWViewportModeTop:
+                attr = NSLayoutAttributeTop;
+                break;
+            case HKWViewportModeBottom:
+                attr = NSLayoutAttributeBottom;
+                break;
+        }
+        // Constrain the overlay view's top or bottom to be fixed to the text view's top or bottom
+        [self.superview addConstraint:[NSLayoutConstraint constraintWithItem:self.touchCaptureOverlayView
+                                                                   attribute:attr
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self
+                                                                   attribute:attr
+                                                                  multiplier:1
+                                                                    constant:0]];
+        [self updateConstraints];
+    }
 
     self.inSingleLineViewportMode = YES;
     self.showsVerticalScrollIndicator = NO;
