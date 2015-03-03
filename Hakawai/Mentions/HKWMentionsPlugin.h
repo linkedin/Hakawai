@@ -107,7 +107,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 /// Inform the delegate that the specified mentions plug-in deactivated and hid its chooser view.
 - (void)mentionsPluginDeactivatedChooserView:(HKWMentionsPlugin *)plugin;
 
-/// Inform the delegate that the specified mentions plug-in created a mention at the given location.
+/*! 
+ Inform the delegate that the specified mentions plug-in created a mention at the given location as a result of user
+ input.
+
+ \note Mentions created by calling the \c addMention: or \c addMentions: methods will not trigger this method.
+ */
 - (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
         createdMention:(id<HKWMentionsEntityProtocol>)entity
             atLocation:(NSUInteger)location;
@@ -295,6 +300,32 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 - (void)addMentions:(NSArray *)mentions;
 
 
+#pragma mark - Behavior Configuration
+
+/*!
+ Whether or not the text view delegate's \c textViewDidChange: method should be called whenever a mention is added as a
+ result of user action.
+
+ \note Mentions created by calling the \c addMention: or \c addMentions: methods will not trigger the method.
+ */
+@property (nonatomic) BOOL notifyTextViewDelegateOnMentionCreation;
+
+/*!
+ Whether or not the text view delegate's \c textViewDidChange: method should be called whenever a mention is trimmed.
+ */
+@property (nonatomic) BOOL notifyTextViewDelegateOnMentionTrim;
+
+/*!
+ Whether or not the text view delegate's \c textViewDidChange: method should be called whenever a mention is deleted.
+ */
+@property (nonatomic) BOOL notifyTextViewDelegateOnMentionDeletion;
+
+/*!
+ Whether or not to allow resumption of mentions creation upon resuming editing.
+ */
+@property (nonatomic) BOOL resumeMentionsCreationEnabled;
+
+
 #pragma mark - Chooser UI Configuration
 
 /*! 
@@ -340,9 +371,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  Whether or not the delegate supports displaying a loading cell in the chooser view while waiting for the results
  */
 @property (nonatomic, readonly) BOOL loadingCellSupported;
-
-/// Whether or not to allow resumption of mentions creation upon resuming editing
-@property (nonatomic) BOOL resumeMentionsCreationEnabled;
 
 /*!
  If the plug-in is set to display the chooser view in a custom position, set the top level view and a block to be called

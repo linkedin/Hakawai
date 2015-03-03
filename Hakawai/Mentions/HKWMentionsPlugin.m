@@ -196,16 +196,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         NSAssert(NO, @"Mentions plug-in is only supported for iOS 7.1 or later.");
     }
 
-    HKWMentionsPlugin *plugin = [[self class] new];
-    plugin.state = HKWMentionsStateQuiescent;
-    plugin.initialSetupPerformed = NO;
+    HKWMentionsPlugin *plugin = [[[self class] alloc] init];
     plugin.chooserPositionMode = mode;
-    plugin.previousSelectionRange = NSMakeRange(NSNotFound, 0);
-    plugin.previousTextLength = 0;
     plugin.controlCharacterSet = controlCharacterSet;
     plugin.implicitSearchLength = searchLength;
 
-    plugin.characterForAdvanceStateForCharacterInsertion = (unichar)0;
 
     // Validate attribute dictionaries
     // (unselected mention attributes)
@@ -237,6 +232,24 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     plugin.mentionSelectedAttributes = [buffer copy];
 
     return plugin;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (!self) { return nil; }
+
+    self.state = HKWMentionsStateQuiescent;
+    self.initialSetupPerformed = NO;
+    self.previousSelectionRange = NSMakeRange(NSNotFound, 0);
+    self.previousTextLength = 0;
+    self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
+
+    self.shouldResumeMentionsCreation = NO;
+    self.notifyTextViewDelegateOnMentionCreation = NO;
+    self.notifyTextViewDelegateOnMentionTrim = NO;
+    self.notifyTextViewDelegateOnMentionDeletion = NO;
+
+    return self;
 }
 
 // Return an array of mentions objects corresponding to the mentions currently in the text view.
@@ -538,11 +551,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 /*!
  'Bleach' all mentions that fall within a certain range. This is used when multiple characters' worth of text must be
- deleted; mentions formatting is stripped if part or all of a mention is part of the excised text.
+ deleted; mentions formatting is stripped if part or all of a mention is part of the excised text. This method returns
+ the number of mentions that were bleached.
  */
-- (void)bleachMentionsWithinRange:(NSRange)bleachRange {
+- (NSUInteger)bleachMentionsWithinRange:(NSRange)bleachRange {
     if (bleachRange.location == NSNotFound || bleachRange.length == 0) {
-        return;
+        return 0;
     }
     NSMutableArray *ranges = [NSMutableArray array];
     [self.parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(self.parentTextView.attributedText)
@@ -577,6 +591,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                       return [buffer copy];
                                   }];
     }
+    return [ranges count];
 }
 
 /*!
@@ -960,6 +975,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 self.parentTextView.selectedRange = NSMakeRange(self.currentlySelectedMentionRange.location + [trimmedString length],
                                                                 0);
                 location = self.parentTextView.selectedRange.location;
+
+                // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
+                if (self.notifyTextViewDelegateOnMentionTrim
+                    && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+                }
             }
             else {
                 // Delete mention entirely
@@ -995,6 +1016,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                         self.state = HKWMentionsStateAboutToSelectMention;
                     }
                     location = locationAfterDeletion;
+                }
+
+                // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
+                if (self.notifyTextViewDelegateOnMentionDeletion
+                    && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
                 }
             }
             returnValue = NO;
@@ -1131,7 +1158,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                deletedString:(NSString *)deletedString
                           precedingCharacter:(unichar)precedingCharacter {
     // Remove all mentions within the selection range before continuing
-    [self bleachMentionsWithinRange:range];
+    NSUInteger numberOfMentionsDestroyed = [self bleachMentionsWithinRange:range];
     switch (self.state) {
         case HKWMentionsStateQuiescent:
             [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:precedingCharacter];
@@ -1153,6 +1180,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
             break;
     }
+
+    // If mentions were deleted, notify the text view's external delegate as appropriate.
+    if (self.notifyTextViewDelegateOnMentionDeletion
+        && numberOfMentionsDestroyed > 0
+        && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+    }
+
     return YES;
 }
 
@@ -1649,6 +1684,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // Inform the delegate (if appropriate)
     if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:createdMention:atLocation:)]) {
         [self.stateChangeDelegate mentionsPlugin:self createdMention:mention atLocation:location];
+    }
+    // Invoke the parent text view's delegate if appropriate, since a mention was added and the text changed.
+    if (self.notifyTextViewDelegateOnMentionCreation
+        && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
     }
 }
 
