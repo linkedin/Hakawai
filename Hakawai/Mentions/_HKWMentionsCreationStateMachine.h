@@ -44,6 +44,11 @@
 - (void)attachViewToParentEditor:(UIView *)view origin:(CGPoint)origin mode:(HKWAccessoryViewMode)mode;
 
 /*!
+ Inform the delegate that the accessory view is about to be activated or deactivated.
+ */
+- (void)accessoryViewStateWillChange:(BOOL)activated;
+
+/*!
  Inform the delegate that the accessory view has been activated or deactivated.
  */
 - (void)accessoryViewActivated:(BOOL)activated;

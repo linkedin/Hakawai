@@ -1794,6 +1794,20 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
 }
 
+- (void)accessoryViewStateWillChange:(BOOL)activated {
+  if (activated) {
+    // Tell state change delegate that the chooser view will open.
+    if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPluginWillActivateChooserView:)]) {
+      [self.stateChangeDelegate mentionsPluginWillActivateChooserView:self];
+    }
+  }
+  else {
+    if (self.viewportLocksUponMentionCreation) {
+      [self.parentTextView exitSingleLineViewportMode];
+    }
+  }
+}
+
 - (void)accessoryViewActivated:(BOOL)activated {
     if (activated) {
         self.parentTextView.shouldRejectAutocorrectInsertions = YES;
@@ -1809,12 +1823,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         }
     }
     else {
-        if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
-            [self.stateChangeDelegate mentionsPluginDeactivatedChooserView:self];
-        }
-        if (self.viewportLocksUponMentionCreation) {
-            [self.parentTextView exitSingleLineViewportMode];
-        }
+      // Tell state change delegate that the chooser view has been closed.
+      if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
+        [self.stateChangeDelegate mentionsPluginDeactivatedChooserView:self];
+      }
     }
 }
 

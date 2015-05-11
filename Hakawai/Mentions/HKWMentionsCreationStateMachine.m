@@ -482,6 +482,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 #pragma mark - Private (chooser view related)
 
 - (void)showChooserView {
+    [self.delegate accessoryViewStateWillChange:YES];
+
     self.chooserState = HKWMentionsCreationChooserStateVisible;
     [self.entityChooserView becomeVisible];
     if ([self.entityChooserView respondsToSelector:@selector(setInsertionPointMarkerEnabled:)]) {
@@ -504,8 +506,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 }
 
 - (void)hideChooserView {
-    [self.delegate accessoryViewActivated:NO];
+    [self.delegate accessoryViewStateWillChange:NO];
     [self.entityChooserView resetScrollPositionAndHide];
+    [self.delegate accessoryViewActivated:NO];
 }
 
 - (UIView<HKWChooserViewProtocol> *)createNewChooserView {

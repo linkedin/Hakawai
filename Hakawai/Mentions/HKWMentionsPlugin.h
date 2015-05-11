@@ -101,6 +101,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
         stateChangedTo:(HKWMentionsPluginState)newState
                   from:(HKWMentionsPluginState)oldState;
 
+/// Inform the delegate that the specified mentions plug-in is about to activate and display its chooser view.
+- (void)mentionsPluginWillActivateChooserView:(HKWMentionsPlugin *)plugin;
+
 /// Inform the delegate that the specified mentions plug-in activated and displayed its chooser view.
 - (void)mentionsPluginActivatedChooserView:(HKWMentionsPlugin *)plugin;
 
