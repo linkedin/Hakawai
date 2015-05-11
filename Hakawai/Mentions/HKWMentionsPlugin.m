@@ -1392,8 +1392,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         [self advanceStateForSelectionChanged:range];
     }
     else if (self.previousSelectionRange.location != NSNotFound
-             && labs(self.previousSelectionRange.location - range.location) == 1
-             && labs(self.previousTextLength - [textView.text length]) == 1) {
+             && self.previousSelectionRange.location - range.location == 1
+             && self.previousTextLength - [textView.text length] == 1) {
         // The cursor moved as a result of the user entering or deleting a single character
         self.previousSelectionRange = range;
         self.previousTextLength = [textView.text length];
