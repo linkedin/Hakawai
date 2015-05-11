@@ -14,7 +14,6 @@
 
 #import "HKWCustomAttributes.h"
 #import "HKWRoundedRectBackgroundAttributeValue.h"
-#import "_HKWOSVersionMacros.h"
 
 #import "HKWTextView.h"
 #import "HKWTextView+TextTransformation.h"
@@ -192,7 +191,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                   unselectedMentionAttributes:(NSDictionary *)unselectedAttributes
                     selectedMentionAttributes:(NSDictionary *)selectedAttributes {
     // Make sure iOS version is 7.1 or greater
-    if (!HKW_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(_iOS_7_1)) {
+    if (!HKW_systemVersionIsAtLeast(@"7.1")) {
         NSAssert(NO, @"Mentions plug-in is only supported for iOS 7.1 or later.");
     }
 

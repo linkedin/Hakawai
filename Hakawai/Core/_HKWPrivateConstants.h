@@ -24,5 +24,7 @@
 #define HKW_DESCRIBE_FRAME(__frame, __msg) HKWLOG(@"frame (%@, origin: (%f, %f), width: %f, height: %f)", (__msg), \
 (__frame).origin.x, (__frame).origin.y, (__frame).size.width, (__frame).size.height)
 
+BOOL HKW_systemVersionIsAtLeast(NSString *version);
+
 // ifndef
 #endif

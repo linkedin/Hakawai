@@ -17,7 +17,8 @@
 
 #import "HKWTextView.h"
 #import "HKWMentionsPlugin.h"
-#import "_HKWOSVersionMacros.h"
+
+BOOL HKW_systemVersionIsAtLeast(NSString *version);
 
 @interface MentionsDemoViewController ()
 @property (nonatomic, weak) IBOutlet HKWTextView *textView;
@@ -33,7 +34,7 @@
     self.textView.layer.borderWidth = 0.5;
     self.textView.layer.borderColor = [UIColor lightGrayColor].CGColor;
 
-    if (HKW_SYSTEM_VERSION_LESS_THAN(_iOS_7_1)) {
+    if (!HKW_systemVersionIsAtLeast(@"7.1")) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Warning"
                                                         message:@"The mentions plug-in is only supported on iOS 7.1 and later."
                                                        delegate:nil

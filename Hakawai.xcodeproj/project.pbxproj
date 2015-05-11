@@ -75,7 +75,6 @@
 		E1233C0219A3090B0052217A /* HKWTControlFlowDummyPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTControlFlowDummyPlugin.m; path = "Supporting Classes/HKWTControlFlowDummyPlugin.m"; sourceTree = "<group>"; };
 		E1233C0519A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewSingleLineViewportModeTests.m; sourceTree = "<group>"; };
 		E1233C0819A3C6680052217A /* HKWTextViewAttributeTransformerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewAttributeTransformerTests.m; sourceTree = "<group>"; };
-		E1720EA41A1BCDEE008B79BC /* _HKWOSVersionMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _HKWOSVersionMacros.h; sourceTree = "<group>"; };
 		E187EE5C19E62F9100AF163A /* HKWAbstractionLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWAbstractionLayer.h; path = AbstractionLayer/HKWAbstractionLayer.h; sourceTree = "<group>"; };
 		E187EE5D19E62F9100AF163A /* HKWAbstractionLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWAbstractionLayer.m; path = AbstractionLayer/HKWAbstractionLayer.m; sourceTree = "<group>"; };
 		E1B3086C19A2C0D60096DE0E /* _HKWPrivateConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _HKWPrivateConstants.h; sourceTree = "<group>"; };
@@ -175,7 +174,6 @@
 			isa = PBXGroup;
 			children = (
 				E1B3086C19A2C0D60096DE0E /* _HKWPrivateConstants.h */,
-				E1720EA41A1BCDEE008B79BC /* _HKWOSVersionMacros.h */,
 				E1B3087219A2C0D60096DE0E /* HKWSimplePluginProtocol.h */,
 				E1B3087119A2C0D60096DE0E /* HKWControlFlowPluginProtocols.h */,
 				E1B3087919A2C0D60096DE0E /* HKWTextView.h */,

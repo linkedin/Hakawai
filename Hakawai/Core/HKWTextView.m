@@ -603,3 +603,17 @@
 }
 
 @end
+
+
+# pragma mark - Miscellaneous utilities
+
+BOOL HKW_systemVersionIsAtLeast(NSString *version) {
+  /*
+   let deviceSystemVersion = self.currentDevice().systemVersion
+   let osVersionCompareResult = deviceSystemVersion.compare(version, options: .NumericSearch)
+   return osVersionCompareResult == .OrderedSame || osVersionCompareResult == .OrderedDescending
+   */
+  NSString *systemVersion = [UIDevice currentDevice].systemVersion;
+  NSComparisonResult result = [systemVersion compare:version options:NSNumericSearch];
+  return result == NSOrderedDescending || result == NSOrderedSame;
+}
