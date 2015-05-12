@@ -31,11 +31,10 @@
  */
 @property (nonatomic, strong) NSMutableDictionary *customTypingAttributes;
 
-/*!
- This property prevents any of the UITextView delegate methods from being fired while it is YES. This is used to prevent
- several types of manipulations to the text view from spuriously triggering additional behavior.
- */
-@property (nonatomic) BOOL firstResponderIsCycling;
+
+// This property prevents any of the UITextView delegate methods from being fired while it is YES. This is used to
+// prevent several types of manipulations to the text view from spuriously triggering additional behavior.
+@property (nonatomic, readwrite) BOOL firstResponderIsCycling;
 
 /*!
  This property prevents the 'selection changed' \c UITextViewDelegate method from being forwarded to any registered

@@ -118,6 +118,12 @@ typedef NS_ENUM(NSInteger, HKWAccessoryViewMode) {
 #pragma mark - API (autocorrect)
 
 /*!
+ Whether or not the first responder is cycling. Host apps that respond to keyboard change events may need to
+ conditionally execute behavior depending on whether or not the first responder is cycling.
+ */
+@property (nonatomic, readonly) BOOL firstResponderIsCycling;
+
+/*!
  A property allowing a plug-in to inform the text view as to whether or not attempts by the autocorrect/predictive text
  system should be ignored.
 
