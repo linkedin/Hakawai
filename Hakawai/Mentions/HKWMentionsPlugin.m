@@ -1314,6 +1314,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 #pragma mark - Plug-in protocol
 
+-(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView {
+    if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
+        [self.creationStateMachine cancelMentionCreation];
+    } else {
+       self.state = HKWMentionsStateQuiescent;
+    }
+
+    [self.startDetectionStateMachine resetStateUsingString:[textView.text copy]];
+    [self resetAuxiliaryState];
+}
+
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     BOOL returnValue = YES;
     self.suppressSelectionChangeNotifications = YES;

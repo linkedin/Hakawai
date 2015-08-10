@@ -51,6 +51,25 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     return sm;
 }
 
+-(void) resetStateUsingString:(NSString *)string {
+
+    self.state = HKWMentionsStartDetectionStateQuiescentReady;
+    self.charactersSinceLastWhitespace = 0;
+    
+    if (!string || string.length == 0) {
+        self.stringBuffer = [@"" mutableCopy];
+        
+    } else {
+        self.stringBuffer = [string mutableCopy];
+        
+        NSRange lastWhitespaceRange = [self.stringBuffer rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet] options:NSBackwardsSearch];
+        if (lastWhitespaceRange.location != NSNotFound && NSMaxRange(lastWhitespaceRange) <= self.stringBuffer.length) {
+            self.charactersSinceLastWhitespace = self.stringBuffer.length - NSMaxRange(lastWhitespaceRange);
+        }
+    }
+    
+}
+
 - (void)validStringInserted:(NSString *)string
                  atLocation:(NSUInteger)location
       usingControlCharacter:(BOOL)usingControlCharacter

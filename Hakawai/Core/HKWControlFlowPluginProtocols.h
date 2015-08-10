@@ -42,6 +42,11 @@
  */
 - (void)singleLineViewportTapped;
 
+/*!
+ If available, this method is called when the text view is programatically updated (e.g. setText: or setAttributedText:)
+ */
+-(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView;
+
 @end
 
 @protocol HKWAbstractionLayerControlFlowPluginProtocol <HKWAbstractionLayerDelegate, HKWSimplePluginProtocol>
@@ -58,6 +63,11 @@
  and the user tapped on the text view somewhere.
  */
 - (void)singleLineViewportTapped;
+
+/*!
+ If available, this method is called when the text view is programatically updated (e.g. setText: or setAttributedText:)
+ */
+-(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView;
 
 // UITextViewDelegate optional helper methods
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView;

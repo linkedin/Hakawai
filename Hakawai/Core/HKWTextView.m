@@ -214,6 +214,15 @@
     }
 }
 
+-(void) textViewDidProgrammaticallyUpdate {
+    
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
+        [self.controlFlowPlugin textViewDidProgrammaticallyUpdate:self];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
+        [self.abstractionControlFlowPlugin textViewDidProgrammaticallyUpdate:self];
+    }
+}
 
 #pragma mark - UITextViewDelegate
 
