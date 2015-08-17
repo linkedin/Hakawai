@@ -87,6 +87,13 @@
 - (void)removeSimplePluginNamed:(NSString *)name;
 
 
+/*!
+ Inform the the textview that it was programatically updated (e.g. setText: or setAttributedText:) so that associated
+ plugins can update their state accordingly.
+ */
+-(void) textViewDidProgrammaticallyUpdate;
+
+
 #pragma mark - API (plug-in status)
 
 /*!

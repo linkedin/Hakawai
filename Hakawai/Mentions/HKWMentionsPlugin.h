@@ -272,6 +272,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 #pragma mark - API
 
 /*!
+ Inform the plugin that the textview was programatically updated (e.g. setText: or setAttributedText:)
+ */
+-(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView;
+
+/*!
  Extract mentions attributes from an attributed string. The array of mentions attribute objects returned by this method
  can be passed directly into the \c addMentions: method on the plug-in.
  */

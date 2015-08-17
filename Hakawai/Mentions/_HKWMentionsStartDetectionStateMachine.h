@@ -120,4 +120,9 @@
  */
 - (void)mentionCreationResumed;
 
+/*!
+ Inform the state machine that the attached control view has reset it's state, and now represents the specified string
+ */
+-(void) resetStateUsingString:(NSString *)string;
+
 @end
