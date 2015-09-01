@@ -17,7 +17,7 @@ class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, 
     // Protocol factory method
     @objc(chooserViewWithFrame:delegate:)
     class func chooserViewWithFrame(frame: CGRect, delegate: HKWCustomChooserViewDelegate) -> AnyObject {
-        let item = NSBundle.mainBundle().loadNibNamed("SimpleChooserView", owner: nil, options: nil)[0] as SimpleChooserView
+        let item = NSBundle.mainBundle().loadNibNamed("SimpleChooserView", owner: nil, options: nil)[0] as! SimpleChooserView
         item.delegate = delegate
         item.frame = frame
         item.setNeedsLayout()
@@ -59,7 +59,7 @@ class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, 
     // MARK: Picker view delegate and data source
 
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
-        let model = delegate?.modelObjectForIndex(row) as HKWMentionsEntityProtocol
+        let model = delegate?.modelObjectForIndex(row) as! HKWMentionsEntityProtocol
         return model.entityName()
     }
 
