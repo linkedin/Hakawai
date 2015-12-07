@@ -212,6 +212,17 @@
     if ([self.externalDelegate respondsToSelector:@selector(textViewWasTappedInSingleLineViewportMode:)]) {
         [self.externalDelegate textViewWasTappedInSingleLineViewportMode:self];
     }
+
+    // Move the cursor to tapped location
+    CGPoint tapLocation = [gestureRecognizer locationInView:self];
+
+    NSUInteger characterIndex = [self.layoutManager characterIndexForPoint:tapLocation
+                                                    inTextContainer:self.textContainer
+                                                    fractionOfDistanceBetweenInsertionPoints:NULL];
+
+    if (characterIndex < self.textStorage.length) {
+        self.selectedRange = NSMakeRange(characterIndex, 0);
+    }
 }
 
 -(void) textViewDidProgrammaticallyUpdate {
@@ -600,13 +611,11 @@
 
 - (UIView *)touchCaptureOverlayView {
     if (!_touchCaptureOverlayView) {
-        // Unfortunately, using a UIView and adding a gesture recognizer doesn't seem to work.
-        UIControl *control = [[UIControl alloc] init];
-        control.translatesAutoresizingMaskIntoConstraints = NO;
-        control.backgroundColor = [UIColor clearColor];
-        control.userInteractionEnabled = YES;
-        [control addTarget:self action:@selector(touchOverlayViewTapped:) forControlEvents:UIControlEventTouchUpInside];
-        _touchCaptureOverlayView = control;
+        UITapGestureRecognizer* tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(touchOverlayViewTapped:)];
+        _touchCaptureOverlayView.userInteractionEnabled = YES;
+        _touchCaptureOverlayView = [UIView new];
+        _touchCaptureOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_touchCaptureOverlayView addGestureRecognizer:tapGesture];
     }
     return _touchCaptureOverlayView;
 }
