@@ -1661,7 +1661,48 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     UIColor *parentColor = self.parentTextView.textColorSetByApp;
     NSAssert(self.mentionUnselectedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
-    [self.parentTextView transformTextAtRange:NSMakeRange(location, currentLocation - location)
+    NSRange rangeToTransform = NSMakeRange(location, currentLocation - location);
+
+    /*
+     When the textview text that matches the mention text is not the first part of the mention text,
+     we must check the text preceding the current cursor location
+     to see if it matches the first part of the mention text
+     and change the range of text to be transformed accordingly
+     e.g. mention text is "Bruce Wayne" & the matched part is "wayn"
+     textview text is "... bruce wayn| ..."
+     here the rangeToTransform will only replace "wayn"
+     and the textview text will become "... bruce Bruce Wayne ..."
+     The following code checks for & prevents this from happening
+     */
+    // Get the text from the textview that was matched for the mention & trim white spaces
+    NSString *matchedText = [self.parentTextView.text substringWithRange:NSMakeRange(location, currentLocation - location)];
+    matchedText = [matchedText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+    // If the matched text is the first part of the mention text, we don't need any further calculation
+    // e.g. matched text is "bruc"
+    if (![mentionText.lowercaseString hasPrefix:matchedText.lowercaseString]) {
+        // Add white space to the start of the mention & get range for the text in mention
+        matchedText = [NSString stringWithFormat:@" %@", matchedText];
+        NSRange matchedTextRange = [mentionText.lowercaseString rangeOfString:matchedText.lowercaseString];
+        if (matchedTextRange.location != NSNotFound
+            && matchedTextRange.location + 1 < mentionText.length) {
+            // Get the first part of mention text (preceding the matched text)
+            NSString *excessStringToReplace = [mentionText substringWithRange:NSMakeRange(0, matchedTextRange.location + 1)];
+            NSInteger excessLength = excessStringToReplace.length;
+            if (location >= excessLength) {
+                // Get similar length string from the text view preceding locationß
+                NSString *stringFromTextView = [self.parentTextView.text substringWithRange:NSMakeRange(location - excessLength, excessLength)];
+                // If the first part of mention text matches the string from textview preceding the cursor,
+                // we adjust the range of text to transform to include the excess string as well
+                if ([stringFromTextView.lowercaseString isEqualToString:excessStringToReplace.lowercaseString]) {
+                    rangeToTransform = NSMakeRange(rangeToTransform.location - excessLength, rangeToTransform.length + excessLength);
+                    location = rangeToTransform.location;
+                }
+            }
+        }
+    }
+
+    [self.parentTextView transformTextAtRange:rangeToTransform
                               withTransformer:^NSAttributedString *(NSAttributedString *input) {
                                   NSMutableDictionary *attributes = [unselectedAttributes mutableCopy];
                                   attributes[HKWMentionAttributeName] = mention;
