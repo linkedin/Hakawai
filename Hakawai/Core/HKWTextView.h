@@ -26,6 +26,8 @@
     originalText:(NSAttributedString *)originalText
    originalRange:(NSRange)originalRange;
 - (void)textView:(HKWTextView *)textView didReceiveNewTextAttachment:(NSTextAttachment *)attachment;
+- (void)textView:(HKWTextView *)textView willBeginEditing:(BOOL)editing;
+- (void)textView:(HKWTextView *)textView willEndEditing:(BOOL)editing;
 
 @end
 

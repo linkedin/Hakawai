@@ -238,20 +238,26 @@
 #pragma mark - UITextViewDelegate
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
+    BOOL shouldBeginEditing = YES;
     if (self.firstResponderIsCycling) {
-        return YES;
+        shouldBeginEditing = YES;
     }
-    if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
-        return [self.controlFlowPlugin textViewShouldBeginEditing:textView];
+    else if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
+        shouldBeginEditing = [self.controlFlowPlugin textViewShouldBeginEditing:textView];
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
-        return [self.abstractionControlFlowPlugin textViewShouldBeginEditing:textView];
+        shouldBeginEditing = [self.abstractionControlFlowPlugin textViewShouldBeginEditing:textView];
     }
     // Forward to external delegate
-    if ([self.externalDelegate respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
-        return [self.externalDelegate textViewShouldBeginEditing:textView];
+    else if ([self.externalDelegate respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
+        shouldBeginEditing = [self.externalDelegate textViewShouldBeginEditing:textView];
     }
-    return YES;
+
+    // Let external-delegate know about begin editing.
+    if ([self.externalDelegate respondsToSelector:@selector(textView:willBeginEditing:)]) {
+        [self.externalDelegate textView:self willBeginEditing:shouldBeginEditing];
+    }
+    return shouldBeginEditing;
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
@@ -271,20 +277,27 @@
 }
 
 - (BOOL)textViewShouldEndEditing:(UITextView *)textView {
+    BOOL shouldEndEditing = YES;
     if (self.firstResponderIsCycling) {
-        return YES;
+        shouldEndEditing = YES;
     }
-    if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
-        return [self.controlFlowPlugin textViewShouldEndEditing:textView];
+    else if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
+        shouldEndEditing = [self.controlFlowPlugin textViewShouldEndEditing:textView];
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
-        return [self.abstractionControlFlowPlugin textViewShouldEndEditing:textView];
+        shouldEndEditing = [self.abstractionControlFlowPlugin textViewShouldEndEditing:textView];
     }
     // Forward to external delegate
-    if ([self.externalDelegate respondsToSelector:@selector(textViewShouldEndEditing:)]) {
-        return [self.externalDelegate textViewShouldEndEditing:textView];
+    else if ([self.externalDelegate respondsToSelector:@selector(textViewShouldEndEditing:)]) {
+        shouldEndEditing = [self.externalDelegate textViewShouldEndEditing:textView];
     }
-    return YES;
+
+
+    // Let external-delegate know about end editing.
+    if ([self.externalDelegate respondsToSelector:@selector(textView:willEndEditing:)]) {
+        [self.externalDelegate textView:self willEndEditing:shouldEndEditing];
+    }
+    return shouldEndEditing;
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView {
