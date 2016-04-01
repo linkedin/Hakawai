@@ -975,6 +975,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                                                 0);
                 location = self.parentTextView.selectedRange.location;
 
+                // Notify the plugin's state change delegate that a mention was trimmed.
+                if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:trimmedMention:atLocation:)]) {
+                    [self.stateChangeDelegate mentionsPlugin:self trimmedMention:self.currentlySelectedMention atLocation:location];
+                }
                 // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
                 if (self.notifyTextViewDelegateOnMentionTrim
                     && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
@@ -1014,7 +1018,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                         self.currentlySelectedMentionRange = mentionRange;
                         self.state = HKWMentionsStateAboutToSelectMention;
                     }
-                    location = locationAfterDeletion;
+                }
+                location = locationAfterDeletion;
+                // Notify the plugin's state change delegate that a mention was deleted.
+                if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:deletedMention:atLocation:)]) {
+                    [self.stateChangeDelegate mentionsPlugin:self deletedMention:self.currentlySelectedMention atLocation:location];
                 }
 
                 // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
