@@ -998,6 +998,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                           }];
                 [self stripCustomAttributesFromTypingAttributes];
                 self.parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
+
+				// Store current mention before reset
+				HKWMentionsAttribute *currentMention = self.currentlySelectedMention;
                 [self resetCurrentMentionsData];
                 self.state = HKWMentionsStateQuiescent;
                 // Update selection state
@@ -1022,7 +1025,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 location = locationAfterDeletion;
                 // Notify the plugin's state change delegate that a mention was deleted.
                 if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:deletedMention:atLocation:)]) {
-                    [self.stateChangeDelegate mentionsPlugin:self deletedMention:self.currentlySelectedMention atLocation:location];
+                    [self.stateChangeDelegate mentionsPlugin:self deletedMention:currentMention atLocation:location];
                 }
 
                 // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
