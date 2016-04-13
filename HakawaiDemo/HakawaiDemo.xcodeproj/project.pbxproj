@@ -194,6 +194,7 @@
 		E1562B9319E72A6F00D68787 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = LinkedIn;
 				TargetAttributes = {

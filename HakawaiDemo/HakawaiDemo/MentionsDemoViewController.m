@@ -13,7 +13,6 @@
 #import "MentionsDemoViewController.h"
 
 #import "MentionsManager.h"
-#import "HakawaiDemo-Swift.h"
 
 #import "HKWTextView.h"
 #import "HKWMentionsPlugin.h"

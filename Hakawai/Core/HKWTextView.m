@@ -345,8 +345,11 @@
                                shouldChangeTextInRange:range
                                        replacementText:replacementText];
     }
-    // Forward to external delegate
-    if (!shouldUseCustomValue
+    // Forward to external delegate if:
+    // 1) There is no control flow plugin registered OR
+    // 2) Control flow plugin doesn't implement this delegate method OR
+    // 2) Control flow plugin has approved the replacement
+    if ((!shouldUseCustomValue || customValue)
         && [self.externalDelegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]) {
         shouldUseCustomValue = YES;
         customValue = [self.externalDelegate textView:textView
