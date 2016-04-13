@@ -120,6 +120,22 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
         createdMention:(id<HKWMentionsEntityProtocol>)entity
             atLocation:(NSUInteger)location;
 
+/*!
+ Inform the delegate that the specified mentions plug-in trimmed a mention at the given location as a result of user
+ input.
+ */
+- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
+        trimmedMention:(id<HKWMentionsEntityProtocol>)entity
+            atLocation:(NSUInteger)location;
+
+/*!
+ Inform the delegate that the specified mentions plug-in deleted a mention at the given location as a result of user
+ input.
+ */
+- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
+        deletedMention:(id<HKWMentionsEntityProtocol>)entity
+            atLocation:(NSUInteger)location;
+
 @end
 
 /*!
