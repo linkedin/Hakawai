@@ -30,7 +30,7 @@ class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, 
         pickerView.delegate = self
     }
 
-    required init(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
 
