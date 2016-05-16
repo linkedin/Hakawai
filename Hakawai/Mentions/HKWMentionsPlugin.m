@@ -1275,8 +1275,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 // No mention
                 [self resetCurrentMentionsData];
                 self.state = HKWMentionsStateQuiescent;
-                [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:precedingChar];
             }
+            [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:precedingChar];
             break;
         }
         case HKWMentionsStateSelectedMention: {
