@@ -1256,6 +1256,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             else {
                 NSAssert(precedingChar == (unichar)0,
                          @"Logic error: at beginning of document, but preceding character is not null");
+                return;
             }
             if (precedingMention) {
                 // A mention was found.

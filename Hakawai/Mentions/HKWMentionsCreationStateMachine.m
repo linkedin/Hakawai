@@ -361,7 +361,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                    usingControlCharacter:(BOOL)usingControlCharacter
                         controlCharacter:(unichar)character
                                 location:(NSUInteger)location {
-    if (!self.networkState == HKWMentionsCreationNetworkStateQuiescent) {
+    if (self.networkState != HKWMentionsCreationNetworkStateQuiescent) {
         return;
     }
     self.state = HKWMentionsCreationStateCreatingMention;
