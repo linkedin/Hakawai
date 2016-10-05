@@ -60,7 +60,7 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
 
     UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:self.selectedRange.location];
     NSAssert(p != nil, @"Text position from %@, offset %ld returned nil. This should never happen.",
-             self.beginningOfDocument, self.selectedRange.location);
+             self.beginningOfDocument, (unsigned long)self.selectedRange.location);
     CGRect caretRect = [self caretRectForPosition:p];
 
     CGFloat offsetY = 0;
