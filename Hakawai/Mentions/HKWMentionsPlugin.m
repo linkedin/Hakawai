@@ -1687,26 +1687,30 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
      The following code checks for & prevents this from happening
      */
     // Get the text from the textview that was matched for the mention & trim white spaces
+
+    NSAssert(self.parentTextView.text, @"Text of parent textview should not be nil.");
     NSString *matchedText = [self.parentTextView.text substringWithRange:NSMakeRange(location, currentLocation - location)];
     matchedText = [matchedText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 
     // If the matched text is the first part of the mention text, we don't need any further calculation
     // e.g. matched text is "bruc"
-    if (![mentionText.lowercaseString hasPrefix:matchedText.lowercaseString]) {
+    BOOL hasPrefix = matchedText && [mentionText rangeOfString:matchedText options:NSCaseInsensitiveSearch | NSAnchoredSearch].location != NSNotFound;
+
+    if (!hasPrefix) {
         // Add white space to the start of the mention & get range for the text in mention
         matchedText = [NSString stringWithFormat:@" %@", matchedText];
-        NSRange matchedTextRange = [mentionText.lowercaseString rangeOfString:matchedText.lowercaseString];
+        NSRange matchedTextRange = [mentionText rangeOfString:matchedText options:NSCaseInsensitiveSearch];
         if (matchedTextRange.location != NSNotFound
             && matchedTextRange.location + 1 < mentionText.length) {
             // Get the first part of mention text (preceding the matched text)
             NSString *excessStringToReplace = [mentionText substringWithRange:NSMakeRange(0, matchedTextRange.location + 1)];
             NSInteger excessLength = excessStringToReplace.length;
             if (location >= excessLength) {
-                // Get similar length string from the text view preceding locationß
+                // Get similar length string from the text view preceding location
                 NSString *stringFromTextView = [self.parentTextView.text substringWithRange:NSMakeRange(location - excessLength, excessLength)];
                 // If the first part of mention text matches the string from textview preceding the cursor,
                 // we adjust the range of text to transform to include the excess string as well
-                if ([stringFromTextView.lowercaseString isEqualToString:excessStringToReplace.lowercaseString]) {
+                if (stringFromTextView && [stringFromTextView caseInsensitiveCompare:excessStringToReplace] == NSOrderedSame) {
                     rangeToTransform = NSMakeRange(rangeToTransform.location - excessLength, rangeToTransform.length + excessLength);
                     location = rangeToTransform.location;
                 }
