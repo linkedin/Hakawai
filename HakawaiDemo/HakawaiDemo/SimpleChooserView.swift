@@ -12,12 +12,12 @@ import UIKit
 class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, HKWChooserViewProtocol {
 
     weak var delegate: HKWCustomChooserViewDelegate? = nil
-    var borderMode : HKWChooserBorderMode = .Top
+    var borderMode : HKWChooserBorderMode = .top
 
     // Protocol factory method
     @objc(chooserViewWithFrame:delegate:)
-    class func chooserViewWithFrame(frame: CGRect, delegate: HKWCustomChooserViewDelegate) -> AnyObject {
-        let item = NSBundle.mainBundle().loadNibNamed("SimpleChooserView", owner: nil, options: nil)[0] as! SimpleChooserView
+    class func chooserView(withFrame frame: CGRect, delegate: HKWCustomChooserViewDelegate) -> AnyObject {
+        let item = Bundle.main.loadNibNamed("SimpleChooserView", owner: nil, options: nil)?[0] as! SimpleChooserView
         item.delegate = delegate
         item.frame = frame
         item.setNeedsLayout()
@@ -35,20 +35,20 @@ class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, 
     }
 
     func becomeVisible() {
-        hidden = false
+        isHidden = false
         setNeedsLayout()
     }
 
     func resetScrollPositionAndHide() {
         // Don't do anything
-        hidden = true
+        isHidden = true
     }
 
     @IBOutlet weak var pickerView: UIPickerView!
 
-    @IBAction func chooseButtonTapped(sender: UIButton) {
-        let idx = pickerView.selectedRowInComponent(0)
-        delegate?.modelObjectSelectedAtIndex(idx)
+    @IBAction func chooseButtonTapped(_ sender: UIButton) {
+        let idx = pickerView.selectedRow(inComponent: 0)
+        delegate?.modelObjectSelected(at: idx)
     }
 
     // Reload the data
@@ -58,16 +58,16 @@ class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, 
 
     // MARK: Picker view delegate and data source
 
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
-        let model = delegate?.modelObjectForIndex(row) as! HKWMentionsEntityProtocol
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
+        let model = delegate?.modelObject(for: row) as! HKWMentionsEntityProtocol
         return model.entityName()
     }
 
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
 
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return delegate?.numberOfModelObjects() ?? 0
     }
 }
