@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => "Apache License, Version 2.0", :file => "LICENSE" }
   s.authors      = "Austin Zheng"
   s.platform = :ios, "7.0"
-  s.source       = { :git => "https://github.com/linkedin/Hakawai.git", :tag => "4.2.4" }
+  s.source       = { :git => "https://github.com/linkedin/Hakawai.git", :tag => "4.2.5" }
   s.framework  = "UIKit"
   s.requires_arc = true
 end
