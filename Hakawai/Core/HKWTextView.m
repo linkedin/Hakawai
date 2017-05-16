@@ -29,6 +29,22 @@
 
 #pragma mark - Lifecycle
 
+- (instancetype)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer {
+    HKWLayoutManager *manager = [HKWLayoutManager new];
+    NSTextContainer *container = [[NSTextContainer alloc] initWithSize:CGSizeMake(frame.size.width, FLT_MAX)];
+    container.widthTracksTextView = YES;
+    container.heightTracksTextView = NO;
+    [manager addTextContainer:container];
+    NSTextStorage *storage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
+    [storage addLayoutManager:manager];
+
+    self = [super initWithFrame:frame textContainer:container];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame {
     HKWLayoutManager *manager = [HKWLayoutManager new];
     NSTextContainer *container = [[NSTextContainer alloc] initWithSize:CGSizeMake(frame.size.width, FLT_MAX)];

@@ -39,6 +39,10 @@
  */
 @interface HKWTextView : UITextView
 
+#pragma mark - Initialization
+
+- (instancetype _Nonnull)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer;
+- (instancetype _Nonnull)initWithFrame:(CGRect)frame;
 
 #pragma mark - API (text view delegate)
 
