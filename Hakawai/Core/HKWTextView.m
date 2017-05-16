@@ -29,7 +29,7 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer {
+- (instancetype _Nonnull)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer {
     HKWLayoutManager *manager = [HKWLayoutManager new];
     NSTextContainer *container = [[NSTextContainer alloc] initWithSize:CGSizeMake(frame.size.width, FLT_MAX)];
     container.widthTracksTextView = YES;
@@ -45,7 +45,7 @@
     return self;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype _Nonnull)initWithFrame:(CGRect)frame {
     HKWLayoutManager *manager = [HKWLayoutManager new];
     NSTextContainer *container = [[NSTextContainer alloc] initWithSize:CGSizeMake(frame.size.width, FLT_MAX)];
     container.widthTracksTextView = YES;
