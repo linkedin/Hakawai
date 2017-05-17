@@ -12,6 +12,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class HKWTextView;
 
 @protocol HKWTextViewDelegate <UITextViewDelegate>
@@ -41,22 +43,22 @@
 
 #pragma mark - Initialization
 
-- (instancetype _Nonnull)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer;
-- (instancetype _Nonnull)initWithFrame:(CGRect)frame;
+- (instancetype)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer;
+- (instancetype)initWithFrame:(CGRect)frame;
 
 #pragma mark - API (text view delegate)
 
 /*!
  An optional delegate object implementing the \c HKWTextViewDelegate protocol.
- 
+
  \warning Do NOT set the text view's \c delegate property directly.
  */
-@property (nonatomic, weak) id<HKWTextViewDelegate> externalDelegate;
+@property (nonatomic, weak, nullable) id<HKWTextViewDelegate> externalDelegate;
 
 /*!
  A \c UITextViewDelegate alias for the \c externalDelegate property.
  */
-@property (nonatomic) id<UITextViewDelegate> simpleDelegate;
+@property (nonatomic, nullable) id<UITextViewDelegate> simpleDelegate;
 
 
 #pragma mark - API (plug-ins)
@@ -71,7 +73,7 @@
  \note If a abstraction layer control flow plug-in is registered, setting this method will unregister the other plug-in;
  however, setting this to nil if an abstraction layer plug-in is registered will do nothing.
  */
-@property (nonatomic, strong) id<HKWDirectControlFlowPluginProtocol>controlFlowPlugin;
+@property (nonatomic, strong, nullable) id<HKWDirectControlFlowPluginProtocol>controlFlowPlugin;
 
 /*!
  Register a control flow plug-in with the editor. Unlike simple plug-ins, only one control flow plug-in can be enabled
@@ -80,7 +82,7 @@
  \note If a abstraction layer control flow plug-in is registered, setting this method will unregister the other plug-in;
  however, setting this to nil if a direct plug-in is registered will do nothing.
  */
-@property (nonatomic, strong) id<HKWAbstractionLayerControlFlowPluginProtocol>abstractionControlFlowPlugin;
+@property (nonatomic, strong, nullable) id<HKWAbstractionLayerControlFlowPluginProtocol>abstractionControlFlowPlugin;
 
 /*!
  Register a simple plug-in with the editor.
@@ -118,3 +120,5 @@
 @property (nonatomic, readonly) BOOL inSingleLineViewportMode;
 
 @end
+
+NS_ASSUME_NONNULL_END
