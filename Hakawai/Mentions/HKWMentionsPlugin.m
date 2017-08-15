@@ -1258,7 +1258,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         case HKWMentionsStateQuiescent: {
             NSRange mentionRange;
             HKWMentionsAttribute *precedingMention = nil;
-            if (location > 0) {
+            if (location >= 0) {
                 // Look for a preceding mention, but only if we're at the beginning of the text range
                 precedingMention = [self mentionAttributePrecedingLocation:location
                                                                      range:&mentionRange];
