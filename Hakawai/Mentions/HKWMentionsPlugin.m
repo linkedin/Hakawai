@@ -254,6 +254,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 // Return an array of mentions objects corresponding to the mentions currently in the text view.
 - (NSArray *)mentions {
     NSMutableArray *buffer = [NSMutableArray array];
+    __block HKWMentionsAttribute *previousMention;
 
     [self.parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(self.parentTextView.attributedText)
                                                            options:0 usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
@@ -261,9 +262,18 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                                                if (![mentionObject isKindOfClass:[HKWMentionsAttribute class]]) {
                                                                    return;
                                                                }
+
                                                                HKWMentionsAttribute *attr = [mentionObject copy];
-                                                               attr.range = range;
-                                                               [buffer addObject:attr];
+                                                               // If two attribute dicts have same mention object and the ranges are touching
+                                                               // they are the same mention and should be combined
+                                                               BOOL isGap = ((previousMention.range.location + previousMention.range.length) < range.location);
+                                                               if ([previousMention isEqual:attr] && !isGap) {
+                                                                   previousMention.range = NSMakeRange(previousMention.range.location, previousMention.range.length + range.length);
+                                                               } else {
+                                                                   attr.range = range;
+                                                                   [buffer addObject:attr];
+                                                                   previousMention = attr;
+                                                               }
                                                            }];
 
     return [buffer copy];

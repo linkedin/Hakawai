@@ -37,6 +37,31 @@
     return self.metadata;
 }
 
+- (BOOL)isEqualToMentionsAttribute:(HKWMentionsAttribute *)attribute {
+    if (!attribute) {
+        return NO;
+    }
+
+    return [attribute.entityId isEqualToString:self.entityId];
+}
+
+#pragma mark - NSObject
+
+- (BOOL)isEqual:(id)object {
+    if (self == object) {
+        return YES;
+    }
+
+    if (![object isKindOfClass:[HKWMentionsAttribute class]]) {
+        return NO;
+    }
+
+    return [self isEqualToMentionsAttribute:(HKWMentionsAttribute *)object];
+}
+
+- (NSUInteger)hash {
+    return [self.entityIdentifier hash];
+}
 
 #pragma mark - Private
 
