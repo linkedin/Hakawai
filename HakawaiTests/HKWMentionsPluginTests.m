@@ -20,18 +20,6 @@
 #import "HKWMentionsPlugin.h"
 #import "HKWMentionsAttribute.h"
 
-@interface HKWTextView ()
-- (BOOL)textViewShouldBeginEditing:(UITextView *)textView;
-- (void)textViewDidBeginEditing:(UITextView *)textView;
-- (BOOL)textViewShouldEndEditing:(UITextView *)textView;
-- (void)textViewDidEndEditing:(UITextView *)textView;
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)replacementText;
-- (void)textViewDidChange:(UITextView *)textView;
-- (void)textViewDidChangeSelection:(UITextView *)textView;
-- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange;
-- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange;
-@end
-
 SpecBegin(mentionPluginsSetup)
 
 describe(@"basic mentions plugin setup", ^{
