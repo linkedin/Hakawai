@@ -62,7 +62,7 @@ describe(@"inserting and reading mentions", ^{
         expect(mentionsPlugin.mentions.count).to.equal(0);
 
         [textView insertText:m1.mentionText];
-        m1.range = NSMakeRange(0, 10);
+        m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
         expect(mentionsPlugin.mentions.count).to.equal(1);
@@ -70,7 +70,7 @@ describe(@"inserting and reading mentions", ^{
         [textView insertText:@" "];
 
         [textView insertText:m2.mentionText];
-        m2.range = NSMakeRange(11, 11);
+        m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
 
         expect(mentionsPlugin.mentions.count).to.equal(2);
@@ -83,7 +83,7 @@ describe(@"inserting and reading mentions", ^{
         expect(mentionsPlugin.mentions.count).to.equal(0);
 
         [textView insertText:m1.mentionText];
-        m1.range = NSMakeRange(0, 11);
+        m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
         expect(mentionsPlugin.mentions.count).to.equal(1);
@@ -91,9 +91,30 @@ describe(@"inserting and reading mentions", ^{
         [textView insertText:@" "];
 
         [textView insertText:m2.mentionText];
-        m2.range = NSMakeRange(12, 25);
+        m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
         
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+    });
+
+    it(@"should properly handle mentions containing only emoji", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"🐝🙅‍♂️ 👨‍👨‍👧👔" identifier:@"1"];
+        HKWMentionsAttribute *m2 = [HKWMentionsAttribute mentionWithText:@"🦎🌘" identifier:@"2"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        [textView insertText:@" "];
+
+        [textView insertText:m2.mentionText];
+        m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
+        [mentionsPlugin addMention:m2];
+
         expect(mentionsPlugin.mentions.count).to.equal(2);
     });
 });
