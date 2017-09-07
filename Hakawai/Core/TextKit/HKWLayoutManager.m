@@ -90,8 +90,17 @@ typedef NSMutableArray RectValuesBuffer;
     if (!textStorage || range.location == NSNotFound) {
         return nil;
     }
+
+    // Avoid out of bounds crashes that can happen when typing in languages like Tamil
+    NSRange adjustedRange;
+    if (range.location + range.length > textStorage.length) {
+        adjustedRange = NSMakeRange(range.location, textStorage.length - range.location);
+    } else {
+        adjustedRange = range;
+    }
+
     // Go through the attributes in the given range and pick out the ones that correspond to the
-    [textStorage enumerateAttributesInRange:range
+    [textStorage enumerateAttributesInRange:adjustedRange
                                     options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
                                  usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
                                      for (NSString *attr in attrs) {
