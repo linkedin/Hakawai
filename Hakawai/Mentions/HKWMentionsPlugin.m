@@ -1258,16 +1258,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         case HKWMentionsStateQuiescent: {
             NSRange mentionRange;
             HKWMentionsAttribute *precedingMention = nil;
-            if (location >= 0) {
-                // Look for a preceding mention, but only if we're at the beginning of the text range
-                precedingMention = [self mentionAttributePrecedingLocation:location
-                                                                     range:&mentionRange];
-            }
-            else {
-                NSAssert(precedingChar == (unichar)0,
-                         @"Logic error: at beginning of document, but preceding character is not null");
-                return;
-            }
+            // Look for a preceding mention, but only if we're at the beginning of the text range
+            precedingMention = [self mentionAttributePrecedingLocation:location
+                                                                 range:&mentionRange];
             if (precedingMention) {
                 // A mention was found.
                 self.currentlySelectedMention = precedingMention;
