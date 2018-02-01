@@ -894,6 +894,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     mention.metadata = [entity entityMetadata];
     self.state = HKWMentionsCreationStateQuiescent;
     [self.delegate createMention:mention startingLocation:self.startingLocation];
+    [self.delegate selected:entity atIndexPath:indexPath];
 }
 
 

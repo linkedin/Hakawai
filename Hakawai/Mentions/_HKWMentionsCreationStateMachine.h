@@ -60,6 +60,12 @@
 - (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)location;
 
 /*!
+ Inform the delegate an entity was selected as a result of user input.
+ */
+- (void)selected:(id<HKWMentionsEntityProtocol>)entity
+     atIndexPath:(NSIndexPath *)indexPath;
+
+/*!
  Inform the delegate that the editor view should move out of the mention creation state without adding a new mention
  annotation.
  */

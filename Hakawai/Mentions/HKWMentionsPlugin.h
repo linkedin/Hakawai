@@ -136,6 +136,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
         deletedMention:(id<HKWMentionsEntityProtocol>)entity
             atLocation:(NSUInteger)location;
 
+/*!
+ Inform the delegate an entity was selected as a result of user input.
+ */
+- (void)selected:(id<HKWMentionsEntityProtocol>)entity
+     atIndexPath:(NSIndexPath *)indexPath;
+
 @end
 
 /*!
