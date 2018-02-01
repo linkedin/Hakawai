@@ -1660,6 +1660,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     [self.parentTextView restoreOriginalAutocorrection:(self.state != HKWMentionsStateLosingFocus)];
 }
 
+- (void)selected:(id<HKWMentionsEntityProtocol>)entity atIndexPath:(NSIndexPath *)indexPath {
+    // Inform the delegate (if appropriate)
+    if ([self.stateChangeDelegate respondsToSelector:@selector(selected:atIndexPath:)]) {
+        [self.stateChangeDelegate selected:entity atIndexPath:indexPath];
+    }
+}
+
 - (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)location {
     if (self.state != HKWMentionsStartDetectionStateCreatingMention || !mention) {
         return;

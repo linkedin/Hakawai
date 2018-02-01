@@ -200,6 +200,10 @@
     NSLog(@"Mentions plug-in created mention named \"%@\" at location %ld", [entity entityName], (long) location);
 }
 
+- (void)selected:(id<HKWMentionsEntityProtocol>)entity atIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"Mentions plug-in selected entity named \"%@\" at index %ld", [entity entityName], (long) [indexPath row]);
+}
+
 
 #pragma mark - Utility
 
