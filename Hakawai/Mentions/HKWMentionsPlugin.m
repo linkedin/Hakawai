@@ -382,8 +382,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
     // Enable 'undo' if this plug-in is being unregistered
     if (self.shouldEnableUndoUponUnregistration) {
-        [self.parentTextView.undoManager enableUndoRegistration];
+        if(!self.parentTextView.undoManager.isUndoRegistrationEnabled)
+            [self.parentTextView.undoManager enableUndoRegistration];
     }
+    
+    
     // Restore the parent text view's spell checking
     [self.parentTextView restoreOriginalSpellChecking:NO];
 
