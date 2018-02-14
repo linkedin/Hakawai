@@ -1382,7 +1382,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             textView.selectedRange = range;
         }
     }
-    else if ([text length] > 1) {
+    else if (range.length == 0 && [text length] > 1) {
         // Inserting text (e.g. pasting)
         returnValue = [self advanceStateForStringInsertionAtRange:range text:text];
     }
