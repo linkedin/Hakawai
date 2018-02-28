@@ -497,6 +497,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                        mode:mode];
     [self.delegate accessoryViewActivated:YES];
 
+    // Force entityChooserView to be laid out before calculating the right cursor position.
+    [self.entityChooserView layoutIfNeeded];
+
     // Move the chooser cursor to the right position
     CGFloat newPosition = [self.delegate positionForChooserCursorRelativeToView:self.entityChooserView
                                                                      atLocation:self.startingLocation];
