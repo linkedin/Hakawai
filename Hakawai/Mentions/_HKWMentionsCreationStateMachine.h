@@ -134,7 +134,7 @@
  \param prefix                   a string containing text that the user typed before mentions creation started, but
                                  should be used as a query string for asking the data source for suggestions
  \param usingControlCharacter    whether or not the mention was started by typing a special control character
- \param controlCharacter         if \c usingControlCharacter is NO, this is ignored; otherwise, the control character
+ \param character                if \c usingControlCharacter is NO, this is ignored; otherwise, the control character
                                  used to begin the mention
  \param location                 the index position where the completed mention should begin
  */

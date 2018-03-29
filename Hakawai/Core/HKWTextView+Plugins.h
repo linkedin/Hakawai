@@ -56,8 +56,8 @@ typedef NS_ENUM(NSInteger, HKWAccessoryViewMode) {
  \warning Do not move the text view to a different superview while the text view is in single-line viewport mode; this
  will cause problems.
 
- \param captureTouches    if YES, taps on the text view while in single line viewport mode will not be forwarded to the
-                          text view; instead they will trigger special events (that the plug-in can respond to)
+ \param shouldCaptureTouches    if YES, taps on the text view while in single line viewport mode will not be forwarded
+                                to the text view; instead they will trigger special events (that the plug-in can respond to)
 
  \returns a \c CGRect describing (relative to the editor view's bounds) the rectangle occupied by the single line
           viewport

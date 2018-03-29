@@ -35,7 +35,7 @@
                                    the prefix (if an implicit mention was created) was fully inserted into the text view
                                    buffer at the time the method was invoked
  \param usingControlCharacter      whether the mention was begun by the user typing a special control character
- \param controlCharacter           if \c usingControlCharacter is NO, ignored; otherwise, the control character used to
+ \param character                  if \c usingControlCharacter is NO, ignored; otherwise, the control character used to
                                    begin the mention
  */
 - (void)beginMentionsCreationWithString:(NSString *)prefix
@@ -52,7 +52,7 @@
  \param location                   the index in the textView which identifies the start of the target string (including
                                    the control char if present)
  \param usingControlCharacter      whether the mention was begun by the user typing a special control character
- \param controlCharacter           if \c usingControlCharacter is NO, ignored; otherwise, the control character used to
+ \param character                  if \c usingControlCharacter is NO, ignored; otherwise, the control character used to
                                    begin the mention
  */
 - (void)beginMentionsCreationWithString:(NSString *)prefix
@@ -79,10 +79,10 @@
  Inform the state machine that a valid string was typed (or pasted, or auto-inserted) by the user into the text view.
  \param string                   the string that is being analyzed in the text view (not including a control character
                                  if one exists)
- \param location                 the text view index of the \c controlCharacter if present, or the start index of the
-                                 \c string if a \c controlCharacter is not present
+ \param location                 the text view index of the \c character if present, or the start index of the \c string
+                                 if a \c character is not present
  \param usingControlCharacter    whether the mention was begun by the user typing a special control character
- \param controlCharacter         if \c usingControlCharacter is NO, ignored; otherwise, the control character used to
+ \param character                if \c usingControlCharacter is NO, ignored; otherwise, the control character used to
                                  begin the mention
  */
 - (void)validStringInserted:(NSString *)string

@@ -174,10 +174,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  completion block accordingly.
 
  \param keyString          the string that the data source should search upon
- \param searchType         an enum describing the mention type for search purposes; currently, this can be Explicit
+ \param type               an enum describing the mention type for search purposes; currently, this can be Explicit
                            (user typed in control character) or Implicit (user typed in a number of consecutive valid
                            characters)
- \param character          if \c searchType is Explicit, this is the control character that was typed to begin the
+ \param character          if \c type is Explicit, this is the control character that was typed to begin the
                            mention creation; otherwise, it should be ignored
  \param completionBlock    a provided block that must be called upon completion or failure. Pass in an array containing
                            items conforming to the \c HKWMentionsEntityProtocol protocol; these will be used to populate
