@@ -520,10 +520,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     // Handle the case where the chooser frame is completely custom
     if ([HKWMentionsCreationStateMachine modeRequiresCustomFrame:mode]) {
         // Placeholder frame; used until the constraints are properly applied
-        chooserFrame = CGRectMake(0,
-                                  0,
-                                  [UIApplication sharedApplication].keyWindow.bounds.size.width,
-                                  100);
+        chooserFrame = CGRectZero;
     }
     NSAssert(!CGRectIsNull(chooserFrame), @"Logic error: got a null rect for the chooser view's frame");
 
