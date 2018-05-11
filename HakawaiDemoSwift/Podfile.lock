@@ -1,0 +1,17 @@
+PODS:
+  - Hakawai (5.1.1):
+    - Hakawai/Core (= 5.1.1)
+    - Hakawai/Mentions (= 5.1.1)
+  - Hakawai/Core (5.1.1)
+  - Hakawai/Mentions (5.1.1):
+    - Hakawai/Core
+
+DEPENDENCIES:
+  - Hakawai
+
+SPEC CHECKSUMS:
+  Hakawai: 98dfeb08fce7c1ae9310089020c358a98acf29b5
+
+PODFILE CHECKSUM: 8afb544880f2856932d1fd9950c29e8e1627c5ba
+
+COCOAPODS: 1.3.1

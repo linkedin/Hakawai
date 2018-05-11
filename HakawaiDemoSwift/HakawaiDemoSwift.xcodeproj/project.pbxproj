@@ -1,0 +1,450 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		98642551B770836A30D7E1D4 /* Pods_HakawaiDemoSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E4504D25EEE97F7E2EDAECD /* Pods_HakawaiDemoSwift.framework */; };
+		CDD0343A20A61F5100E1F0BD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0343920A61F5100E1F0BD /* AppDelegate.swift */; };
+		CDD0343F20A61F5100E1F0BD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CDD0343D20A61F5100E1F0BD /* Main.storyboard */; };
+		CDD0344120A61F5100E1F0BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CDD0344020A61F5100E1F0BD /* Assets.xcassets */; };
+		CDD0344420A61F5100E1F0BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CDD0344220A61F5100E1F0BD /* LaunchScreen.storyboard */; };
+		CDD0344D20A6202000E1F0BD /* MentionsDemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0344C20A6202000E1F0BD /* MentionsDemoViewController.swift */; };
+		CDD0344F20A6245800E1F0BD /* MentionsEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0344E20A6245800E1F0BD /* MentionsEntity.swift */; };
+		CDD0345120A6256200E1F0BD /* MentionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0345020A6256200E1F0BD /* MentionsManager.swift */; };
+		CDD0345320A62BE100E1F0BD /* CustomChooserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD0345220A62BE100E1F0BD /* CustomChooserView.swift */; };
+		CDD0345520A62D4900E1F0BD /* CustomChooserView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDD0345420A62D4900E1F0BD /* CustomChooserView.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		5068325EF39877E795382F41 /* Pods-HakawaiDemoSwift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiDemoSwift.release.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiDemoSwift/Pods-HakawaiDemoSwift.release.xcconfig"; sourceTree = "<group>"; };
+		7E4504D25EEE97F7E2EDAECD /* Pods_HakawaiDemoSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HakawaiDemoSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		90ED0D547272B7A1C2EF2D01 /* Pods-HakawaiDemoSwift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiDemoSwift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiDemoSwift/Pods-HakawaiDemoSwift.debug.xcconfig"; sourceTree = "<group>"; };
+		CDD0343620A61F5100E1F0BD /* HakawaiDemoSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HakawaiDemoSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CDD0343920A61F5100E1F0BD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CDD0343E20A61F5100E1F0BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		CDD0344020A61F5100E1F0BD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CDD0344320A61F5100E1F0BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CDD0344520A61F5100E1F0BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CDD0344C20A6202000E1F0BD /* MentionsDemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionsDemoViewController.swift; sourceTree = "<group>"; };
+		CDD0344E20A6245800E1F0BD /* MentionsEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionsEntity.swift; sourceTree = "<group>"; };
+		CDD0345020A6256200E1F0BD /* MentionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionsManager.swift; sourceTree = "<group>"; };
+		CDD0345220A62BE100E1F0BD /* CustomChooserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomChooserView.swift; sourceTree = "<group>"; };
+		CDD0345420A62D4900E1F0BD /* CustomChooserView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CustomChooserView.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CDD0343320A61F5100E1F0BD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98642551B770836A30D7E1D4 /* Pods_HakawaiDemoSwift.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1B103C0EBD37FB6DC9559F16 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7E4504D25EEE97F7E2EDAECD /* Pods_HakawaiDemoSwift.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B48DF5B547229E57D68EF420 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				90ED0D547272B7A1C2EF2D01 /* Pods-HakawaiDemoSwift.debug.xcconfig */,
+				5068325EF39877E795382F41 /* Pods-HakawaiDemoSwift.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		CDD0342D20A61F5100E1F0BD = {
+			isa = PBXGroup;
+			children = (
+				CDD0343820A61F5100E1F0BD /* HakawaiDemoSwift */,
+				CDD0343720A61F5100E1F0BD /* Products */,
+				B48DF5B547229E57D68EF420 /* Pods */,
+				1B103C0EBD37FB6DC9559F16 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		CDD0343720A61F5100E1F0BD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CDD0343620A61F5100E1F0BD /* HakawaiDemoSwift.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CDD0343820A61F5100E1F0BD /* HakawaiDemoSwift */ = {
+			isa = PBXGroup;
+			children = (
+				CDD0343920A61F5100E1F0BD /* AppDelegate.swift */,
+				CDD0343D20A61F5100E1F0BD /* Main.storyboard */,
+				CDD0344B20A61FDF00E1F0BD /* Mentions */,
+				CDD0345720A6306800E1F0BD /* Resources */,
+				CDD0345620A6303700E1F0BD /* Supporting Files */,
+			);
+			path = HakawaiDemoSwift;
+			sourceTree = "<group>";
+		};
+		CDD0344B20A61FDF00E1F0BD /* Mentions */ = {
+			isa = PBXGroup;
+			children = (
+				CDD0344C20A6202000E1F0BD /* MentionsDemoViewController.swift */,
+				CDD0344E20A6245800E1F0BD /* MentionsEntity.swift */,
+				CDD0345020A6256200E1F0BD /* MentionsManager.swift */,
+				CDD0345220A62BE100E1F0BD /* CustomChooserView.swift */,
+				CDD0345420A62D4900E1F0BD /* CustomChooserView.xib */,
+			);
+			path = Mentions;
+			sourceTree = "<group>";
+		};
+		CDD0345620A6303700E1F0BD /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CDD0344520A61F5100E1F0BD /* Info.plist */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CDD0345720A6306800E1F0BD /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CDD0344220A61F5100E1F0BD /* LaunchScreen.storyboard */,
+				CDD0344020A61F5100E1F0BD /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CDD0343520A61F5100E1F0BD /* HakawaiDemoSwift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CDD0344820A61F5100E1F0BD /* Build configuration list for PBXNativeTarget "HakawaiDemoSwift" */;
+			buildPhases = (
+				55E33F4E9F4D98EDEFA48751 /* [CP] Check Pods Manifest.lock */,
+				CDD0343220A61F5100E1F0BD /* Sources */,
+				CDD0343320A61F5100E1F0BD /* Frameworks */,
+				CDD0343420A61F5100E1F0BD /* Resources */,
+				B333E3F830DB18DCD0A59ED9 /* [CP] Embed Pods Frameworks */,
+				742FE208B92B56EB35F19DD6 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HakawaiDemoSwift;
+			productName = HakawaiDemoSwift;
+			productReference = CDD0343620A61F5100E1F0BD /* HakawaiDemoSwift.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CDD0342E20A61F5100E1F0BD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0920;
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = com.linkedin;
+				TargetAttributes = {
+					CDD0343520A61F5100E1F0BD = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = CDD0343120A61F5100E1F0BD /* Build configuration list for PBXProject "HakawaiDemoSwift" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CDD0342D20A61F5100E1F0BD;
+			productRefGroup = CDD0343720A61F5100E1F0BD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CDD0343520A61F5100E1F0BD /* HakawaiDemoSwift */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CDD0343420A61F5100E1F0BD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CDD0344420A61F5100E1F0BD /* LaunchScreen.storyboard in Resources */,
+				CDD0344120A61F5100E1F0BD /* Assets.xcassets in Resources */,
+				CDD0345520A62D4900E1F0BD /* CustomChooserView.xib in Resources */,
+				CDD0343F20A61F5100E1F0BD /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		55E33F4E9F4D98EDEFA48751 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HakawaiDemoSwift-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		742FE208B92B56EB35F19DD6 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HakawaiDemoSwift/Pods-HakawaiDemoSwift-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B333E3F830DB18DCD0A59ED9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-HakawaiDemoSwift/Pods-HakawaiDemoSwift-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Hakawai/Hakawai.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Hakawai.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HakawaiDemoSwift/Pods-HakawaiDemoSwift-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CDD0343220A61F5100E1F0BD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CDD0344F20A6245800E1F0BD /* MentionsEntity.swift in Sources */,
+				CDD0344D20A6202000E1F0BD /* MentionsDemoViewController.swift in Sources */,
+				CDD0345320A62BE100E1F0BD /* CustomChooserView.swift in Sources */,
+				CDD0345120A6256200E1F0BD /* MentionsManager.swift in Sources */,
+				CDD0343A20A61F5100E1F0BD /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		CDD0343D20A61F5100E1F0BD /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CDD0343E20A61F5100E1F0BD /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		CDD0344220A61F5100E1F0BD /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CDD0344320A61F5100E1F0BD /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CDD0344620A61F5100E1F0BD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CDD0344720A61F5100E1F0BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CDD0344920A61F5100E1F0BD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 90ED0D547272B7A1C2EF2D01 /* Pods-HakawaiDemoSwift.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HLS658NRU7;
+				INFOPLIST_FILE = HakawaiDemoSwift/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.linkedin.HakawaiDemoSwift;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CDD0344A20A61F5100E1F0BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5068325EF39877E795382F41 /* Pods-HakawaiDemoSwift.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HLS658NRU7;
+				INFOPLIST_FILE = HakawaiDemoSwift/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.linkedin.HakawaiDemoSwift;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CDD0343120A61F5100E1F0BD /* Build configuration list for PBXProject "HakawaiDemoSwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CDD0344620A61F5100E1F0BD /* Debug */,
+				CDD0344720A61F5100E1F0BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CDD0344820A61F5100E1F0BD /* Build configuration list for PBXNativeTarget "HakawaiDemoSwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CDD0344920A61F5100E1F0BD /* Debug */,
+				CDD0344A20A61F5100E1F0BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CDD0342E20A61F5100E1F0BD /* Project object */;
+}
