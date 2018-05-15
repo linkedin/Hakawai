@@ -19,15 +19,12 @@ class MentionsDemoViewController: UIViewController {
     @IBOutlet weak var textView: HKWTextView!
     @IBOutlet weak var mentionsListButton: UIButton!
     
-    //
-    private var plugin: HKWMentionsPlugin!
+    private var plugin: HKWMentionsPlugin?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
-
-
 }
 
 // MARK: -
@@ -54,10 +51,9 @@ extension MentionsDemoViewController {
         // Add edge insets so chooser view doesn't overlap the text view's cosmetic grey border
         mentionsPlugin?.chooserViewEdgeInsets = UIEdgeInsetsMake(2, 0.5, 0.5, 0.5)
         plugin = mentionsPlugin
-        plugin.chooserViewBackgroundColor = .lightGray
+        plugin?.chooserViewBackgroundColor = .lightGray
         // The mentions plug-in requires a delegate, which provides it with mentions entities in response to a query string
         mentionsPlugin?.delegate = MentionsManager.shared
-//        mentionsPlugin?.stateChangeDelegate =
         textView.controlFlowPlugin = mentionsPlugin
     }
 }
@@ -66,7 +62,7 @@ extension MentionsDemoViewController {
 extension MentionsDemoViewController {
     
     @IBAction func listMentionsButtonTapped(_ sender: UIButton) {
-        print("There are mention(s): \(plugin.mentions().count) @% \(plugin.mentions())")
+        print("There are mention(s): \(String(describing: plugin?.mentions().count)) @% \(String(describing: plugin?.mentions()))")
     }
     
     @IBAction func doneEditingButtonTapped(_ sender: UIButton) {

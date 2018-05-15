@@ -17,6 +17,8 @@ class MentionsManager: NSObject {
 
     static let shared = MentionsManager()
     
+    private let mentionsCellId = "mentionsCell"
+    private let mentionsCellHeight: CGFloat = 44.0
     private var fakeData = [MentionsEntity]()
     
     private func setupFakeData() {
@@ -42,8 +44,9 @@ extension MentionsManager: HKWMentionsDelegate {
     //  perform whatever work is necessary to get the entities for that search string (network call, database query, etc),
     //  and then to call the completion block with an array of entity objects corresponding to the search string. See the
     //  documentation for the method for more details.
-    func asyncRetrieveEntities(forKeyString keyString: String!, searchType type: HKWMentionsSearchType, controlCharacter character: unichar, completion completionBlock: (([Any]?, Bool, Bool) -> Void)!) {
-        if completionBlock == nil {
+    func asyncRetrieveEntities(forKeyString keyString: String!, searchType type: HKWMentionsSearchType, controlCharacter character: unichar,
+                               completion completionBlock: (([Any]?, Bool, Bool) -> Void)!) {
+        guard completionBlock != nil else {
             return
         }
         setupFakeData()
@@ -66,9 +69,9 @@ extension MentionsManager: HKWMentionsDelegate {
     // In this method, the plug-in gives us a mentions entity (one we previously returned in response to a query), and asks
     //  us to provide a table view cell corresponding to that entity to be presented to the user.
     func cell(forMentionsEntity entity: HKWMentionsEntityProtocol!, withMatch matchString: String!, tableView: UITableView!) -> UITableViewCell! {
-        var cell = tableView.dequeueReusableCell(withIdentifier: "mentionsCell")
+        var cell = tableView.dequeueReusableCell(withIdentifier: mentionsCellId)
         if cell == nil {
-            cell = UITableViewCell(style: .subtitle, reuseIdentifier: "mentionsCell")
+            cell = UITableViewCell(style: .subtitle, reuseIdentifier: mentionsCellId)
             cell?.backgroundColor = .lightGray
         }
         cell?.textLabel?.text = entity.entityName()
@@ -77,7 +80,7 @@ extension MentionsManager: HKWMentionsDelegate {
     }
     
     func heightForCell(forMentionsEntity entity: HKWMentionsEntityProtocol!, tableView: UITableView!) -> CGFloat {
-        return 44
+        return mentionsCellHeight
     }
     
     

@@ -15,7 +15,7 @@ import Hakawai
 
 class MentionsEntity: NSObject {
 
-    private var name: String!
+    private var name: String?
     private var id:   String!
     
     init(name: String, id: String) {
