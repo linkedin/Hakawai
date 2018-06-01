@@ -788,10 +788,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     self.chooserState = HKWMentionsCreationChooserStateHidden;
 
     // However, there are two conditions under which mentions creation should actually end completely:
-    // 1. The user's initial query turned up no results
+    // 1. The user's initial query turned up no results and we should not continue searching after empty results
     // 2. There are no results because the last character the user typed was a whitespace or newline (whether or not
-    //    the previous request resulted in results or not)
-    BOOL shouldStop = (self.resultsState == HKWMentionsCreationResultsStateAwaitingFirstResult
+    //    the previous request resulted ifn results or not)
+    BOOL noResultsAndShouldStop = (!self.delegate.shouldContinueSearchingAfterEmptyResults
+                                   && self.resultsState == HKWMentionsCreationResultsStateAwaitingFirstResult);
+    BOOL shouldStop = (noResultsAndShouldStop
                        || previousAction == HKWMentionsCreationActionWhitespaceCharacterInserted);
     if (shouldStop) {
         [self.delegate cancelMentionFromStartingLocation:self.startingLocation];
@@ -801,7 +803,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
     // Advance the results state. The user could have been in one of two states formally: results existed, or there were
     //  no results but the user hadn't typed a whitespace character since results stopped coming back
-    NSAssert(self.resultsState == HKWMentionsCreationResultsStateCreatingMentionWithResults
+    NSAssert((self.delegate.shouldContinueSearchingAfterEmptyResults && self.resultsState == HKWMentionsCreationResultsStateAwaitingFirstResult)
+             || self.resultsState == HKWMentionsCreationResultsStateCreatingMentionWithResults
              || self.resultsState == HKWMentionsCreationResultsStateNoResultsWithoutWhitespace,
              @"Logic error in dataReturnedForResults:...; resultsState is inconsistent. Got %@, which is invalid.",
              nameForResultsState(self.resultsState));

@@ -27,6 +27,13 @@
 @property (nonatomic, readonly) BOOL loadingCellSupported;
 
 /*!
+ Whether or not we should continue searching for an explicit mention after we get back empty results. If this
+ is off, empty results will return the mentions creation state to \c HKWMentionsPluginStateQuiescent. If this is
+ on, empty results won't modify the mentions creation state.
+ */
+@property (nonatomic, readonly) BOOL shouldContinueSearchingAfterEmptyResults;
+
+/*!
  Request the bounds of the editor text view owning the delegate.
  */
 - (CGRect)boundsForParentEditorView;
