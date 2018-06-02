@@ -355,6 +355,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  */
 @property (nonatomic) BOOL resumeMentionsCreationEnabled;
 
+/*!
+ Whether or not we should continue searching for an explicit mention after we get back empty results. If this
+ is off, empty results will return the mentions creation state to \c HKWMentionsPluginStateQuiescent. If this is
+ on, empty results won't modify the mentions creation state.
+ */
+@property (nonatomic) BOOL shouldContinueSearchingAfterEmptyResults;
+
 
 #pragma mark - Chooser UI Configuration
 
