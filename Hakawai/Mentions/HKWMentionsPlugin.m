@@ -809,7 +809,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         case HKWMentionsStateQuiescent: {
             // Inform the start detection state machine that a character was inserted. Also, override the double space
             //  to period auto-substitution if the substitution would place a period right after a preceding mention.
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO];
+            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar];
             NSRange r;
             id mentionTwoPreceding = [self mentionAttributePrecedingLocation:(location-1) range:&r];
             BOOL shouldSuppress = (mentionTwoPreceding != nil) && (r.location + r.length == location-1);
@@ -835,7 +835,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             //  insert a new character and continue in the quiescent state. Do not allow auto-substitution.
             self.state = HKWMentionsStateQuiescent;
             [self resetCurrentMentionsData];
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO];
+            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar];
             if (isSecondSpace) {
                 [self manuallyInsertCharacter:newChar atLocation:location inTextView:self.parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
@@ -857,7 +857,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self resetCurrentMentionsData];
             self.state = HKWMentionsStateQuiescent;
             self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES];
+            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES previousCharacter:precedingChar];
             returnValue = NO;
             break;
         case HKWMentionsStateLosingFocus:
@@ -1093,7 +1093,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 self.previousSelectionRange = newSelectionRange;
                 self.previousTextLength = [[self.parentTextView text] length];
 
-                [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0] asInsertedCharacter:YES];
+                [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0] asInsertedCharacter:YES previousCharacter:precedingChar];
                 return NO;
             }
             else if ([self stringValidForMentionsCreation:text]) {

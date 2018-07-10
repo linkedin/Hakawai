@@ -106,7 +106,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     }
 }
 
-- (void)characterTyped:(unichar)c asInsertedCharacter:(BOOL)inserted {
+- (void)characterTyped:(unichar)c asInsertedCharacter:(BOOL)inserted previousCharacter:(unichar)previousCharacter {
     NSCharacterSet *whitespaceSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     // Determine the type of the character
     enum CharacterType {
@@ -123,6 +123,16 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
         NSCharacterSet *controlCharacterSet = [self.delegate controlCharacterSet];
         if (controlCharacterSet && [controlCharacterSet characterIsMember:c]) {
             currentCharacterType = CharacterTypeControlCharacter;
+        }
+    }
+    enum CharacterType previousCharacterType = CharacterTypeNormal;
+    if ([whitespaceSet characterIsMember:previousCharacter]) {
+        previousCharacterType = CharacterTypeWhitespace;
+    } else {
+        // Get the control character set and see if the typed character is a control character
+        NSCharacterSet *controlCharacterSet = [self.delegate controlCharacterSet];
+        if (controlCharacterSet && [controlCharacterSet characterIsMember:previousCharacter]) {
+            previousCharacterType = CharacterTypeControlCharacter;
         }
     }
 
@@ -146,7 +156,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
                     }
                 }
             }
-            else if (currentCharacterType == CharacterTypeControlCharacter) {
+            else if ((currentCharacterType == CharacterTypeControlCharacter)
+                     && (previousCharacterType == CharacterTypeWhitespace || previousCharacter == 0)) {
                 if (self.charactersSinceLastWhitespace == 0) {
                     // Start an EXPLICIT MENTION
                     self.state = HKWMentionsStartDetectionStateCreatingMention;
