@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		9C65FBC81F607DEB004A9CB4 /* HKWLayoutManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */; };
 		9C65FBC91F607DEB004A9CB4 /* HKWMentionsPluginTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */; };
+		B149A63E2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m in Sources */ = {isa = PBXBuildFile; fileRef = B149A63D2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m */; };
+		B149A6432106294C00AFEAFB /* HKWTDummyMentionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B149A63F2106294C00AFEAFB /* HKWTDummyMentionsManager.m */; };
+		B149A6442106294C00AFEAFB /* HKWTDummyMentionEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = B149A6422106294C00AFEAFB /* HKWTDummyMentionEntity.m */; };
 		D923C7A86BAE4140B98CE674 /* libPods-HakawaiTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA135592875A450893230734 /* libPods-HakawaiTests.a */; };
 		E11DF8D119EC8DA30072F4AD /* HKWTextView+TextTransformation.m in Sources */ = {isa = PBXBuildFile; fileRef = E11DF8D019EC8DA30072F4AD /* HKWTextView+TextTransformation.m */; };
 		E1233BFC19A303620052217A /* HKWTextViewPluginTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */; };
@@ -68,6 +71,11 @@
 		9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManagerTests.m; sourceTree = "<group>"; };
 		9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWMentionsPluginTests.m; sourceTree = "<group>"; };
 		ADAD3A835F36586553D39C04 /* Pods-HakawaiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B149A63D2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWMentionsCreationStateMachineTest.m; sourceTree = "<group>"; };
+		B149A63F2106294C00AFEAFB /* HKWTDummyMentionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTDummyMentionsManager.m; path = "Supporting Classes/HKWTDummyMentionsManager.m"; sourceTree = "<group>"; };
+		B149A6402106294C00AFEAFB /* HKWTDummyMentionEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTDummyMentionEntity.h; path = "Supporting Classes/HKWTDummyMentionEntity.h"; sourceTree = "<group>"; };
+		B149A6412106294C00AFEAFB /* HKWTDummyMentionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTDummyMentionsManager.h; path = "Supporting Classes/HKWTDummyMentionsManager.h"; sourceTree = "<group>"; };
+		B149A6422106294C00AFEAFB /* HKWTDummyMentionEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTDummyMentionEntity.m; path = "Supporting Classes/HKWTDummyMentionEntity.m"; sourceTree = "<group>"; };
 		C6EA852D0C609CF4B630BAD3 /* Pods-HakawaiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.release.xcconfig"; sourceTree = "<group>"; };
 		DA135592875A450893230734 /* libPods-HakawaiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HakawaiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E11DF8CF19EC8DA30072F4AD /* HKWTextView+TextTransformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+TextTransformation.h"; sourceTree = "<group>"; };
@@ -158,6 +166,10 @@
 			isa = PBXGroup;
 			children = (
 				E1233BFE19A3089B0052217A /* HKWTBasicDummyPlugin.h */,
+				B149A6402106294C00AFEAFB /* HKWTDummyMentionEntity.h */,
+				B149A6422106294C00AFEAFB /* HKWTDummyMentionEntity.m */,
+				B149A6412106294C00AFEAFB /* HKWTDummyMentionsManager.h */,
+				B149A63F2106294C00AFEAFB /* HKWTDummyMentionsManager.m */,
 				E1233BFF19A3089B0052217A /* HKWTBasicDummyPlugin.m */,
 				E1233C0119A3090B0052217A /* HKWTControlFlowDummyPlugin.h */,
 				E1233C0219A3090B0052217A /* HKWTControlFlowDummyPlugin.m */,
@@ -312,6 +324,7 @@
 				E1233C0819A3C6680052217A /* HKWTextViewAttributeTransformerTests.m */,
 				E1233C0519A30EC80052217A /* HKWTextViewSingleLineViewportModeTests.m */,
 				E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */,
+				B149A63D2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m */,
 				E1233BFD19A308790052217A /* Supporting Classes */,
 				E1C9677619A2A66000A4AA93 /* Supporting Files */,
 			);
@@ -497,10 +510,13 @@
 			files = (
 				9C65FBC81F607DEB004A9CB4 /* HKWLayoutManagerTests.m in Sources */,
 				9C65FBC91F607DEB004A9CB4 /* HKWMentionsPluginTests.m in Sources */,
+				B149A6442106294C00AFEAFB /* HKWTDummyMentionEntity.m in Sources */,
+				B149A63E2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m in Sources */,
 				E1233C0919A3C6680052217A /* HKWTextViewAttributeTransformerTests.m in Sources */,
 				E1DC1F8D19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m in Sources */,
 				E1D5501719A2EDF9001DCF1F /* HKWTextViewExtrasTests.m in Sources */,
 				E1233BFC19A303620052217A /* HKWTextViewPluginTests.m in Sources */,
+				B149A6432106294C00AFEAFB /* HKWTDummyMentionsManager.m in Sources */,
 				E1D5501D19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m in Sources */,
 				E1233C0019A3089B0052217A /* HKWTBasicDummyPlugin.m in Sources */,
 				E1D5501A19A2F479001DCF1F /* HKWTextViewAutoXTests.m in Sources */,
