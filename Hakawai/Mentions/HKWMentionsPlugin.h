@@ -198,7 +198,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  */
 - (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
                            withMatchString:(NSString *)matchString
-                                 tableView:(UITableView *)tableView;
+                                 tableView:(UITableView *)tableView
+                               atIndexPath:(NSIndexPath *)indexPath;
 
 /*!
  Return the height of the table view cell for a given mention entity in the chooser view.

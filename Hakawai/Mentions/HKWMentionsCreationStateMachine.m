@@ -855,7 +855,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     NSAssert(indexPath.row >= 0 && indexPath.row < [self.entityArray count],
              @"Entity chooser table view requested a cell with an out-of-bounds index path row.");
     id<HKWMentionsEntityProtocol> entity = self.entityArray[indexPath.row];
-    return [self.delegate cellForMentionsEntity:entity withMatchString:[self.stringBuffer copy] tableView:tableView];
+    return [self.delegate cellForMentionsEntity:entity withMatchString:[self.stringBuffer copy] tableView:tableView atIndexPath:indexPath];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

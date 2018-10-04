@@ -1610,8 +1610,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 - (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
                            withMatchString:(NSString *)matchString
-                                 tableView:(UITableView *)tableView {
-    return [self.delegate cellForMentionsEntity:entity withMatchString:matchString tableView:tableView];
+                                 tableView:(UITableView *)tableView
+                               atIndexPath:(NSIndexPath *)indexPath {
+    return [self.delegate cellForMentionsEntity:entity withMatchString:matchString tableView:tableView atIndexPath:indexPath];
 }
 
 - (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
