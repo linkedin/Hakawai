@@ -286,7 +286,8 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
 
 - (void)dismissAutocorrectSuggestion {
     [self cycleFirstResponderStatusWithMode:HKWCycleFirstResponderModeNone
-                            cancelAnimation:YES];
+                            cancelAnimation:YES
+                disableResignFirstResponder:NO];
 }
 
 - (void)overrideAutocapitalizationWith:(UITextAutocapitalizationType)override {
@@ -296,7 +297,8 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     self.overridingAutocapitalization = YES;
     self.originalAutocapitalization = self.autocapitalizationType;
     [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:override]
-                            cancelAnimation:YES];
+                            cancelAnimation:YES
+                disableResignFirstResponder:NO];
 }
 
 - (void)restoreOriginalAutocapitalization:(BOOL)shouldCycle {
@@ -305,7 +307,8 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     }
     if (shouldCycle) {
         [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:self.originalAutocapitalization]
-                                cancelAnimation:YES];
+                                cancelAnimation:YES
+                    disableResignFirstResponder:NO];
     }
     else {
         self.autocapitalizationType = self.originalAutocapitalization;
@@ -320,7 +323,8 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     self.overridingAutocorrection = YES;
     self.originalAutocorrection = self.autocorrectionType;
     [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:override]
-                            cancelAnimation:YES];
+                            cancelAnimation:YES
+                disableResignFirstResponder:YES];
 }
 
 - (void)restoreOriginalAutocorrection:(BOOL)shouldCycle {
@@ -329,7 +333,8 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     }
     if (shouldCycle) {
         [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:self.originalAutocorrection]
-                                cancelAnimation:YES];
+                                cancelAnimation:YES
+                    disableResignFirstResponder:YES];
     }
     else {
         self.autocorrectionType = self.originalAutocorrection;
@@ -344,7 +349,8 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     self.overridingSpellChecking = YES;
     self.originalSpellChecking = self.spellCheckingType;
     [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:override]
-                            cancelAnimation:YES];
+                            cancelAnimation:YES
+                disableResignFirstResponder:NO];
 }
 
 - (void)restoreOriginalSpellChecking:(BOOL)shouldCycle {
@@ -353,21 +359,28 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     }
     if (shouldCycle) {
         [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:self.originalSpellChecking]
-                                cancelAnimation:YES];
+                                cancelAnimation:YES
+                    disableResignFirstResponder:NO];
     }
     else {
         self.spellCheckingType = self.originalSpellChecking;
     }
     self.overridingSpellChecking = NO;
 }
-
-- (void)cycleFirstResponderStatusWithMode:(HKWCycleFirstResponderMode)mode cancelAnimation:(BOOL)cancelAnimation {
+/*
+ disableResignFirstResponder is set to skip calling resignFirstResponder, which will result in crash with 3D touch. Not calling resignFirstResponder in general does not seem to have negative impact.
+ However, to limit the scope of the change and the potential impact, we will skill the call only in the code path of 3D touch crashes, which are restoreOriginalAutocorrection and overrideAutocorrectionWith.
+ TODO: remove disableResignFirstResponder once we have more data about its impact.
+ */
+- (void)cycleFirstResponderStatusWithMode:(HKWCycleFirstResponderMode)mode cancelAnimation:(BOOL)cancelAnimation disableResignFirstResponder:(BOOL)disableResignFirstResponder{
     BOOL usingAbstraction = self.abstractionLayerEnabled;
     if (usingAbstraction) {
         [self.abstractionLayer pushIgnore];
     }
     self.firstResponderIsCycling = YES;
-    [self resignFirstResponder];
+    if (!disableResignFirstResponder) {
+        [self resignFirstResponder];
+    }
 
     switch (mode) {
         case HKWCycleFirstResponderModeAutocapitalizationNone:
