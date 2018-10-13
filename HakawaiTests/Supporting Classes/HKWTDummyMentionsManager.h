@@ -20,7 +20,11 @@
                          controlCharacter:(unichar)character
                                completion:(void(^)(NSArray *results, BOOL dedupe, BOOL isComplete))completionBlock;
 
-- (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity withMatchString:(NSString *)matchString tableView:(UITableView *)tableView;
+- (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
+                           withMatchString:(NSString *)matchString
+                                 tableView:(UITableView *)tableView
+                               atIndexPath:(NSIndexPath *)indexPath;
+
 
 - (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity tableView:(UITableView *)tableView;
 

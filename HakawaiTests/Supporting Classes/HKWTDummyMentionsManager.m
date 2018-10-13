@@ -28,11 +28,15 @@
     }
 }
 
-- (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity withMatchString:(NSString *)matchString tableView:(UITableView *)tableView {
+- (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
+                           withMatchString:(NSString *)matchString
+                                 tableView:(UITableView *)tableView
+                               atIndexPath:(NSIndexPath *)indexPath {
     return [[UITableViewCell alloc] init];
 }
 
-- (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity tableView:(UITableView *)tableView {
+- (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
+                                tableView:(UITableView *)tableView {
     return 0;
 }
 

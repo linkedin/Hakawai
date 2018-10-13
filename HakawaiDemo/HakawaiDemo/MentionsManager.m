@@ -73,7 +73,8 @@
 //  us to provide a table view cell corresponding to that entity to be presented to the user.
 - (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
                            withMatchString:(NSString *)matchString
-                                 tableView:(UITableView *)tableView {
+                                 tableView:(UITableView *)tableView
+                               atIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"mentionsCell"];
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"mentionsCell"];
@@ -84,7 +85,8 @@
     return cell;
 }
 
-- (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity tableView:(UITableView *)tableView {
+- (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
+                                tableView:(UITableView *)tableView {
     return 44;
 }
 
