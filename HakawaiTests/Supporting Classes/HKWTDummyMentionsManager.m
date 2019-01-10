@@ -18,6 +18,9 @@
                                searchType:(HKWMentionsSearchType)type
                          controlCharacter:(unichar)character
                                completion:(void(^)(NSArray *results, BOOL dedupe, BOOL isComplete))completionBlock {
+    if (type == HKWMentionsSearchTypeInitial) {
+        completionBlock([[NSArray alloc] initWithObjects:[HKWTDummyMentionEntity entityWithName:@"Alan Perlis" entityID:@"1"], nil], YES, YES);
+    }
     NSArray *fakeData = @[[HKWTDummyMentionEntity entityWithName:@"Alan Perlis" entityID:@"1"],
                           [HKWTDummyMentionEntity entityWithName:@"Maurice Wilkes" entityID:@"2"],
                           [HKWTDummyMentionEntity entityWithName:@"Michael Rabin" entityID:@"12"],
@@ -28,7 +31,7 @@
     }
 }
 
-- (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity withMatchString:(NSString *)matchString tableView:(UITableView *)tableView {
+- (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity withMatchString:(NSString *)matchString tableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath  {
     return [[UITableViewCell alloc] init];
 }
 

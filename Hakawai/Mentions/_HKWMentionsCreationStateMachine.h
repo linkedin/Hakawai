@@ -166,6 +166,11 @@
 - (void)hideChooserArrow;
 
 /*!
+ Inform the state machine to trigger fetch for initial mentions
+ */
+- (void)fetchInitialMentions;
+
+/*!
  Get the chooser view frame. If the chooser view has not yet been instantiated, returns the nil rectangle.
  */
 - (CGRect)chooserViewFrame;
