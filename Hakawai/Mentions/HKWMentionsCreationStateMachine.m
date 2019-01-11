@@ -426,17 +426,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     self.searchType = HKWMentionsSearchTypeInitial;
     self.sequenceNumber += 1;
     NSUInteger sequenceNumber = self.sequenceNumber;
-    __weak typeof(self) __self = self;
+    __weak typeof(self) __weakSelf = self;
 
     [self.delegate asyncRetrieveEntitiesForKeyString:@""
                                           searchType:self.searchType
                                     controlCharacter:0
                                           completion:^(NSArray *results, BOOL dedupe, BOOL isComplete) {
-                                              [__self dataReturnedWithResults:results
-                                                               sequenceNumber:sequenceNumber
-                                                                triggerAction:HKWMentionsCreationActionNone
-                                                                dedupeResults:dedupe
-                                                          dataFetchIsComplete:isComplete];
+                                              [__weakSelf dataReturnedWithResults:results
+                                                                   sequenceNumber:sequenceNumber
+                                                                    triggerAction:HKWMentionsCreationActionNone
+                                                                    dedupeResults:dedupe
+                                                              dataFetchIsComplete:isComplete];
                                           }];
 }
 
