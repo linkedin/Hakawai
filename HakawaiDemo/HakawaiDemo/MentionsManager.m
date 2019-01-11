@@ -73,7 +73,8 @@
 //  us to provide a table view cell corresponding to that entity to be presented to the user.
 - (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
                            withMatchString:(NSString *)matchString
-                                 tableView:(UITableView *)tableView {
+                                 tableView:(UITableView *)tableView
+                               atIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"mentionsCell"];
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"mentionsCell"];
@@ -97,6 +98,9 @@
                          controlCharacter:(unichar)character
                                completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
     if (!completionBlock) {
+        return;
+    }
+    if (type == HKWMentionsSearchTypeInitial) {
         return;
     }
     NSArray *data = self.fakeData;

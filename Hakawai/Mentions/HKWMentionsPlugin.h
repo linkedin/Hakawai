@@ -76,7 +76,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsChooserPositionMode) {
 
 typedef NS_ENUM(NSInteger, HKWMentionsSearchType) {
     HKWMentionsSearchTypeImplicit,
-    HKWMentionsSearchTypeExplicit
+    HKWMentionsSearchTypeExplicit,
+    HKWMentionsSearchTypeInitial
 };
 
 /*!

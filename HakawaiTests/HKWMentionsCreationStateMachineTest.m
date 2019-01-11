@@ -88,6 +88,11 @@ describe(@"Showing mentions list for explicit search only", ^{
         [textView setText:@"@"];
         expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(5);
     });
+
+    it(@"should trigger initial fetch mentions request when text begins editing", ^{
+        [textView.delegate textViewShouldBeginEditing:textView];
+        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(1);
+    });
 });
 
 SpecEnd

@@ -422,6 +422,23 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     return nil;
 }
 
+- (void)fetchInitialMentions {
+    self.searchType = HKWMentionsSearchTypeInitial;
+    self.sequenceNumber += 1;
+    NSUInteger sequenceNumber = self.sequenceNumber;
+    __weak typeof(self) weakSelf = self;
+
+    [self.delegate asyncRetrieveEntitiesForKeyString:@""
+                                          searchType:self.searchType
+                                    controlCharacter:0
+                                          completion:^(NSArray *results, BOOL dedupe, BOOL isComplete) {
+                                              [weakSelf dataReturnedWithResults:results
+                                                                 sequenceNumber:sequenceNumber
+                                                                  triggerAction:HKWMentionsCreationActionNone
+                                                                  dedupeResults:dedupe
+                                                            dataFetchIsComplete:isComplete];
+                                          }];
+}
 
 #pragma mark - Chooser View Frame
 
@@ -645,7 +662,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                 (unsigned long)sequence, (unsigned long)self.sequenceNumber);
         return;
     }
-    if (self.state == HKWMentionsCreationStateQuiescent) {
+    if (self.state == HKWMentionsCreationStateQuiescent && self.searchType != HKWMentionsSearchTypeInitial) {
         NSAssert(self.chooserState == HKWMentionsCreationChooserStateHidden,
                  @"Logic error: entity chooser view is active even though state machine is quiescent.");
         self.entityArray = nil;
@@ -703,8 +720,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
     self.entityArray = [validResults copy];
 
-    // If mentions creation is still active and we haven't shown the chooser view, show it now.
-    if (self.state != HKWMentionsCreationStateQuiescent
+    // If mentions creation is still active or if its for initial search, and we haven't shown the chooser view, show it now.
+    if ((self.state != HKWMentionsCreationStateQuiescent || self.searchType == HKWMentionsSearchTypeInitial)
         && self.chooserState == HKWMentionsCreationChooserStateHidden) {
         [self showChooserView];
     }
@@ -802,10 +819,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
 
     // Advance the results state. The user could have been in one of two states formally: results existed, or there were
-    //  no results but the user hadn't typed a whitespace character since results stopped coming back
+    //  no results but the user hadn't typed a whitespace character since results stopped coming back, or if the search results are for initial state
     NSAssert((self.delegate.shouldContinueSearchingAfterEmptyResults && self.resultsState == HKWMentionsCreationResultsStateAwaitingFirstResult)
              || self.resultsState == HKWMentionsCreationResultsStateCreatingMentionWithResults
-             || self.resultsState == HKWMentionsCreationResultsStateNoResultsWithoutWhitespace,
+             || self.resultsState == HKWMentionsCreationResultsStateNoResultsWithoutWhitespace
+             || self.searchType == HKWMentionsSearchTypeInitial,
              @"Logic error in dataReturnedForResults:...; resultsState is inconsistent. Got %@, which is invalid.",
              nameForResultsState(self.resultsState));
     self.resultsState = HKWMentionsCreationResultsStateNoResultsWithoutWhitespace;

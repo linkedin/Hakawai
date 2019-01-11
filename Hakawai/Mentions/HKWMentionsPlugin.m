@@ -367,6 +367,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     NSUInteger location = self.parentTextView.selectedRange.location;
     unichar precedingChar = [self.parentTextView characterPrecedingLocation:location];
     [self advanceStateForInsertionChanged:precedingChar location:location];
+    [self.creationStateMachine fetchInitialMentions];
 }
 
 // Delegate method called when the plug-in is unregistered from a text view. Cleans up the state of the text view.
