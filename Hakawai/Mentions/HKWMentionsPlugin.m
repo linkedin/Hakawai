@@ -1095,6 +1095,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 self.previousTextLength = [[self.parentTextView text] length];
 
                 [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0] asInsertedCharacter:YES previousCharacter:precedingChar];
+
+                // Manually notify external delegate that the textView changed
+                if ([self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+                }
                 return NO;
             }
             else if ([self stringValidForMentionsCreation:text]) {
@@ -1117,6 +1122,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                                           atLocation:location
                                                usingControlCharacter:NO
                                                     controlCharacter:0];
+
+                // Manually notify external delegate that the textView changed
+                if ([self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+                }
                 return NO;
             }
             else {
