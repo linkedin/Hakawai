@@ -1,0 +1,12 @@
+// iOS build settings shared between apps/libs and debug flavor
+
+#include "Hakawai.common.xcconfig"
+
+COPY_PHASE_STRIP = NO
+DEPLOYMENT_POSTPROCESSING = NO
+ENABLE_NS_ASSERTIONS = YES
+ENABLE_TESTABILITY = YES
+ONLY_ACTIVE_ARCH = YES
+STRIP_INSTALLED_PRODUCT = NO
+STRIP_STYLE = debugging
+STRIP_SWIFT_SYMBOLS = NO
