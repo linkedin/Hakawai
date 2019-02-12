@@ -68,6 +68,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		44A295D52212320C00B73558 /* Hakawai.common.warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.common.warnings.xcconfig; path = xcconfigs/Hakawai.common.warnings.xcconfig; sourceTree = SOURCE_ROOT; };
+		44A295D722124BAB00B73558 /* Hakawai.common.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.common.xcconfig; path = xcconfigs/Hakawai.common.xcconfig; sourceTree = SOURCE_ROOT; };
+		44A295D822134C7600B73558 /* Hakawai.debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.debug.xcconfig; path = xcconfigs/Hakawai.debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		44A295D922134C7600B73558 /* Hakawai.release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.release.xcconfig; path = xcconfigs/Hakawai.release.xcconfig; sourceTree = SOURCE_ROOT; };
 		9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManagerTests.m; sourceTree = "<group>"; };
 		9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWMentionsPluginTests.m; sourceTree = "<group>"; };
 		ADAD3A835F36586553D39C04 /* Pods-HakawaiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -296,6 +300,10 @@
 		E1C9676119A2A66000A4AA93 /* Hakawai */ = {
 			isa = PBXGroup;
 			children = (
+				44A295D822134C7600B73558 /* Hakawai.debug.xcconfig */,
+				44A295D922134C7600B73558 /* Hakawai.release.xcconfig */,
+				44A295D722124BAB00B73558 /* Hakawai.common.xcconfig */,
+				44A295D52212320C00B73558 /* Hakawai.common.warnings.xcconfig */,
 				E1B3088819A2C1140096DE0E /* Mentions */,
 				E1B3086B19A2C0D60096DE0E /* Core */,
 				E1B3089719A2C1DB0096DE0E /* ChooserView */,
@@ -549,6 +557,7 @@
 /* Begin XCBuildConfiguration section */
 		E1C9677D19A2A66000A4AA93 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 44A295D822134C7600B73558 /* Hakawai.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -578,7 +587,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
@@ -586,6 +594,7 @@
 		};
 		E1C9677E19A2A66000A4AA93 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 44A295D922134C7600B73558 /* Hakawai.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -609,7 +618,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
