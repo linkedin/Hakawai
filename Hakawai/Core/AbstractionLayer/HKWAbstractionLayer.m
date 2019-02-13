@@ -493,11 +493,11 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                     // The user selected text and has chosen replacement CJK text using an IME keyboard.
                     NSUInteger location = self.selectedRangeWhenTextWasLastSelected.location;
                     NSAssert(self.selectedRangeWhenTextWasLastSelected.length > 0, @"Internal error");
-                    NSUInteger lengthDelta = [parentTextView.text length] - self.textLengthWhenTextWasLastSelected;
-                    NSUInteger newLength = self.selectedRangeWhenTextWasLastSelected.length + lengthDelta;
+                    NSInteger lengthDelta = (NSInteger)[parentTextView.text length] - (NSInteger)self.textLengthWhenTextWasLastSelected;
+                    NSInteger newLength = (NSInteger)self.selectedRangeWhenTextWasLastSelected.length + lengthDelta;
                     NSAssert(newLength > 0, @"Internal error");
                     if ([delegate respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
-                        NSString *newText = [parentTextView.text substringWithRange:NSMakeRange(location, newLength)];
+                        NSString *newText = [parentTextView.text substringWithRange:NSMakeRange(location, (NSUInteger)newLength)];
                         BOOL shouldChange = [delegate textView:parentTextView
                                            replacedTextAtRange:self.selectedRangeWhenTextWasLastSelected
                                                        newText:newText
@@ -616,14 +616,14 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
 
                     if (textWasSelectedWhenMarkingStarted) {
                         // The user started out with text selected
-                        NSUInteger textLengthAfterDeletion = (self.textLengthWhenMarkingStarted - self.selectedRangeWhenMarkingStarted.length);
-                        NSUInteger start = self.selectedRangeWhenMarkingStarted.location;
-                        if (currentTextLength == textLengthAfterDeletion) {
+                        NSInteger textLengthAfterDeletion = (NSInteger)self.textLengthWhenMarkingStarted - (NSInteger)self.selectedRangeWhenMarkingStarted.length;
+                        NSInteger start = (NSInteger)self.selectedRangeWhenMarkingStarted.location;
+                        if ((NSInteger)currentTextLength == textLengthAfterDeletion) {
                             // The user deleted all the marked mode text. Notify of deletion.
                             if ([delegate respondsToSelector:@selector(textView:textDeletedFromLocation:length:)]) {
                                 NSUInteger length = self.selectedRangeWhenMarkingStarted.length;
                                 BOOL shouldChange = [delegate textView:parentTextView
-                                               textDeletedFromLocation:start
+                                               textDeletedFromLocation:(NSUInteger)start
                                                                 length:length];
                                 if (self.changeRejectionEnabled) {
                                     if (shouldChange) {
@@ -638,9 +638,9 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                         }
                         else {
                             // Replacement of text.
-                            NSAssert(currentTextLength > textLengthAfterDeletion, @"Internal error");
-                            NSUInteger length = currentTextLength - textLengthAfterDeletion;
-                            NSString *insertedText = [parentTextView.text substringWithRange:NSMakeRange(start, length)];
+                            NSAssert((NSInteger)currentTextLength > textLengthAfterDeletion, @"Internal error");
+                            NSInteger length = (NSInteger)currentTextLength - textLengthAfterDeletion;
+                            NSString *insertedText = [parentTextView.text substringWithRange:NSMakeRange((NSUInteger)start, (NSUInteger)length)];
                             if ([delegate respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
                                 NSRange markingRange = self.selectedRangeWhenMarkingStarted;
                                 BOOL shouldChange = [delegate textView:parentTextView

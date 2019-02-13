@@ -161,6 +161,7 @@ typedef NSMutableArray RectValuesBuffer;
                                                //  whitespace characters, which *should* map one-to-one with their
                                                //  glyphs.
                                                // If there are trailing whitespace/newlines, remove them.
+                                               NSAssert((NSUInteger)glyphRange.length >= count, @"Internal error");
                                                NSRange subRange = NSMakeRange((NSUInteger)glyphRange.location, (NSUInteger)glyphRange.length-count);
                                                CGRect subRect = [self boundingRectForGlyphRange:subRange inTextContainer:textContainer];
                                                [lineFragments addObject:[NSValue valueWithCGRect:subRect]];
