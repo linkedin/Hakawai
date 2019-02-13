@@ -14,9 +14,9 @@
 
 @implementation HKWTDummyMentionsManager
 
-- (void)asyncRetrieveEntitiesForKeyString:(NSString *)keyString
+- (void)asyncRetrieveEntitiesForKeyString:(__unused NSString *)keyString
                                searchType:(HKWMentionsSearchType)type
-                         controlCharacter:(unichar)character
+                         controlCharacter:(__unused unichar)character
                                completion:(void(^)(NSArray *results, BOOL dedupe, BOOL isComplete))completionBlock {
     if (type == HKWMentionsSearchTypeInitial) {
         completionBlock([[NSArray alloc] initWithObjects:[HKWTDummyMentionEntity entityWithName:@"Alan Perlis" entityID:@"1"], nil], YES, YES);
@@ -31,11 +31,14 @@
     }
 }
 
-- (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity withMatchString:(NSString *)matchString tableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath  {
+- (UITableViewCell *)cellForMentionsEntity:(__unused id<HKWMentionsEntityProtocol>)entity
+                           withMatchString:(__unused NSString *)matchString
+                                 tableView:(__unused UITableView *)tableView
+                               atIndexPath:(__unused NSIndexPath *)indexPath  {
     return [[UITableViewCell alloc] init];
 }
 
-- (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity tableView:(UITableView *)tableView {
+- (CGFloat)heightForCellForMentionsEntity:(__unused id<HKWMentionsEntityProtocol>)entity tableView:(__unused UITableView *)tableView {
     return 0;
 }
 
