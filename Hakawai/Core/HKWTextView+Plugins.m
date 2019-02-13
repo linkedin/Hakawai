@@ -135,8 +135,9 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
 
     self.inSingleLineViewportMode = YES;
     self.showsVerticalScrollIndicator = NO;
-    if ([self.externalDelegate respondsToSelector:@selector(textViewDidEnterSingleLineViewportMode:)]) {
-        [self.externalDelegate textViewDidEnterSingleLineViewportMode:self];
+    __strong __auto_type externalDelegate = self.externalDelegate;
+    if ([externalDelegate respondsToSelector:@selector(textViewDidEnterSingleLineViewportMode:)]) {
+        [externalDelegate textViewDidEnterSingleLineViewportMode:self];
     }
     return viewportRect;
 }
@@ -173,8 +174,9 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     self.showsVerticalScrollIndicator = YES;
     self.inSingleLineViewportMode = NO;
     // Reset viewport to original value
-    if ([self.externalDelegate respondsToSelector:@selector(textViewDidExitSingleLineViewportMode:)]) {
-        [self.externalDelegate textViewDidExitSingleLineViewportMode:self];
+    __strong __auto_type externalDelegate = self.externalDelegate;
+    if ([externalDelegate respondsToSelector:@selector(textViewDidExitSingleLineViewportMode:)]) {
+        [externalDelegate textViewDidExitSingleLineViewportMode:self];
     }
     [self setContentOffset:self.originalContentOffset animated:NO];
 }
