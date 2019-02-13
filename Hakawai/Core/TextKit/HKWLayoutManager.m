@@ -48,7 +48,7 @@ typedef NSMutableArray RectValuesBuffer;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSaveGState(context);
-    for (NSInteger i=0; i<[tuples count]; i++) {
+    for (NSUInteger i=0; i<[tuples count]; i++) {
         HKWRoundedRectBackgroundAttributeValue *data = tuples[i][1];
         CGContextSetStrokeColorWithColor(context, [data.backgroundColor CGColor]);
         CGContextSetFillColorWithColor(context, [data.backgroundColor CGColor]);
@@ -151,7 +151,7 @@ typedef NSMutableArray RectValuesBuffer;
                                                return;
                                            }
                                            NSString *substr = [[self.textStorage attributedSubstringFromRange:glyphRange] string];
-                                           NSInteger count = [[self class] numberOfTrailingSpacesInString:substr];
+                                           NSUInteger count = [[self class] numberOfTrailingSpacesInString:substr];
                                            if (count == 0) {
                                                [lineFragments addObject:[NSValue valueWithCGRect:usedRect]];
                                            }
@@ -161,7 +161,8 @@ typedef NSMutableArray RectValuesBuffer;
                                                //  whitespace characters, which *should* map one-to-one with their
                                                //  glyphs.
                                                // If there are trailing whitespace/newlines, remove them.
-                                               NSRange subRange = NSMakeRange(glyphRange.location, glyphRange.length-count);
+                                               NSAssert((NSUInteger)glyphRange.length >= count, @"Internal error");
+                                               NSRange subRange = NSMakeRange((NSUInteger)glyphRange.location, (NSUInteger)glyphRange.length-count);
                                                CGRect subRect = [self boundingRectForGlyphRange:subRange inTextContainer:textContainer];
                                                [lineFragments addObject:[NSValue valueWithCGRect:subRect]];
                                            }
@@ -196,7 +197,7 @@ typedef NSMutableArray RectValuesBuffer;
     }
 
     // First, destructure fragmentRects
-    const NSInteger fragmentRectsCount = [fragmentRects count];
+    const NSUInteger fragmentRectsCount = [fragmentRects count];
     CGFloat *rectXArray = malloc(fragmentRectsCount * sizeof(CGFloat));
     if (!rectXArray) {
         goto ALLOC_X_FAILED;
@@ -214,7 +215,7 @@ typedef NSMutableArray RectValuesBuffer;
         goto ALLOC_HEIGHT_FAILED;
     }
 
-    for (NSInteger i=0; i<fragmentRectsCount; i++) {
+    for (NSUInteger i=0; i<fragmentRectsCount; i++) {
         CGRect fragmentRect = [fragmentRects[i] CGRectValue];
         rectXArray[i] = fragmentRect.origin.x;
         rectYArray[i] = fragmentRect.origin.y;
@@ -227,7 +228,7 @@ typedef NSMutableArray RectValuesBuffer;
 
         // Clip the enclosing rect to the bounds of the fragment rects
         CGRect intersectionRect = currentEnclosingRect;
-        for (NSInteger i=0; i<fragmentRectsCount; i++) {
+        for (NSUInteger i=0; i<fragmentRectsCount; i++) {
             CGRect currentFragmentRect = CGRectMake(rectXArray[i],
                                                     rectYArray[i],
                                                     rectWidthArray[i],
@@ -252,10 +253,10 @@ ALLOC_X_FAILED:
     return [NSArray arrayWithArray:buffer];
 }
 
-+ (NSInteger)numberOfTrailingSpacesInString:(NSString *)str {
-    NSInteger count = 0;
-    for (NSInteger i=[str length]-1; i>=0; i--) {
-        if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[str characterAtIndex:i]]) {
++ (NSUInteger)numberOfTrailingSpacesInString:(NSString *)str {
+    NSUInteger count = 0;
+    for (NSInteger i=(NSInteger)[str length]-1; i>=0; i--) {
+        if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[str characterAtIndex:(NSUInteger)i]]) {
             count++;
         }
         else {

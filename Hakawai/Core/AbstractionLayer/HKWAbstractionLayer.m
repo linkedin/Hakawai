@@ -93,14 +93,14 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
 @property (nonatomic, readonly) BOOL shouldIgnore;
 
 @property (nonatomic) NSRange previousSelectedRange;
-@property (nonatomic) NSInteger previousTextLength;
+@property (nonatomic) NSUInteger previousTextLength;
 
 /*!
  A range used to track the text view's selection range when IME entry began; this is necessary to properly report where
  text was replaced when the user ends up selecting a character or canceling the IME process.
  */
 @property (nonatomic) NSRange selectedRangeWhenMarkingStarted;
-@property (nonatomic) NSInteger textLengthWhenMarkingStarted;
+@property (nonatomic) NSUInteger textLengthWhenMarkingStarted;
 @property (nonatomic) BOOL lastMarkedCharactersJustDeleted;
 
 /*!
@@ -117,7 +117,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
  The length of the text view's text at the time that the \c selectedRangeWhenTextWasLastSelected property was most
  recently updated with a valid value.
  */
-@property (nonatomic) NSInteger textLengthWhenTextWasLastSelected;
+@property (nonatomic) NSUInteger textLengthWhenTextWasLastSelected;
 
 /*!
  If the state machine is in 'pending update' mode (trying to distinguish between the user drawing characters on a
@@ -130,7 +130,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
 //  committed to the text buffer. (For example, choosing 'The', inserting 'The ', and then typing a space will almost
 //  certainly cause the space to not appear.)
 @property (nonatomic) BOOL lastChangeWasSpaceInsertion;
-@property (nonatomic) NSInteger textLengthWhenSpaceWasInserted;
+@property (nonatomic) NSUInteger textLengthWhenSpaceWasInserted;
 
 // User change tracking properties. These properties are used to determine what type of change (insertion, replacement,
 //  deletion, etc) is made in response to user input.
@@ -493,11 +493,11 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                     // The user selected text and has chosen replacement CJK text using an IME keyboard.
                     NSUInteger location = self.selectedRangeWhenTextWasLastSelected.location;
                     NSAssert(self.selectedRangeWhenTextWasLastSelected.length > 0, @"Internal error");
-                    NSInteger lengthDelta = [parentTextView.text length] - self.textLengthWhenTextWasLastSelected;
-                    NSInteger newLength = self.selectedRangeWhenTextWasLastSelected.length + lengthDelta;
+                    NSInteger lengthDelta = (NSInteger)[parentTextView.text length] - (NSInteger)self.textLengthWhenTextWasLastSelected;
+                    NSInteger newLength = (NSInteger)self.selectedRangeWhenTextWasLastSelected.length + lengthDelta;
                     NSAssert(newLength > 0, @"Internal error");
                     if ([delegate respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
-                        NSString *newText = [parentTextView.text substringWithRange:NSMakeRange(location, newLength)];
+                        NSString *newText = [parentTextView.text substringWithRange:NSMakeRange(location, (NSUInteger)newLength)];
                         BOOL shouldChange = [delegate textView:parentTextView
                                            replacedTextAtRange:self.selectedRangeWhenTextWasLastSelected
                                                        newText:newText
@@ -612,19 +612,18 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                     //    marked text into normal text
                     NSAssert(self.selectedRangeWhenMarkingStarted.location != NSNotFound, @"Internal error");
                     BOOL textWasSelectedWhenMarkingStarted = (self.selectedRangeWhenMarkingStarted.length > 0);
-                    NSInteger currentTextLength = [parentTextView.text length];
+                    NSUInteger currentTextLength = [parentTextView.text length];
 
                     if (textWasSelectedWhenMarkingStarted) {
                         // The user started out with text selected
-                        NSInteger textLengthAfterDeletion = (self.textLengthWhenMarkingStarted
-                                                             - self.selectedRangeWhenMarkingStarted.length);
-                        NSUInteger start = self.selectedRangeWhenMarkingStarted.location;
-                        if (currentTextLength == textLengthAfterDeletion) {
+                        NSInteger textLengthAfterDeletion = (NSInteger)self.textLengthWhenMarkingStarted - (NSInteger)self.selectedRangeWhenMarkingStarted.length;
+                        NSInteger start = (NSInteger)self.selectedRangeWhenMarkingStarted.location;
+                        if ((NSInteger)currentTextLength == textLengthAfterDeletion) {
                             // The user deleted all the marked mode text. Notify of deletion.
                             if ([delegate respondsToSelector:@selector(textView:textDeletedFromLocation:length:)]) {
                                 NSUInteger length = self.selectedRangeWhenMarkingStarted.length;
                                 BOOL shouldChange = [delegate textView:parentTextView
-                                               textDeletedFromLocation:start
+                                               textDeletedFromLocation:(NSUInteger)start
                                                                 length:length];
                                 if (self.changeRejectionEnabled) {
                                     if (shouldChange) {
@@ -639,10 +638,9 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                         }
                         else {
                             // Replacement of text.
-                            NSAssert(currentTextLength > textLengthAfterDeletion, @"Internal error");
-                            NSInteger length = currentTextLength - textLengthAfterDeletion;
-                            NSString *insertedText = [parentTextView.text substringWithRange:NSMakeRange(start,
-                                                                                                              length)];
+                            NSAssert((NSInteger)currentTextLength > textLengthAfterDeletion, @"Internal error");
+                            NSInteger length = (NSInteger)currentTextLength - textLengthAfterDeletion;
+                            NSString *insertedText = [parentTextView.text substringWithRange:NSMakeRange((NSUInteger)start, (NSUInteger)length)];
                             if ([delegate respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
                                 NSRange markingRange = self.selectedRangeWhenMarkingStarted;
                                 BOOL shouldChange = [delegate textView:parentTextView
@@ -670,9 +668,8 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                             // Insertion of text.
                             NSAssert(currentTextLength > self.textLengthWhenMarkingStarted, @"Internal error");
                             NSUInteger start = self.selectedRangeWhenMarkingStarted.location;
-                            NSInteger length = currentTextLength - self.textLengthWhenMarkingStarted;
-                            NSString *insertedText = [parentTextView.text substringWithRange:NSMakeRange(start,
-                                                                                                              length)];
+                            NSUInteger length = currentTextLength - self.textLengthWhenMarkingStarted;
+                            NSString *insertedText = [parentTextView.text substringWithRange:NSMakeRange(start, length)];
                             if ([delegate respondsToSelector:@selector(textView:textInserted:atLocation:autocorrect:)]) {
                                 BOOL shouldChange = [delegate textView:parentTextView
                                                           textInserted:insertedText
@@ -783,7 +780,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
     NSInteger end = [parentTextView offsetFromPosition:parentTextView.beginningOfDocument
                                             toPosition:markedRange.end];
     NSAssert(end >= start, @"Internal error: marked text range is inconsistent; this is an OS error");
-    return NSMakeRange(start, end - start);
+    return NSMakeRange((NSUInteger)start, (NSUInteger)(end - start));
 }
 
 

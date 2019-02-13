@@ -37,19 +37,19 @@ typedef NS_ENUM(NSInteger, HKWChooserBorderMode) {
 /*!
  Return the number of model objects to display. Returns 0 if loading is occuring.
  */
-- (NSInteger)numberOfModelObjects;
+- (NSUInteger)numberOfModelObjects;
 
 /*!
  Given an index value between 0 and (numberOfModelObjects - 1), return the appropriate model object. Depending on what
  application you are using the custom view for (e.g. Mentions), you may have to downcast the model in order to use it.
  */
-- (id)modelObjectForIndex:(NSInteger)index;
+- (id)modelObjectForIndex:(NSUInteger)index;
 
 /*!
  Inform the Hakawai consumer that the user selected a model index at a value between 0 and (numberOfObjects - 1). If the
  index is out of range the consumer will do nothing.
  */
-- (void)modelObjectSelectedAtIndex:(NSInteger)index;
+- (void)modelObjectSelectedAtIndex:(NSUInteger)index;
 
 @end
 

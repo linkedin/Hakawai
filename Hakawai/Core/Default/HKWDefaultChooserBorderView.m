@@ -87,7 +87,7 @@
 
 - (void)moveArrowToPosition {
     BOOL arrowPointsUp = self.borderOnTop;
-    CGFloat xPosition = floorf((self.bounds.size.width * self.pointerXPercent) - (self.arrowWidth/2.0));
+    CGFloat xPosition = floor((self.bounds.size.width * self.pointerXPercent) - (self.arrowWidth/2.0));
     CGFloat yPosition = arrowPointsUp ? (self.bounds.size.height - self.arrowHeight) : 0;
     [self.delegate moveArrowViewToPositionRelativeToBorderView:CGPointMake(xPosition, yPosition)];
 }
@@ -146,7 +146,7 @@
 }
 
 - (CGFloat)arrowMiddleX {
-    return floorf(self.pointerXPercent * (self.bounds.size.width));
+    return floor(self.pointerXPercent * (self.bounds.size.width));
 }
 
 - (CGFloat)arrowRightX {

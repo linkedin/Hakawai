@@ -98,7 +98,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
  mode.
  */
 @property (nonatomic) NSRange previousSelectionRange;
-@property (nonatomic) NSInteger previousTextLength;
+@property (nonatomic) NSUInteger previousTextLength;
 
 /*!
  The mention currently highlighted as the 'selected' mention (due to the cursor being in the right place), or the
@@ -139,8 +139,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 // Properties for resuming mentions creation
 @property (nonatomic) BOOL shouldResumeMentionsCreation;
 @property (nonatomic) unichar resumeMentionsControlCharacter;   // 0 if implicit mention
-@property (nonatomic) NSInteger resumeMentionsPriorTextLength;
-@property (nonatomic) NSInteger resumeMentionsPriorPosition;
+@property (nonatomic) NSUInteger resumeMentionsPriorTextLength;
+@property (nonatomic) NSUInteger resumeMentionsPriorPosition;
 @property (nonatomic) NSString *resumeMentionsPriorString;
 
 @property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
@@ -309,7 +309,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             return;
     }
 
-    NSInteger location = parentTextView.selectedRange.location;
+    NSUInteger location = parentTextView.selectedRange.location;
     NSRange originalRange = NSMakeRange(location, 0);
     NSDictionary *mentionAttributes = self.mentionUnselectedAttributes;
     // Mentions cannot overlap. In order to avoid inconsistency, destroy any existing mentions that intrude within the
@@ -331,7 +331,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
     // Update the mentions attributes.
     location = parentTextView.selectedRange.location;
-    unichar precedingChar = [parentTextView characterPrecedingLocation:location];
+    unichar precedingChar = [parentTextView characterPrecedingLocation:(NSInteger)location];
     // Advance the state, as if the insertion point changed
     [self advanceStateForInsertionChanged:precedingChar location:location];
 }
@@ -369,7 +369,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
     // Initialize the state (as if the insertion point changed)
     NSUInteger location = parentTextView.selectedRange.location;
-    unichar precedingChar = [parentTextView characterPrecedingLocation:location];
+    unichar precedingChar = [parentTextView characterPrecedingLocation:(NSInteger)location];
     [self advanceStateForInsertionChanged:precedingChar location:location];
     [self.creationStateMachine fetchInitialMentions];
 }
@@ -481,7 +481,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         return NO;
     }
     NSCharacterSet *invalidChars = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    for (NSInteger i=0; i<[string length]; i++) {
+    for (NSUInteger i=0; i<[string length]; i++) {
         unichar c = [string characterAtIndex:i];
         if ([invalidChars characterIsMember:c]) { return NO; }
         if (self.controlCharacterSet && [self.controlCharacterSet characterIsMember:c]) { return NO; }
@@ -694,8 +694,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     return delegateImplementsCustomTrimming || (whitespaceRange.length > 0);
 }
 
-- (HKWMentionsAttribute *)mentionAttributePrecedingLocation:(NSInteger)location
-                                                       range:(NSRangePointer)range {
+- (HKWMentionsAttribute *)mentionAttributePrecedingLocation:(NSUInteger)location
+                                                      range:(NSRangePointer)range {
     __strong __auto_type parentTextView = self.parentTextView;
     if (location < 1 || location > [parentTextView.attributedText length]) {
         // No mention can precede the beginning of the text view.
@@ -743,8 +743,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         return NO;
     }
     // CASE 2: selection range
-    for (NSInteger i = 0; i < range.length + 1; i++) {
-        NSInteger currentLocation = range.location + i;
+    for (NSUInteger i = 0; i < range.length + 1; i++) {
+        NSUInteger currentLocation = range.location + i;
         if (currentLocation > [parentTextView.text length]) {
             // Out of bounds
             return NO;
@@ -928,7 +928,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                         // the string starting from 0 to the deleted character's index
                         NSString *leftString = [parentTextView.text substringToIndex:location];
                         if ([leftString length] > 0) {
-                            NSInteger index = [leftString length] - 1;
+                            NSUInteger index = [leftString length] - 1;
                             // Grab the start index of word to the left of the cursor by walking backwards through the string
                             // until a whitespace char is hit or the beginning of the string
                             for (; index >= 0; index--) {
@@ -1019,7 +1019,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 NSAssert(self.currentlySelectedMentionRange.location != NSNotFound,
                          @"Logic error: preparing to delete a mention, but the currently selected mention range is invalid");
                 NSUInteger locationAfterDeletion = self.currentlySelectedMentionRange.location;
-                unichar newPrecedingChar = [parentTextView characterPrecedingLocation:locationAfterDeletion];
+                unichar newPrecedingChar = [parentTextView characterPrecedingLocation:(NSInteger)locationAfterDeletion];
                 [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
                 [parentTextView transformTextAtRange:self.currentlySelectedMentionRange
                                      withTransformer:^NSAttributedString *(NSAttributedString *input) {
@@ -1085,7 +1085,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     __strong __auto_type parentTextView = self.parentTextView;
     NSRange originalSelectedRange = parentTextView.selectedRange;
     unichar precedingChar = [text characterAtIndex:[text length] - 1];
-    unichar originalPrecedingChar = [parentTextView characterPrecedingLocation:range.location];
+    unichar originalPrecedingChar = [parentTextView characterPrecedingLocation:(NSInteger)range.location];
     if (parentTextView.selectedRange.length > 0) {
         // Multiple characters are selected. Bleach everything in the selection range before continuing.
         [self bleachMentionsWithinRange:parentTextView.selectedRange];
@@ -1366,7 +1366,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     BOOL returnValue = YES;
     self.suppressSelectionChangeNotifications = YES;
     __strong __auto_type parentTextView = self.parentTextView;
-    unichar precedingChar = [parentTextView characterPrecedingLocation:range.location];
+    unichar precedingChar = [parentTextView characterPrecedingLocation:(NSInteger)range.location];
 
     if (self.nextInsertionShouldBeIgnored) {
         self.nextInsertionShouldBeIgnored = NO;
@@ -1450,7 +1450,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
     else {
         // The user moved the insertion point
-        unichar precedingChar = [self.parentTextView characterPrecedingLocation:range.location];
+        unichar precedingChar = [self.parentTextView characterPrecedingLocation:(NSInteger)range.location];
         [self advanceStateForInsertionChanged:precedingChar location:range.location];
         self.previousSelectionRange = range;
         self.previousTextLength = [textView.text length];
@@ -1467,7 +1467,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 - (void)textViewDidBeginEditing:(UITextView *)textView {
     // Bring the text view back to a known good state
     __strong __auto_type parentTextView = self.parentTextView;
-    NSInteger currentLength = [parentTextView.text length];
+    NSUInteger currentLength = [parentTextView.text length];
     BOOL shouldResume = NO;
     if (self.shouldResumeMentionsCreation && self.resumeMentionsCreationEnabled) {
         self.shouldResumeMentionsCreation = NO;
@@ -1516,7 +1516,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     self.previousTextLength = [parentTextView.text length];
     self.state = HKWMentionsStateQuiescent;
     // Advance the state, as if the insertion point changed
-    unichar precedingChar = [parentTextView characterPrecedingLocation:parentTextView.selectedRange.location];
+    unichar precedingChar = [parentTextView characterPrecedingLocation:(NSInteger)parentTextView.selectedRange.location];
     [self advanceStateForInsertionChanged:precedingChar location:parentTextView.selectedRange.location];
 }
 
@@ -1530,7 +1530,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             break;
         case HKWMentionsStartDetectionStateCreatingMention: {
             __strong __auto_type parentTextView = self.parentTextView;
-            NSInteger currentLength = [parentTextView.text length];
+            NSUInteger currentLength = [parentTextView.text length];
             self.shouldResumeMentionsCreation = YES;
             self.resumeMentionsPriorTextLength = [parentTextView.text length];
             self.resumeMentionsPriorString = [parentTextView.text substringWithRange:NSMakeRange(self.resumeMentionsPriorPosition,
@@ -1575,7 +1575,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         // Beginning an EXPLICIT MENTION by typing a single control character
         if (alreadyInserted) {
             NSAssert(self.controlCharacterSet &&
-                     [self.controlCharacterSet characterIsMember:[parentTextView characterPrecedingLocation:location]],
+                     [self.controlCharacterSet characterIsMember:[parentTextView characterPrecedingLocation:(NSInteger)location]],
                      @"Logic error: mention started with control character, but control character was not found");
             // The control character has already been inserted into the text buffer. We need to back up the location by
             //  one in order to ensure that the inserted mention will overwrite the control character.
@@ -1584,7 +1584,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
     else {
         // Beginning an IMPLICIT MENTION by typing enough normal characters
-        NSInteger prefixLength = [prefix length] - (alreadyInserted ? 0 : 1);
+        NSUInteger prefixLength = [prefix length] - (alreadyInserted ? 0 : 1);
         NSAssert(prefixLength <= location,
                  @"Logic error: prefixLength would make the location of the mention negative");
         location -= prefixLength;
@@ -1681,9 +1681,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     //  (without waiting for a second space).
     __strong __auto_type parentTextView = self.parentTextView;
     parentTextView.shouldRejectAutocorrectInsertions = NO;
-    NSInteger currentLocation = parentTextView.selectedRange.location;
+    NSUInteger currentLocation = parentTextView.selectedRange.location;
     NSCharacterSet *whitespaces = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    BOOL canRestart = ([whitespaces characterIsMember:[parentTextView characterPrecedingLocation:currentLocation]]
+    BOOL canRestart = ([whitespaces characterIsMember:[parentTextView characterPrecedingLocation:(NSInteger)currentLocation]]
                        || (self.characterForAdvanceStateForCharacterInsertion != 0
                            && [whitespaces characterIsMember:self.characterForAdvanceStateForCharacterInsertion]));
     [self performMentionCreationEndCleanup:canRestart];
@@ -1746,7 +1746,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             && matchedTextRange.location + 1 < mentionText.length) {
             // Get the first part of mention text (preceding the matched text)
             NSString *excessStringToReplace = [mentionText substringWithRange:NSMakeRange(0, matchedTextRange.location + 1)];
-            NSInteger excessLength = excessStringToReplace.length;
+            NSUInteger excessLength = excessStringToReplace.length;
             if (location >= excessLength) {
                 // Get similar length string from the text view preceding location
                 NSString *stringFromTextView = [parentTextView.text substringWithRange:NSMakeRange(location - excessLength, excessLength)];
@@ -1959,7 +1959,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     __strong __auto_type parentTextView = self.parentTextView;
     UITextView *textView = parentTextView;
     CGRect rect = [textView caretRectForPosition:[textView positionFromPosition:textView.beginningOfDocument
-                                                                         offset:location]];
+                                                                         offset:(NSInteger)location]];
     CGPoint correctedPoint = [view convertPoint:rect.origin fromView:parentTextView];
     return correctedPoint.x + rect.size.width/2;
 }

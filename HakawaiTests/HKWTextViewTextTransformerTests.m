@@ -105,7 +105,7 @@ describe(@"transformTextAtRange with attributed text", ^{
                                                                          attributes:@{NSForegroundColorAttributeName: [UIColor redColor]}];
             return buffer;
         }];
-        for (NSInteger i=0; i<[textView.attributedText length]; i++) {
+        for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *fColor = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i < location + [replacementString length]) {
                 expect(fColor).to.equal([UIColor redColor]);
@@ -127,7 +127,7 @@ describe(@"transformTextAtRange with attributed text", ^{
                                                                          attributes:@{NSForegroundColorAttributeName: [UIColor redColor]}];
             return buffer;
         }];
-        for (NSInteger i=0; i<[textView.attributedText length]; i++) {
+        for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *fColor = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:i effectiveRange:NULL];
             UIColor *expectColor = (i >= location && i < location + [replacementString length]) ? [UIColor redColor] : [UIColor greenColor];
             expect(fColor).to.equal(expectColor);
@@ -143,7 +143,7 @@ describe(@"transformTextAtRange with attributed text", ^{
         [textView transformTextAtRange:NSMakeRange(location, length) withTransformer:^NSAttributedString *(NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:replacementString];
         }];
-        for (NSInteger i=0; i<[textView.attributedText length]; i++) {
+        for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *fColor = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i < location + [replacementString length]) {
                 expect(fColor).to.beNil;
@@ -233,7 +233,7 @@ describe(@"insertAttributedText", ^{
         NSUInteger location = 0;
         [textView insertAttributedText:insertString location:location];
         expect(textView.text).to.equal(@"1234567890The quick brown fox jumps over the lazy dog");
-        for (NSInteger i=0; i<[textView.attributedText length]; i++) {
+        for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *bgColor = [textView.attributedText attribute:NSBackgroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i < location + [insertString length]) {
                 expect(bgColor).to.equal([UIColor purpleColor]);
@@ -248,7 +248,7 @@ describe(@"insertAttributedText", ^{
         NSUInteger location = 4;
         [textView insertAttributedText:insertString location:location];
         expect(textView.text).to.equal(@"The 1234567890quick brown fox jumps over the lazy dog");
-        for (NSInteger i=0; i<[textView.attributedText length]; i++) {
+        for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *bgColor = [textView.attributedText attribute:NSBackgroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i < location + [insertString length]) {
                 expect(bgColor).to.equal([UIColor purpleColor]);
@@ -263,7 +263,7 @@ describe(@"insertAttributedText", ^{
         NSUInteger location = 43;
         [textView insertAttributedText:insertString location:location];
         expect(textView.text).to.equal(@"The quick brown fox jumps over the lazy dog1234567890");
-        for (NSInteger i=0; i<[textView.attributedText length]; i++) {
+        for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *bgColor = [textView.attributedText attribute:NSBackgroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i <= location + [insertString length]) {
                 expect(bgColor).to.equal([UIColor purpleColor]);

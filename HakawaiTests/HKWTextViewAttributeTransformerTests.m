@@ -46,7 +46,7 @@ describe(@"customAttributes API", ^{
         [textView activateCustomAttributeWithName:c1 value:customValue];
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:replacement];
         // Now check to see if the attribute was added
-        for (NSInteger i=0; i<[textView.text length]; i++) {
+        for (NSUInteger i=0; i<[textView.text length]; i++) {
             id value = [textView.attributedText attribute:c1 atIndex:i effectiveRange:NULL];
             expect(value).to.equal(customValue);
         }
@@ -54,7 +54,7 @@ describe(@"customAttributes API", ^{
         NSUInteger newLocation = [textView.text length];
         textView.selectedRange = NSMakeRange(newLocation, 0);
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(newLocation, 0) replacementText:replacement];
-        for (NSInteger i=0; i<[textView.text length]; i++) {
+        for (NSUInteger i=0; i<[textView.text length]; i++) {
             id value = [textView.attributedText attribute:c1 atIndex:i effectiveRange:NULL];
             expect(value).to.equal(customValue);
         }
@@ -65,7 +65,7 @@ describe(@"customAttributes API", ^{
         [textView activateCustomAttributeWithName:c1 value:customValue];
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:replacement];
         // Now check to see if the attribute was added
-        for (NSInteger i=0; i<[textView.text length]; i++) {
+        for (NSUInteger i=0; i<[textView.text length]; i++) {
             id value = [textView.attributedText attribute:c1 atIndex:i effectiveRange:NULL];
             expect(value).to.equal(customValue);
         }
@@ -74,7 +74,7 @@ describe(@"customAttributes API", ^{
         [textView deactivateCustomAttributeWithName:c1];
         textView.selectedRange = NSMakeRange(newLocation, 0);
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(newLocation, 0) replacementText:replacement];
-        for (NSInteger i=0; i<[textView.text length]; i++) {
+        for (NSUInteger i=0; i<[textView.text length]; i++) {
             id value = [textView.attributedText attribute:c1 atIndex:i effectiveRange:NULL];
             if (i < [replacement length]) {
                 // Only the first half of the string should have the custom value
@@ -95,7 +95,7 @@ describe(@"customAttributes API", ^{
         [textView activateCustomAttributeWithName:c3 value:cv3];
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:replacement];
         // Now check to see if the attributes were added
-        for (NSInteger i=0; i<[textView.text length]; i++) {
+        for (NSUInteger i=0; i<[textView.text length]; i++) {
             id value1 = [textView.attributedText attribute:c1 atIndex:i effectiveRange:NULL];
             id value2 = [textView.attributedText attribute:c2 atIndex:i effectiveRange:NULL];
             id value3 = [textView.attributedText attribute:c3 atIndex:i effectiveRange:NULL];
@@ -108,7 +108,7 @@ describe(@"customAttributes API", ^{
         [textView deactivateAllCustomAttributes];
         textView.selectedRange = NSMakeRange(newLocation, 0);
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(newLocation, 0) replacementText:replacement];
-        for (NSInteger i=0; i<[textView.text length]; i++) {
+        for (NSUInteger i=0; i<[textView.text length]; i++) {
             id value1 = [textView.attributedText attribute:c1 atIndex:i effectiveRange:NULL];
             id value2 = [textView.attributedText attribute:c2 atIndex:i effectiveRange:NULL];
             id value3 = [textView.attributedText attribute:c3 atIndex:i effectiveRange:NULL];
@@ -129,7 +129,7 @@ describe(@"customAttributes API", ^{
     it(@"should properly ignore trying to add attribute with nil name", ^{
         [textView activateCustomAttributeWithName:nil value:[UIColor greenColor]];
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:replacement];
-        for (NSInteger i=0; i<[textView.text length]; i++) {
+        for (NSUInteger i=0; i<[textView.text length]; i++) {
             id value = [textView.attributedText attribute:c1 atIndex:i effectiveRange:NULL];
             expect(value).to.beNil;
         }
@@ -138,7 +138,7 @@ describe(@"customAttributes API", ^{
     it(@"should properly ignore trying to remove nil attributes", ^{
         [textView activateCustomAttributeWithName:c1 value:nil];
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:replacement];
-        for (NSInteger i=0; i<[textView.text length]; i++) {
+        for (NSUInteger i=0; i<[textView.text length]; i++) {
             id value = [textView.attributedText attribute:c1 atIndex:i effectiveRange:NULL];
             expect(value).to.beNil;
         }
@@ -151,7 +151,7 @@ SpecBegin(stripAttributeFromTextAtRange)
 
 describe(@"stripAttributeFromTextAtRange API", ^{
     NSString *baseString = @"The quick brown fox jumps over the lazy dog";
-    NSInteger baseLength = [baseString length];
+    NSUInteger baseLength = [baseString length];
     __block HKWTextView *textView;
 
     beforeEach(^{
@@ -163,13 +163,13 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         id attributeValue = [UIColor greenColor];
         textView.attributedText = [[NSAttributedString alloc] initWithString:baseString
                                                                   attributes:@{attributeName: attributeValue}];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             id observedValue = [textView.attributedText attribute:attributeName atIndex:i effectiveRange:NULL];
             expect(observedValue).to.equal(attributeValue);
         }
         // Strip the attribute
         [textView stripAttributeFromTextAtRange:HKWT_FULL_RANGE(textView.attributedText) attributeName:attributeName];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             id observedValue = [textView.attributedText attribute:attributeName atIndex:i effectiveRange:NULL];
             expect(observedValue).to.beNil;
         }
@@ -186,7 +186,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         [buffer addAttribute:attributeName value:attributeValue range:NSMakeRange(attrLocation, attrLength)];
         textView.attributedText = buffer;
 
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             id observedValue = [textView.attributedText attribute:attributeName atIndex:i effectiveRange:NULL];
             if (i >= attrLocation && i < attrLocation + attrLength) {
                 expect(observedValue).to.equal(attributeValue);
@@ -197,7 +197,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         }
         // Strip the attribute
         [textView stripAttributeFromTextAtRange:HKWT_FULL_RANGE(textView.attributedText) attributeName:attributeName];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             id observedValue = [textView.attributedText attribute:attributeName atIndex:i effectiveRange:NULL];
             expect(observedValue).to.beNil;
         }
@@ -209,7 +209,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         id attributeValue = [UIColor greenColor];
         textView.attributedText = [[NSAttributedString alloc] initWithString:baseString
                                                                   attributes:@{attributeName: attributeValue}];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             id observedValue = [textView.attributedText attribute:attributeName atIndex:i effectiveRange:NULL];
             expect(observedValue).to.equal(attributeValue);
         }
@@ -217,7 +217,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         NSUInteger stripLocation = 5;
         NSUInteger stripLength = 8;
         [textView stripAttributeFromTextAtRange:NSMakeRange(stripLocation, stripLength) attributeName:attributeName];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             id observedValue = [textView.attributedText attribute:attributeName atIndex:i effectiveRange:NULL];
             if (i >= stripLocation && i < stripLocation + stripLength) {
                 expect(observedValue).to.equal(nil);
@@ -236,7 +236,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         textView.attributedText = buffer;
         buffer = textView.attributedText;
         [textView stripAttributeFromTextAtRange:HKWT_FULL_RANGE(buffer) attributeName:NSStrikethroughColorAttributeName];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             NSDictionary *attrs = [textView.attributedText attributesAtIndex:i effectiveRange:NULL];
             NSDictionary *baseAttrs = [buffer attributesAtIndex:i effectiveRange:NULL];
             expect(attrs).to.equal(baseAttrs);
@@ -251,7 +251,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         textView.attributedText = buffer;
         buffer = textView.attributedText;
         [textView stripAttributeFromTextAtRange:HKWT_FULL_RANGE(buffer) attributeName:nil];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             NSDictionary *attrs = [textView.attributedText attributesAtIndex:i effectiveRange:NULL];
             NSDictionary *baseAttrs = [buffer attributesAtIndex:i effectiveRange:NULL];
             expect(attrs).to.equal(baseAttrs);
@@ -266,7 +266,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         textView.attributedText = buffer;
         buffer = textView.attributedText;
         [textView stripAttributeFromTextAtRange:NSMakeRange(10000, 5) attributeName:attributeName];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             NSDictionary *attrs = [textView.attributedText attributesAtIndex:i effectiveRange:NULL];
             NSDictionary *baseAttrs = [buffer attributesAtIndex:i effectiveRange:NULL];
             expect(attrs).to.equal(baseAttrs);
@@ -281,7 +281,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         textView.attributedText = buffer;
         buffer = textView.attributedText;
         [textView stripAttributeFromTextAtRange:NSMakeRange(3, 0) attributeName:attributeName];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             NSDictionary *attrs = [textView.attributedText attributesAtIndex:i effectiveRange:NULL];
             NSDictionary *baseAttrs = [buffer attributesAtIndex:i effectiveRange:NULL];
             expect(attrs).to.equal(baseAttrs);
@@ -296,7 +296,7 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         textView.attributedText = buffer;
         buffer = textView.attributedText;
         [textView stripAttributeFromTextAtRange:NSMakeRange(0, 5000) attributeName:attributeName];
-        for (NSInteger i=0; i<baseLength; i++) {
+        for (NSUInteger i=0; i<baseLength; i++) {
             id observedValue = [textView.attributedText attribute:attributeName atIndex:i effectiveRange:NULL];
             expect(observedValue).to.beNil;
         }

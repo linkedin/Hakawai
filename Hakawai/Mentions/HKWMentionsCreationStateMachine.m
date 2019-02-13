@@ -844,15 +844,15 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     return !self.currentQueryIsComplete;
 }
 
-- (NSInteger)numberOfModelObjects {
+- (NSUInteger)numberOfModelObjects {
     return [self.entityArray count];
 }
 
-- (id)modelObjectForIndex:(NSInteger)index {
+- (id)modelObjectForIndex:(NSUInteger)index {
     return self.entityArray[index];
 }
 
-- (void)modelObjectSelectedAtIndex:(NSInteger)index {
+- (void)modelObjectSelectedAtIndex:(NSUInteger)index {
     id<HKWMentionsEntityProtocol> entity = self.entityArray[index];
     HKWMentionsAttribute *mention = [HKWMentionsAttribute mentionWithText:[entity entityName]
                                                                identifier:[entity entityId]];
@@ -881,7 +881,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
     NSAssert(indexPath.row >= 0 && indexPath.row < [self.entityArray count],
              @"Entity chooser table view requested a cell with an out-of-bounds index path row.");
-    id<HKWMentionsEntityProtocol> entity = self.entityArray[indexPath.row];
+    id<HKWMentionsEntityProtocol> entity = self.entityArray[(NSUInteger)indexPath.row];
     return [delegate cellForMentionsEntity:entity withMatchString:[self.stringBuffer copy] tableView:tableView atIndexPath:indexPath];
 }
 
@@ -896,7 +896,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
         // Loading cell
         return 1;
     }
-    return [self.entityArray count];
+    return (NSInteger)[self.entityArray count];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -909,7 +909,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
     NSAssert(indexPath.row >= 0 && indexPath.row < [self.entityArray count],
              @"Entity chooser table view requested a cell with an out-of-bounds index path row.");
-    id<HKWMentionsEntityProtocol> entity = self.entityArray[indexPath.row];
+    id<HKWMentionsEntityProtocol> entity = self.entityArray[(NSUInteger)indexPath.row];
     return [delegate heightForCellForMentionsEntity:entity tableView:tableView];
 }
 
@@ -919,7 +919,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
         return;
     }
     // Create the mention
-    id<HKWMentionsEntityProtocol> entity = self.entityArray[indexPath.row];
+    id<HKWMentionsEntityProtocol> entity = self.entityArray[(NSUInteger)indexPath.row];
     HKWMentionsAttribute *mention = [HKWMentionsAttribute mentionWithText:[entity entityName]
                                                                  identifier:[entity entityId]];
     mention.metadata = [entity entityMetadata];

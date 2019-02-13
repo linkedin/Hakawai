@@ -58,7 +58,7 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
         self.selectedRange = NSMakeRange(newLocation, 0);
     }
 
-    UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:self.selectedRange.location];
+    UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:(NSInteger)self.selectedRange.location];
     NSAssert(p != nil, @"Text position from %@, offset %ld returned nil. This should never happen.",
              self.beginningOfDocument, (unsigned long)self.selectedRange.location);
     CGRect caretRect = [self caretRectForPosition:p];
@@ -143,7 +143,7 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
 }
 
 - (CGRect)rectForSingleLineViewportInMode:(HKWViewportMode)mode {
-    UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:self.selectedRange.location];
+    UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:(NSInteger)self.selectedRange.location];
     CGRect caretRect = [self caretRectForPosition:p];
     CGRect viewportRect;
     switch (mode) {
