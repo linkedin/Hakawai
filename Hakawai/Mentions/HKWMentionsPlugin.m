@@ -256,35 +256,37 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     NSMutableArray *buffer = [NSMutableArray array];
     __block HKWMentionsAttribute *previousMention;
 
-    [self.parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(self.parentTextView.attributedText)
-                                                           options:0 usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
-                                                               id mentionObject = attrs[HKWMentionAttributeName];
-                                                               if (![mentionObject isKindOfClass:[HKWMentionsAttribute class]]) {
-                                                                   return;
-                                                               }
+    __strong __auto_type parentTextView = self.parentTextView;
+    [parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(parentTextView.attributedText)
+                                                      options:0 usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
+                                                          id mentionObject = attrs[HKWMentionAttributeName];
+                                                          if (![mentionObject isKindOfClass:[HKWMentionsAttribute class]]) {
+                                                              return;
+                                                          }
 
-                                                               HKWMentionsAttribute *attr = [mentionObject copy];
-                                                               // If two attribute dicts have same mention object and the ranges are touching
-                                                               // they are the same mention and should be combined
-                                                               BOOL isGap = ((previousMention.range.location + previousMention.range.length) < range.location);
-                                                               if ([previousMention isEqual:attr] && !isGap) {
-                                                                   previousMention.range = NSMakeRange(previousMention.range.location, previousMention.range.length + range.length);
-                                                               } else {
-                                                                   attr.range = range;
-                                                                   [buffer addObject:attr];
-                                                                   previousMention = attr;
-                                                               }
-                                                           }];
+                                                          HKWMentionsAttribute *attr = [mentionObject copy];
+                                                          // If two attribute dicts have same mention object and the ranges are touching
+                                                          // they are the same mention and should be combined
+                                                          BOOL isGap = ((previousMention.range.location + previousMention.range.length) < range.location);
+                                                          if ([previousMention isEqual:attr] && !isGap) {
+                                                              previousMention.range = NSMakeRange(previousMention.range.location, previousMention.range.length + range.length);
+                                                          } else {
+                                                              attr.range = range;
+                                                              [buffer addObject:attr];
+                                                              previousMention = attr;
+                                                          }
+                                                      }];
 
     return [buffer copy];
 }
 
 // Programmatically add a mention to the text view's text.
 - (void)addMention:(HKWMentionsAttribute *)mention {
+    __strong __auto_type parentTextView = self.parentTextView;
     if (!mention
         || ![mention isKindOfClass:[HKWMentionsAttribute class]]
         || mention.range.location == NSNotFound
-        || mention.range.location > [self.parentTextView.attributedText length]
+        || mention.range.location > [parentTextView.attributedText length]
         || mention.range.length == 0) {
         // Mention range is invalid
         return;
@@ -307,13 +309,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             return;
     }
 
-    NSInteger location = self.parentTextView.selectedRange.location;
+    NSInteger location = parentTextView.selectedRange.location;
     NSRange originalRange = NSMakeRange(location, 0);
     NSDictionary *mentionAttributes = self.mentionUnselectedAttributes;
     // Mentions cannot overlap. In order to avoid inconsistency, destroy any existing mentions that intrude within the
     //  new mention's range.
     [self bleachMentionsWithinRange:mention.range];
-    [self.parentTextView transformTextAtRange:mention.range withTransformer:^NSAttributedString *(NSAttributedString *input) {
+    [parentTextView transformTextAtRange:mention.range withTransformer:^NSAttributedString *(NSAttributedString *input) {
         if (![mention.mentionText isEqualToString:input.string]) {
             // In order to perform the transformation, the plaintext must be the same as the mention text
             return input;
@@ -325,11 +327,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         }
         return buffer;
     }];
-    self.parentTextView.selectedRange = originalRange;
+    parentTextView.selectedRange = originalRange;
 
     // Update the mentions attributes.
-    location = self.parentTextView.selectedRange.location;
-    unichar precedingChar = [self.parentTextView characterPrecedingLocation:location];
+    location = parentTextView.selectedRange.location;
+    unichar precedingChar = [parentTextView characterPrecedingLocation:location];
     // Advance the state, as if the insertion point changed
     [self advanceStateForInsertionChanged:precedingChar location:location];
 }
@@ -345,8 +347,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 // Delegate method called when the plug-in is registered to a text view. Actual setup takes place in 'initialSetup'.
 - (void)performInitialSetup {
-    NSAssert(self.parentTextView != nil, @"Internal error: parent text view is nil; it should have been set already");
-    if (self.parentTextView.isFirstResponder) {
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSAssert(parentTextView != nil, @"Internal error: parent text view is nil; it should have been set already");
+    if (parentTextView.isFirstResponder) {
         [self initialSetup];
     }
 }
@@ -355,17 +358,18 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 /// the text view becomes the first responder, or immediately if the text view already is the first responder.
 - (void)initialSetup {
     self.initialSetupPerformed = YES;
+    __strong __auto_type parentTextView = self.parentTextView;
 
     // Disable 'undo'; it doesn't work right with mentions yet
-    self.shouldEnableUndoUponUnregistration = [self.parentTextView.undoManager isUndoRegistrationEnabled];
-    [self.parentTextView.undoManager disableUndoRegistration];
+    self.shouldEnableUndoUponUnregistration = [parentTextView.undoManager isUndoRegistrationEnabled];
+    [parentTextView.undoManager disableUndoRegistration];
 
     // Disable spell checking
-    [self.parentTextView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
+    [parentTextView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
 
     // Initialize the state (as if the insertion point changed)
-    NSUInteger location = self.parentTextView.selectedRange.location;
-    unichar precedingChar = [self.parentTextView characterPrecedingLocation:location];
+    NSUInteger location = parentTextView.selectedRange.location;
+    unichar precedingChar = [parentTextView characterPrecedingLocation:location];
     [self advanceStateForInsertionChanged:precedingChar location:location];
     [self.creationStateMachine fetchInitialMentions];
 }
@@ -378,15 +382,16 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
 
     // Remove the accessory view from the parent text view's view hierarchy
-    [self.parentTextView detachAccessoryView:self.chooserView];
+    __strong __auto_type parentTextView = self.parentTextView;
+    [parentTextView detachAccessoryView:self.chooserView];
     [self.creationStateMachine resetChooserView];
 
     // Enable 'undo' if this plug-in is being unregistered
     if (self.shouldEnableUndoUponUnregistration) {
-        [self.parentTextView.undoManager enableUndoRegistration];
+        [parentTextView.undoManager enableUndoRegistration];
     }
     // Restore the parent text view's spell checking
-    [self.parentTextView restoreOriginalSpellChecking:NO];
+    [parentTextView restoreOriginalSpellChecking:NO];
 
     self.initialSetupPerformed = NO;
 }
@@ -494,11 +499,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         [d removeObjectForKey:key];
     }
     // Restore the font and/or text color, if the app set either explicitly at any point.
-    if (self.parentTextView.fontSetByApp) {
-        d[NSFontAttributeName] = self.parentTextView.fontSetByApp;
+    __strong __auto_type parentTextView = self.parentTextView;
+    if (parentTextView.fontSetByApp) {
+        d[NSFontAttributeName] = parentTextView.fontSetByApp;
     }
-    if (self.parentTextView.textColorSetByApp) {
-        d[NSForegroundColorAttributeName] = self.parentTextView.textColorSetByApp;
+    if (parentTextView.textColorSetByApp) {
+        d[NSForegroundColorAttributeName] = parentTextView.textColorSetByApp;
     }
     return d;
 }
@@ -508,8 +514,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
  to prevent the color used to denote attributes from 'bleeding' over into newly typed text.
  */
 - (void)stripCustomAttributesFromTypingAttributes {
-    NSDictionary *oldAttrs = self.parentTextView.typingAttributes;
-    self.parentTextView.typingAttributes = [self typingAttributesByStrippingMentionAttributes:oldAttrs];
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSDictionary *oldAttrs = parentTextView.typingAttributes;
+    parentTextView.typingAttributes = [self typingAttributesByStrippingMentionAttributes:oldAttrs];
 }
 
 /*!
@@ -524,7 +531,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 #ifdef DEBUG
     // For development: assert that a mention actually exists
     NSRange dataRange;
-    NSAttributedString *parentText = self.parentTextView.attributedText;
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSAttributedString *parentText = parentTextView.attributedText;
     id mentionData = [parentText attribute:HKWMentionAttributeName
                                    atIndex:range.location
                      longestEffectiveRange:&dataRange
@@ -542,7 +550,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
     // Save the range so the cursor doesn't move.
-    [self.parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
+    [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
         NSMutableAttributedString *buffer = [input mutableCopy];
         NSDictionary *attributesToRemove = (selected ? unselectedAttributes : selectedAttributes);
         NSDictionary *attributesToAdd = (selected ? selectedAttributes : unselectedAttributes);
@@ -569,37 +577,38 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         return 0;
     }
     NSMutableArray *ranges = [NSMutableArray array];
-    [self.parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(self.parentTextView.attributedText)
-                                                           options:0
-                                                        usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
-                                                            // Find all attributes in the string subsection.
-                                                            if (NSIntersectionRange(range, bleachRange).length == 0) {
-                                                                // We only care about attributes whose effective ranges
-                                                                //  lie within bleachRange
-                                                                return;
-                                                            }
-                                                            HKWMentionsAttribute *value = attrs[HKWMentionAttributeName];
-                                                            if (value) {
-                                                                [ranges addObject:[NSValue valueWithRange:range]];
-                                                            }
-                                                        }];
+    __strong __auto_type parentTextView = self.parentTextView;
+    [parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(parentTextView.attributedText)
+                                                      options:0
+                                                   usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
+                                                       // Find all attributes in the string subsection.
+                                                       if (NSIntersectionRange(range, bleachRange).length == 0) {
+                                                           // We only care about attributes whose effective ranges
+                                                           //  lie within bleachRange
+                                                           return;
+                                                       }
+                                                       HKWMentionsAttribute *value = attrs[HKWMentionAttributeName];
+                                                       if (value) {
+                                                           [ranges addObject:[NSValue valueWithRange:range]];
+                                                       }
+                                                   }];
     NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     for (NSValue *v in ranges) {
-        [self.parentTextView transformTextAtRange:[v rangeValue]
-                                  withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                                      NSMutableAttributedString *buffer = [input mutableCopy];
-                                      [buffer removeAttribute:HKWMentionAttributeName range:HKW_FULL_RANGE(input)];
-                                      // NOTE: We may need to add support for capturing and restoring any attributes
-                                      //  overwritten by applying the special mentions attributes in the future.
-                                      for (NSString *key in unselectedAttributes) {
-                                          [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
-                                      }
-                                      for (NSString *key in selectedAttributes) {
-                                          [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
-                                      }
-                                      return [buffer copy];
-                                  }];
+        [parentTextView transformTextAtRange:[v rangeValue]
+                             withTransformer:^NSAttributedString *(NSAttributedString *input) {
+                                 NSMutableAttributedString *buffer = [input mutableCopy];
+                                 [buffer removeAttribute:HKWMentionAttributeName range:HKW_FULL_RANGE(input)];
+                                 // NOTE: We may need to add support for capturing and restoring any attributes
+                                 //  overwritten by applying the special mentions attributes in the future.
+                                 for (NSString *key in unselectedAttributes) {
+                                     [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
+                                 }
+                                 for (NSString *key in selectedAttributes) {
+                                     [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
+                                 }
+                                 return [buffer copy];
+                             }];
     }
     return [ranges count];
 }
@@ -615,7 +624,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 #ifdef DEBUG
     // For development: assert that a mention actually exists
     NSRange dataRange;
-    NSAttributedString *parentText = self.parentTextView.attributedText;
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSAttributedString *parentText = parentTextView.attributedText;
     id mentionData = [parentText attribute:HKWMentionAttributeName
                                    atIndex:range.location
                      longestEffectiveRange:&dataRange
@@ -631,7 +641,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
-    [self.parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
+    [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
         NSMutableAttributedString *buffer = [input mutableCopy];
         [buffer removeAttribute:HKWMentionAttributeName range:HKW_FULL_RANGE(input)];
         // NOTE: We may need to add support for capturing and restoring any attributes overwritten by applying the
@@ -658,10 +668,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // See if the mention is valid
     if (!mention) { return NO; }
     // See if the delegate will allow the mention to be trimmed
-    BOOL delegateImplementsCustomTrimming = [self.delegate respondsToSelector:@selector(trimmedNameForEntity:)];
+    __strong __auto_type delegate = self.delegate;
+    BOOL delegateImplementsCustomTrimming = [delegate respondsToSelector:@selector(trimmedNameForEntity:)];
     BOOL delegateAllowsTrimming = NO;
-    if ([self.delegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
-        delegateAllowsTrimming = [self.delegate entityCanBeTrimmed:mention];
+    if ([delegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
+        delegateAllowsTrimming = [delegate entityCanBeTrimmed:mention];
     }
     if (!delegateAllowsTrimming) { return NO; }
     // See if the mention is actually eligible for trimming
@@ -673,7 +684,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // Return the trimmed string to the caller
     if (stringPointer != NULL) {
         *stringPointer = (delegateImplementsCustomTrimming
-                          ? [self.delegate trimmedNameForEntity:mention]
+                          ? [delegate trimmedNameForEntity:mention]
                           : [text substringWithRange:NSMakeRange(0, whitespaceRange.location)]);
         if ([(*stringPointer) length] == 0 || [(*stringPointer) isEqualToString:text]) {
             // It's not valid to trim a mention to itself, or to return an empty string
@@ -685,11 +696,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 - (HKWMentionsAttribute *)mentionAttributePrecedingLocation:(NSInteger)location
                                                        range:(NSRangePointer)range {
-    if (location < 1 || location > [self.parentTextView.attributedText length]) {
+    __strong __auto_type parentTextView = self.parentTextView;
+    if (location < 1 || location > [parentTextView.attributedText length]) {
         // No mention can precede the beginning of the text view.
         return nil;
     }
-    NSAttributedString *parentText = self.parentTextView.attributedText;
+    NSAttributedString *parentText = parentTextView.attributedText;
     id value = [parentText attribute:HKWMentionAttributeName
                              atIndex:location - 1
                longestEffectiveRange:range
@@ -720,10 +732,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (range.location == NSNotFound) {
         return NO;
     }
+    __strong __auto_type parentTextView = self.parentTextView;
     // CASE 1: zero-length range (e.g. insertion point)
     if (range.length == 0) {
         if ([self mentionAttributePrecedingLocation:range.location range:NULL]
-            || ((range.location + 1) <= [self.parentTextView.text length] && [self mentionAttributePrecedingLocation:(range.location + 1) range:NULL])) {
+            || ((range.location + 1) <= [parentTextView.text length] && [self mentionAttributePrecedingLocation:(range.location + 1) range:NULL])) {
             // Mention exists either before the location, or right after the location
             return YES;
         }
@@ -732,7 +745,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // CASE 2: selection range
     for (NSInteger i = 0; i < range.length + 1; i++) {
         NSInteger currentLocation = range.location + i;
-        if (currentLocation > [self.parentTextView.text length]) {
+        if (currentLocation > [parentTextView.text length]) {
             // Out of bounds
             return NO;
         }
@@ -780,12 +793,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (self.state == HKWMentionsPluginStateCreatingMention) {
         return;
     }
-    BOOL shouldDisable = [self rangeTouchesMentions:range] || [self rangeTouchesMentions:self.parentTextView.selectedRange];
+    __strong __auto_type parentTextView = self.parentTextView;
+    BOOL shouldDisable = [self rangeTouchesMentions:range] || [self rangeTouchesMentions:parentTextView.selectedRange];
     if (shouldDisable) {
-        [self.parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
+        [parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
     }
     else {
-        [self.parentTextView restoreOriginalAutocorrection:YES];
+        [parentTextView restoreOriginalAutocorrection:YES];
     }
 }
 
@@ -804,6 +818,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                  location:(NSUInteger)location {
     BOOL returnValue = YES;
     self.characterForAdvanceStateForCharacterInsertion = newChar;
+    __strong __auto_type parentTextView = self.parentTextView;
     // In certain situations, the double space --> period behavior is suppressed in order to prevent undesired behavior
     BOOL isSecondSpace = (location > 1) && (precedingChar == ' ' && newChar == ' ');
     switch (self.state) {
@@ -815,7 +830,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             id mentionTwoPreceding = [self mentionAttributePrecedingLocation:(location-1) range:&r];
             BOOL shouldSuppress = (mentionTwoPreceding != nil) && (r.location + r.length == location-1);
             if (isSecondSpace && shouldSuppress) {
-                [self manuallyInsertCharacter:newChar atLocation:location inTextView:self.parentTextView];
+                [self manuallyInsertCharacter:newChar atLocation:location inTextView:parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
                 returnValue = NO;
             }
@@ -826,7 +841,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             //  period auto-substitution while the user is creating a mention.
             [self.creationStateMachine characterTyped:newChar];
             if (isSecondSpace) {
-                [self manuallyInsertCharacter:newChar atLocation:location inTextView:self.parentTextView];
+                [self manuallyInsertCharacter:newChar atLocation:location inTextView:parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
                 returnValue = NO;
             }
@@ -838,7 +853,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self resetCurrentMentionsData];
             [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar];
             if (isSecondSpace) {
-                [self manuallyInsertCharacter:newChar atLocation:location inTextView:self.parentTextView];
+                [self manuallyInsertCharacter:newChar atLocation:location inTextView:parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
                 returnValue = NO;
             }
@@ -854,7 +869,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 // Bleach the current mention and move back to the 'quiescent' state.
                 [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
             }
-            [self manuallyInsertCharacter:newChar atLocation:location inTextView:self.parentTextView];
+            [self manuallyInsertCharacter:newChar atLocation:location inTextView:parentTextView];
             [self resetCurrentMentionsData];
             self.state = HKWMentionsStateQuiescent;
             self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
@@ -868,7 +883,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (returnValue) {
         self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
     }
-    NSRange searchRange = [self.parentTextView rangeForWordPrecedingLocation:location searchToEnd:NO];
+    NSRange searchRange = [parentTextView rangeForWordPrecedingLocation:location searchToEnd:NO];
     if (searchRange.location == NSNotFound) {
         searchRange = NSMakeRange(location, 0);
     }
@@ -883,6 +898,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                         deletedCharacter:(unichar)deletedChar
                                 location:(NSUInteger)location {
     BOOL returnValue = YES;
+    __strong __auto_type parentTextView = self.parentTextView;
+    __strong __auto_type externalDelegate = parentTextView.externalDelegate;
+    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
             [self.startDetectionStateMachine deleteTypedCharacter:deletedChar
@@ -908,7 +926,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                     if ([whitespaceSet characterIsMember:deletedChar] && ![whitespaceSet characterIsMember:precedingChar]) {
                         // Capture the previous word that the cursor has encountered. Start by grabbing the left side of
                         // the string starting from 0 to the deleted character's index
-                        NSString *leftString = [self.parentTextView.text substringToIndex:location];
+                        NSString *leftString = [parentTextView.text substringToIndex:location];
                         if ([leftString length] > 0) {
                             NSInteger index = [leftString length] - 1;
                             // Grab the start index of word to the left of the cursor by walking backwards through the string
@@ -975,25 +993,25 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 NSAssert([trimmedString length] > 0,
                          @"Cannot trim a mention to zero length");
                 self.currentlySelectedMention.mentionText = trimmedString;
-                [self.parentTextView transformTextAtRange:self.currentlySelectedMentionRange
-                                          withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                                              return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
-                                          }];
+                [parentTextView transformTextAtRange:self.currentlySelectedMentionRange
+                                     withTransformer:^NSAttributedString *(NSAttributedString *input) {
+                                         return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
+                                     }];
                 self.currentlySelectedMentionRange = NSMakeRange(self.currentlySelectedMentionRange.location,
                                                                  [trimmedString length]);
                 // Move the cursor into position.
-                self.parentTextView.selectedRange = NSMakeRange(self.currentlySelectedMentionRange.location + [trimmedString length],
+                parentTextView.selectedRange = NSMakeRange(self.currentlySelectedMentionRange.location + [trimmedString length],
                                                                 0);
-                location = self.parentTextView.selectedRange.location;
+                location = parentTextView.selectedRange.location;
 
                 // Notify the plugin's state change delegate that a mention was trimmed.
-                if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:trimmedMention:atLocation:)]) {
-                    [self.stateChangeDelegate mentionsPlugin:self trimmedMention:self.currentlySelectedMention atLocation:location];
+                if ([stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:trimmedMention:atLocation:)]) {
+                    [stateChangeDelegate mentionsPlugin:self trimmedMention:self.currentlySelectedMention atLocation:location];
                 }
                 // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
                 if (self.notifyTextViewDelegateOnMentionTrim
-                    && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                    [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+                    && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [externalDelegate textViewDidChange:parentTextView];
                 }
             }
             else {
@@ -1001,22 +1019,22 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 NSAssert(self.currentlySelectedMentionRange.location != NSNotFound,
                          @"Logic error: preparing to delete a mention, but the currently selected mention range is invalid");
                 NSUInteger locationAfterDeletion = self.currentlySelectedMentionRange.location;
-                unichar newPrecedingChar = [self.parentTextView characterPrecedingLocation:locationAfterDeletion];
+                unichar newPrecedingChar = [parentTextView characterPrecedingLocation:locationAfterDeletion];
                 [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
-                [self.parentTextView transformTextAtRange:self.currentlySelectedMentionRange
-                                          withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                                              return (NSAttributedString *)nil;
-                                          }];
+                [parentTextView transformTextAtRange:self.currentlySelectedMentionRange
+                                     withTransformer:^NSAttributedString *(NSAttributedString *input) {
+                                         return (NSAttributedString *)nil;
+                                     }];
                 [self stripCustomAttributesFromTypingAttributes];
-                self.parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
+                parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
 
 				// Store current mention before reset
 				HKWMentionsAttribute *currentMention = self.currentlySelectedMention;
                 [self resetCurrentMentionsData];
                 self.state = HKWMentionsStateQuiescent;
                 // Update selection state
-                self.previousSelectionRange = self.parentTextView.selectedRange;
-                self.previousTextLength = [self.parentTextView.text length];
+                self.previousSelectionRange = parentTextView.selectedRange;
+                self.previousTextLength = [parentTextView.text length];
                 // Prime mentions detection state machine
                 [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:newPrecedingChar];
                 // Look for another mention. If there is a mention immediately preceding the just-deleted mention, the
@@ -1035,14 +1053,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 }
                 location = locationAfterDeletion;
                 // Notify the plugin's state change delegate that a mention was deleted.
-                if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:deletedMention:atLocation:)]) {
-                    [self.stateChangeDelegate mentionsPlugin:self deletedMention:currentMention atLocation:location];
+                if ([stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:deletedMention:atLocation:)]) {
+                    [stateChangeDelegate mentionsPlugin:self deletedMention:currentMention atLocation:location];
                 }
 
                 // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
                 if (self.notifyTextViewDelegateOnMentionDeletion
-                    && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                    [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+                    && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [externalDelegate textViewDidChange:parentTextView];
                 }
             }
             returnValue = NO;
@@ -1052,7 +1070,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
             break;
     }
-    NSRange searchRange = [self.parentTextView rangeForWordPrecedingLocation:location searchToEnd:NO];
+    NSRange searchRange = [parentTextView rangeForWordPrecedingLocation:location searchToEnd:NO];
     if (searchRange.location == NSNotFound) {
         searchRange = NSMakeRange(location, 0);
     }
@@ -1064,17 +1082,18 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
  Advance the state machine when a multi-character string is inserted (due to copy-paste).
  */
 - (BOOL)advanceStateForStringInsertionAtRange:(NSRange)range text:(NSString *)text {
-    NSRange originalSelectedRange = self.parentTextView.selectedRange;
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSRange originalSelectedRange = parentTextView.selectedRange;
     unichar precedingChar = [text characterAtIndex:[text length] - 1];
-    unichar originalPrecedingChar = [self.parentTextView characterPrecedingLocation:range.location];
-    if (self.parentTextView.selectedRange.length > 0) {
+    unichar originalPrecedingChar = [parentTextView characterPrecedingLocation:range.location];
+    if (parentTextView.selectedRange.length > 0) {
         // Multiple characters are selected. Bleach everything in the selection range before continuing.
-        [self bleachMentionsWithinRange:self.parentTextView.selectedRange];
-        self.parentTextView.selectedRange = originalSelectedRange;
+        [self bleachMentionsWithinRange:parentTextView.selectedRange];
+        parentTextView.selectedRange = originalSelectedRange;
     }
 
     // Strip the mentions-specific typing attributes.
-    NSDictionary *parentTypingAttrs = self.parentTextView.typingAttributes;
+    NSDictionary *parentTypingAttrs = parentTextView.typingAttributes;
     NSDictionary *typingAttrs = [self typingAttributesByStrippingMentionAttributes:parentTypingAttrs];
 
     switch (self.state) {
@@ -1082,7 +1101,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             if ([text length] == 1) {
                 // Special handling: treat the inserted character as a typed-in character
                 // Manually replace the text
-                [self.parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
+                [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
                     return [[NSAttributedString alloc] initWithString:text
                                                            attributes:typingAttrs];
                 }];
@@ -1090,9 +1109,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:originalPrecedingChar];
 
                 // Fix the range selection and insertion/deletion detection state
-                self.parentTextView.selectedRange = newSelectionRange;
+                parentTextView.selectedRange = newSelectionRange;
                 self.previousSelectionRange = newSelectionRange;
-                self.previousTextLength = [[self.parentTextView text] length];
+                self.previousTextLength = [[parentTextView text] length];
 
                 [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0] asInsertedCharacter:YES previousCharacter:precedingChar];
                 return NO;
@@ -1100,7 +1119,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             else if ([self stringValidForMentionsCreation:text]) {
                 // Special handling: this string is valid for wholesale insertion
                 // Manually replace the text
-                [self.parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
+                [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
                     return [[NSAttributedString alloc] initWithString:text
                                                            attributes:typingAttrs];
                 }];
@@ -1108,11 +1127,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:originalPrecedingChar];
 
                 // Fix the range selection and insertion/deletion detection state
-                self.parentTextView.selectedRange = newSelectionRange;
+                parentTextView.selectedRange = newSelectionRange;
                 self.previousSelectionRange = newSelectionRange;
-                self.previousTextLength = [[self.parentTextView text] length];
+                self.previousTextLength = [[parentTextView text] length];
 
-                NSUInteger location = self.parentTextView.selectedRange.location - [text length];
+                NSUInteger location = parentTextView.selectedRange.location - [text length];
                 [self.startDetectionStateMachine validStringInserted:text
                                                           atLocation:location
                                                usingControlCharacter:NO
@@ -1148,7 +1167,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             break;
         case HKWMentionsStateSelectedMention:
             // Either add the text to the end of the mention, or bleach the mention and add the text to the middle
-            if (self.parentTextView.selectedRange.length == 0) {
+            if (parentTextView.selectedRange.length == 0) {
                 if (range.location == self.currentlySelectedMentionRange.location + self.currentlySelectedMentionRange.length) {
                     // At the end of the range, so deselect the mention
                     [self toggleMentionsFormattingAtRange:self.currentlySelectedMentionRange selected:NO];
@@ -1158,9 +1177,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                     [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
                 }
             }
-            [self.parentTextView insertPlainText:text location:range.location];
+            [parentTextView insertPlainText:text location:range.location];
             // Manually move the cursor to the 'expected' position, otherwise the cursor will jump to the end.
-            self.parentTextView.selectedRange = NSMakeRange(range.location + [text length], 0);
+            parentTextView.selectedRange = NSMakeRange(range.location + [text length], 0);
             [self resetCurrentMentionsData];
             self.state = HKWMentionsStateQuiescent;
             return NO;
@@ -1203,10 +1222,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
 
     // If mentions were deleted, notify the text view's external delegate as appropriate.
+    __strong __auto_type parentTextView = self.parentTextView;
+    __strong __auto_type externalDelegate = parentTextView.externalDelegate;
     if (self.notifyTextViewDelegateOnMentionDeletion
         && numberOfMentionsDestroyed > 0
-        && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-        [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+        && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [externalDelegate textViewDidChange:parentTextView];
     }
 
     return YES;
@@ -1344,7 +1365,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     BOOL returnValue = YES;
     self.suppressSelectionChangeNotifications = YES;
-    unichar precedingChar = [self.parentTextView characterPrecedingLocation:range.location];
+    __strong __auto_type parentTextView = self.parentTextView;
+    unichar precedingChar = [parentTextView characterPrecedingLocation:range.location];
 
     if (self.nextInsertionShouldBeIgnored) {
         self.nextInsertionShouldBeIgnored = NO;
@@ -1362,7 +1384,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
     else if ([text length] == 0) {
         // Deleting text
-        NSString *toDeleteString = [self.parentTextView.text substringWithRange:range];
+        NSString *toDeleteString = [parentTextView.text substringWithRange:range];
         if (range.length == 0) {
             // At the beginning, and delete was tapped
             self.suppressSelectionChangeNotifications = NO;
@@ -1444,14 +1466,15 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
     // Bring the text view back to a known good state
-    NSInteger currentLength = [self.parentTextView.text length];
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSInteger currentLength = [parentTextView.text length];
     BOOL shouldResume = NO;
     if (self.shouldResumeMentionsCreation && self.resumeMentionsCreationEnabled) {
         self.shouldResumeMentionsCreation = NO;
         shouldResume = YES;
         if (currentLength == self.resumeMentionsPriorTextLength) {
-            NSString *prefix = [self.parentTextView.text substringWithRange:NSMakeRange(self.resumeMentionsPriorPosition,
-                                                                                        currentLength - self.resumeMentionsPriorPosition)];
+            NSString *prefix = [parentTextView.text substringWithRange:NSMakeRange(self.resumeMentionsPriorPosition,
+                                                                                   currentLength - self.resumeMentionsPriorPosition)];
             if ([prefix length] == 0 || ![prefix isEqualToString:self.resumeMentionsPriorString]) {
                 // Text changed between when editing stopped, and now
                 shouldResume = NO;
@@ -1476,9 +1499,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                             ? [self.resumeMentionsPriorString substringFromIndex:1]
                             : self.resumeMentionsPriorString);
 
-        self.previousSelectionRange = self.parentTextView.selectedRange;
-        self.previousTextLength = [self.parentTextView.text length];
-        self.previousInsertionLocation = self.parentTextView.selectedRange.location;
+        self.previousSelectionRange = parentTextView.selectedRange;
+        self.previousTextLength = [parentTextView.text length];
+        self.previousInsertionLocation = parentTextView.selectedRange.location;
 
         [self.startDetectionStateMachine mentionCreationResumed];
         [self.creationStateMachine mentionCreationStartedWithPrefix:buffer
@@ -1490,11 +1513,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
     // Code for fixing state if no resumption is happening
     self.previousSelectionRange = NSMakeRange(0, 0);
-    self.previousTextLength = [self.parentTextView.text length];
+    self.previousTextLength = [parentTextView.text length];
     self.state = HKWMentionsStateQuiescent;
     // Advance the state, as if the insertion point changed
-    unichar precedingChar = [self.parentTextView characterPrecedingLocation:self.parentTextView.selectedRange.location];
-    [self advanceStateForInsertionChanged:precedingChar location:self.parentTextView.selectedRange.location];
+    unichar precedingChar = [parentTextView characterPrecedingLocation:parentTextView.selectedRange.location];
+    [self advanceStateForInsertionChanged:precedingChar location:parentTextView.selectedRange.location];
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView {
@@ -1506,15 +1529,16 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         case HKWMentionsStateQuiescent:
             break;
         case HKWMentionsStartDetectionStateCreatingMention: {
-            NSInteger currentLength = [self.parentTextView.text length];
+            __strong __auto_type parentTextView = self.parentTextView;
+            NSInteger currentLength = [parentTextView.text length];
             self.shouldResumeMentionsCreation = YES;
-            self.resumeMentionsPriorTextLength = [self.parentTextView.text length];
-            self.resumeMentionsPriorString = [self.parentTextView.text substringWithRange:NSMakeRange(self.resumeMentionsPriorPosition,
-                                                                                                      currentLength - self.resumeMentionsPriorPosition)];
+            self.resumeMentionsPriorTextLength = [parentTextView.text length];
+            self.resumeMentionsPriorString = [parentTextView.text substringWithRange:NSMakeRange(self.resumeMentionsPriorPosition,
+                                                                                                 currentLength - self.resumeMentionsPriorPosition)];
 
             [self.creationStateMachine cancelMentionCreation];
             if (self.viewportLocksUponMentionCreation) {
-                [self.parentTextView exitSingleLineViewportMode];
+                [parentTextView exitSingleLineViewportMode];
             }
 
             NSAssert(self.state == HKWMentionsStateQuiescent,
@@ -1543,14 +1567,15 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                   usingControlCharacter:(BOOL)usingControlCharacter
                        controlCharacter:(unichar)character {
 
-    NSUInteger location = self.parentTextView.selectedRange.location;
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSUInteger location = parentTextView.selectedRange.location;
 
     // If a control character is being used, this method assumes that it is next to the cursor
     if (usingControlCharacter) {
         // Beginning an EXPLICIT MENTION by typing a single control character
         if (alreadyInserted) {
             NSAssert(self.controlCharacterSet &&
-                     [self.controlCharacterSet characterIsMember:[self.parentTextView characterPrecedingLocation:location]],
+                     [self.controlCharacterSet characterIsMember:[parentTextView characterPrecedingLocation:location]],
                      @"Logic error: mention started with control character, but control character was not found");
             // The control character has already been inserted into the text buffer. We need to back up the location by
             //  one in order to ensure that the inserted mention will overwrite the control character.
@@ -1622,15 +1647,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 - (UITableViewCell *)loadingCellForTableView:(UITableView *)tableView {
-    NSAssert([self.delegate respondsToSelector:@selector(loadingCellForTableView:)],
+    __strong __auto_type delegate = self.delegate;
+    NSAssert([delegate respondsToSelector:@selector(loadingCellForTableView:)],
              @"The delegate does not implement the loading cell functionality. This probably means the property wasn't checked properly.");
-    return [self.delegate loadingCellForTableView:tableView];
+    return [delegate loadingCellForTableView:tableView];
 }
 
 - (CGFloat)heightForLoadingCellInTableView:(UITableView *)tableView {
-    NSAssert([self.delegate respondsToSelector:@selector(heightForLoadingCellInTableView:)],
+    __strong __auto_type delegate = self.delegate;
+    NSAssert([delegate respondsToSelector:@selector(heightForLoadingCellInTableView:)],
              @"The delegate does not implement the loading cell functionality. This probably means the property wasn't checked properly.");
-    return [self.delegate heightForLoadingCellInTableView:tableView];
+    return [delegate heightForLoadingCellInTableView:tableView];
 }
 
 /*!
@@ -1652,20 +1679,22 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // Note that if the mention was cancelled because the user typed a whitespace and caused no search results to return
     //  as a result, the desired behavior is to allow the start detection state machine to immediately begin searching
     //  (without waiting for a second space).
-    self.parentTextView.shouldRejectAutocorrectInsertions = NO;
-    NSInteger currentLocation = self.parentTextView.selectedRange.location;
+    __strong __auto_type parentTextView = self.parentTextView;
+    parentTextView.shouldRejectAutocorrectInsertions = NO;
+    NSInteger currentLocation = parentTextView.selectedRange.location;
     NSCharacterSet *whitespaces = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    BOOL canRestart = ([whitespaces characterIsMember:[self.parentTextView characterPrecedingLocation:currentLocation]]
+    BOOL canRestart = ([whitespaces characterIsMember:[parentTextView characterPrecedingLocation:currentLocation]]
                        || (self.characterForAdvanceStateForCharacterInsertion != 0
                            && [whitespaces characterIsMember:self.characterForAdvanceStateForCharacterInsertion]));
     [self performMentionCreationEndCleanup:canRestart];
-    [self.parentTextView restoreOriginalAutocorrection:(self.state != HKWMentionsStateLosingFocus)];
+    [parentTextView restoreOriginalAutocorrection:(self.state != HKWMentionsStateLosingFocus)];
 }
 
 - (void)selected:(id<HKWMentionsEntityProtocol>)entity atIndexPath:(NSIndexPath *)indexPath {
     // Inform the delegate (if appropriate)
-    if ([self.stateChangeDelegate respondsToSelector:@selector(selected:atIndexPath:)]) {
-        [self.stateChangeDelegate selected:entity atIndexPath:indexPath];
+    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
+    if ([stateChangeDelegate respondsToSelector:@selector(selected:atIndexPath:)]) {
+        [stateChangeDelegate selected:entity atIndexPath:indexPath];
     }
 }
 
@@ -1678,11 +1707,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
     // Actually create the mention
     NSString *mentionText = mention.mentionText;
-    NSUInteger currentLocation = self.parentTextView.selectedRange.location;
-    NSAssert(self.parentTextView.selectedRange.length == 0,
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSUInteger currentLocation = parentTextView.selectedRange.location;
+    NSAssert(parentTextView.selectedRange.length == 0,
              @"Cannot create a mention unless cursor is in insertion mode.");
-    UIFont *parentFont = self.parentTextView.fontSetByApp;
-    UIColor *parentColor = self.parentTextView.textColorSetByApp;
+    UIFont *parentFont = parentTextView.fontSetByApp;
+    UIColor *parentColor = parentTextView.textColorSetByApp;
     NSAssert(self.mentionUnselectedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     NSRange rangeToTransform = NSMakeRange(location, currentLocation - location);
@@ -1700,8 +1730,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
      */
     // Get the text from the textview that was matched for the mention & trim white spaces
 
-    NSAssert(self.parentTextView.text, @"Text of parent textview should not be nil.");
-    NSString *matchedText = [self.parentTextView.text substringWithRange:NSMakeRange(location, currentLocation - location)];
+    NSAssert(parentTextView.text, @"Text of parent textview should not be nil.");
+    NSString *matchedText = [parentTextView.text substringWithRange:NSMakeRange(location, currentLocation - location)];
     matchedText = [matchedText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 
     // If the matched text is the first part of the mention text, we don't need any further calculation
@@ -1719,7 +1749,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             NSInteger excessLength = excessStringToReplace.length;
             if (location >= excessLength) {
                 // Get similar length string from the text view preceding location
-                NSString *stringFromTextView = [self.parentTextView.text substringWithRange:NSMakeRange(location - excessLength, excessLength)];
+                NSString *stringFromTextView = [parentTextView.text substringWithRange:NSMakeRange(location - excessLength, excessLength)];
                 // If the first part of mention text matches the string from textview preceding the cursor,
                 // we adjust the range of text to transform to include the excess string as well
                 if (stringFromTextView && [stringFromTextView caseInsensitiveCompare:excessStringToReplace] == NSOrderedSame) {
@@ -1730,27 +1760,27 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         }
     }
 
-    [self.parentTextView transformTextAtRange:rangeToTransform
-                              withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                                  NSMutableDictionary *attributes = [unselectedAttributes mutableCopy];
-                                  attributes[HKWMentionAttributeName] = mention;
-                                  // If the 'unselected attributes' dictionary doesn't contain information on the font
-                                  //  or text color, and the text view has a custom font or text color, use those.
-                                  if (!attributes[NSFontAttributeName] && parentFont) {
-                                      attributes[NSFontAttributeName] = parentFont;
-                                  }
-                                  if (!attributes[NSForegroundColorAttributeName] && parentColor) {
-                                      attributes[NSForegroundColorAttributeName] = parentColor;
-                                  }
-                                  return [[NSAttributedString alloc] initWithString:mentionText
-                                                                         attributes:attributes];
-                              }];
+    [parentTextView transformTextAtRange:rangeToTransform
+                         withTransformer:^NSAttributedString *(NSAttributedString *input) {
+                             NSMutableDictionary *attributes = [unselectedAttributes mutableCopy];
+                             attributes[HKWMentionAttributeName] = mention;
+                             // If the 'unselected attributes' dictionary doesn't contain information on the font
+                             //  or text color, and the text view has a custom font or text color, use those.
+                             if (!attributes[NSFontAttributeName] && parentFont) {
+                                 attributes[NSFontAttributeName] = parentFont;
+                             }
+                             if (!attributes[NSForegroundColorAttributeName] && parentColor) {
+                                 attributes[NSForegroundColorAttributeName] = parentColor;
+                             }
+                             return [[NSAttributedString alloc] initWithString:mentionText
+                                                                    attributes:attributes];
+                         }];
     // Remove the color formatting for subsequently typed characters.
-    [self.parentTextView transformTypingAttributesWithTransformer:^NSDictionary *(NSDictionary *currentAttributes) {
+    [parentTextView transformTypingAttributesWithTransformer:^NSDictionary *(NSDictionary *currentAttributes) {
         return [self typingAttributesByStrippingMentionAttributes:currentAttributes];
     }];
     // Move the cursor
-    self.parentTextView.selectedRange = NSMakeRange(location + [mentionText length], 0);
+    parentTextView.selectedRange = NSMakeRange(location + [mentionText length], 0);
     // Since the cursor is right after the mention, set the state to 'about to select'
     self.currentlySelectedMention = mention;
     self.currentlySelectedMentionRange = NSMakeRange(location, [mentionText length]);
@@ -1758,16 +1788,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // Toggle autocorrect. This is because we don't want the user to be able to alter the mention text using autocorrect
     //  (since the cursor will be located immediately after the location of the mention once it's created)
     [self toggleAutocorrectAsRequiredForRange:NSMakeRange(location, 0)];
-    self.parentTextView.shouldRejectAutocorrectInsertions = NO;
+    parentTextView.shouldRejectAutocorrectInsertions = NO;
 
     // Inform the delegate (if appropriate)
-    if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:createdMention:atLocation:)]) {
-        [self.stateChangeDelegate mentionsPlugin:self createdMention:mention atLocation:location];
+    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
+    if ([stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:createdMention:atLocation:)]) {
+        [stateChangeDelegate mentionsPlugin:self createdMention:mention atLocation:location];
     }
     // Invoke the parent text view's delegate if appropriate, since a mention was added and the text changed.
-    if (self.notifyTextViewDelegateOnMentionCreation
-        && [self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-        [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+    __strong __auto_type externalDelegate = parentTextView.externalDelegate;
+    if (self.notifyTextViewDelegateOnMentionCreation && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [externalDelegate textViewDidChange:parentTextView];
     }
 }
 
@@ -1776,9 +1807,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // The chooser view is attached to the text view. Add constraints appropriately.
     UIEdgeInsets insets = self.chooserViewEdgeInsets;
     __weak typeof(self) __self = self;
-    __weak HKWTextView *parentTextView = self.parentTextView;
-    CGFloat gapHeight = [self.parentTextView rectForSingleLineViewportInMode:HKWViewportModeTop].size.height;
-    self.parentTextView.onAccessoryViewAttachmentBlock = ^(UIView *view, BOOL isFreeFloating) {
+    __strong __auto_type parentTextView = self.parentTextView;
+    CGFloat gapHeight = [parentTextView rectForSingleLineViewportInMode:HKWViewportModeTop].size.height;
+    parentTextView.onAccessoryViewAttachmentBlock = ^(UIView *view, BOOL isFreeFloating) {
         typeof(self) strongSelf = __self;
         if (!strongSelf) {
             return;
@@ -1850,19 +1881,20 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         }
 
     };
-    [self.parentTextView attachSiblingAccessoryView:accessoryView position:origin];
+    [parentTextView attachSiblingAccessoryView:accessoryView position:origin];
 }
 
 - (void)attachViewToParentEditor:(UIView *)view origin:(CGPoint)origin mode:(HKWAccessoryViewMode)mode {
     switch (mode) {
         case HKWAccessoryViewModeFreeFloating: {
             // The chooser view is attached to the top level view. Add constraints appropriately.
-            self.parentTextView.onAccessoryViewAttachmentBlock = ^(UIView *view, BOOL ignored) {
+            __strong __auto_type parentTextView = self.parentTextView;
+            parentTextView.onAccessoryViewAttachmentBlock = ^(UIView *view, BOOL ignored) {
                 if (self.customModeAttachmentBlock) {
                     self.customModeAttachmentBlock(view);
                 }
             };
-            [self.parentTextView attachFreeFloatingAccessoryView:view absolutePosition:origin];
+            [parentTextView attachFreeFloatingAccessoryView:view absolutePosition:origin];
             break;
         }
         case HKWAccessoryViewModeSibling: {
@@ -1874,37 +1906,40 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 - (void)accessoryViewStateWillChange:(BOOL)activated {
-  if (activated) {
-    // Tell state change delegate that the chooser view will open.
-    if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPluginWillActivateChooserView:)]) {
-      [self.stateChangeDelegate mentionsPluginWillActivateChooserView:self];
+    if (activated) {
+        // Tell state change delegate that the chooser view will open.
+        __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
+        if ([stateChangeDelegate respondsToSelector:@selector(mentionsPluginWillActivateChooserView:)]) {
+            [stateChangeDelegate mentionsPluginWillActivateChooserView:self];
+        }
     }
-  }
-  else {
-    if (self.viewportLocksUponMentionCreation) {
-      [self.parentTextView exitSingleLineViewportMode];
+    else {
+        if (self.viewportLocksUponMentionCreation) {
+            [self.parentTextView exitSingleLineViewportMode];
+        }
     }
-  }
 }
 
 - (void)accessoryViewActivated:(BOOL)activated {
+    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
     if (activated) {
-        self.parentTextView.shouldRejectAutocorrectInsertions = YES;
-        [self.parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
-        if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPluginActivatedChooserView:)]) {
-            [self.stateChangeDelegate mentionsPluginActivatedChooserView:self];
+        __strong __auto_type parentTextView = self.parentTextView;
+        parentTextView.shouldRejectAutocorrectInsertions = YES;
+        [parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
+        if ([stateChangeDelegate respondsToSelector:@selector(mentionsPluginActivatedChooserView:)]) {
+            [stateChangeDelegate mentionsPluginActivatedChooserView:self];
         }
         if (self.viewportLocksToTopUponMentionCreation) {
-            [self.parentTextView enterSingleLineViewportMode:HKWViewportModeTop captureTouches:YES];
+            [parentTextView enterSingleLineViewportMode:HKWViewportModeTop captureTouches:YES];
         }
         else if (self.viewportLocksToBottomUponMentionCreation) {
-            [self.parentTextView enterSingleLineViewportMode:HKWViewportModeBottom captureTouches:YES];
+            [parentTextView enterSingleLineViewportMode:HKWViewportModeBottom captureTouches:YES];
         }
     }
     else {
       // Tell state change delegate that the chooser view has been closed.
-      if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
-        [self.stateChangeDelegate mentionsPluginDeactivatedChooserView:self];
+      if ([stateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
+        [stateChangeDelegate mentionsPluginDeactivatedChooserView:self];
       }
     }
 }
@@ -1921,10 +1956,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 - (CGFloat)positionForChooserCursorRelativeToView:(UIView *)view atLocation:(NSUInteger)location {
-    UITextView *textView = self.parentTextView;
+    __strong __auto_type parentTextView = self.parentTextView;
+    UITextView *textView = parentTextView;
     CGRect rect = [textView caretRectForPosition:[textView positionFromPosition:textView.beginningOfDocument
                                                                          offset:location]];
-    CGPoint correctedPoint = [view convertPoint:rect.origin fromView:self.parentTextView];
+    CGPoint correctedPoint = [view convertPoint:rect.origin fromView:parentTextView];
     return correctedPoint.x + rect.size.width/2;
 }
 
@@ -1938,16 +1974,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     HKW_STATE_LOG(@"STATE TRANSITION: %@ --> %@", nameForMentionsState(_state), nameForMentionsState(state));
 
     // Inform the delegate, if one exists
-    if ([self.stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:stateChangedTo:from:)]) {
+    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
+    if ([stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:stateChangedTo:from:)]) {
         if (state == HKWMentionsStartDetectionStateCreatingMention && _state != HKWMentionsStartDetectionStateCreatingMention) {
-            [self.stateChangeDelegate mentionsPlugin:self
-                                      stateChangedTo:HKWMentionsPluginStateCreatingMention
-                                                from:HKWMentionsPluginStateQuiescent];
+            [stateChangeDelegate mentionsPlugin:self
+                                 stateChangedTo:HKWMentionsPluginStateCreatingMention
+                                           from:HKWMentionsPluginStateQuiescent];
         }
         else if (state != HKWMentionsStartDetectionStateCreatingMention && _state == HKWMentionsStartDetectionStateCreatingMention) {
-            [self.stateChangeDelegate mentionsPlugin:self
-                                      stateChangedTo:HKWMentionsPluginStateQuiescent
-                                                from:HKWMentionsPluginStateCreatingMention];
+            [stateChangeDelegate mentionsPlugin:self
+                                 stateChangedTo:HKWMentionsPluginStateQuiescent
+                                           from:HKWMentionsPluginStateCreatingMention];
         }
     }
 
@@ -1959,8 +1996,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 - (BOOL)loadingCellSupported {
-    return ([self.delegate respondsToSelector:@selector(loadingCellForTableView:)]
-            && [self.delegate respondsToSelector:@selector(heightForLoadingCellInTableView:)]);
+    __strong __auto_type delegate = self.delegate;
+    return ([delegate respondsToSelector:@selector(loadingCellForTableView:)]
+            && [delegate respondsToSelector:@selector(heightForLoadingCellInTableView:)]);
 }
 
 - (UIView<HKWChooserViewProtocol> *)chooserView {

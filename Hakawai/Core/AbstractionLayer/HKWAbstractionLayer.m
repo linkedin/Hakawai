@@ -223,7 +223,8 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
     if (self.shouldIgnore) {
         return YES;
     }
-    BOOL currentlyMarked = (self.parentTextView.markedTextRange != nil);
+    __strong __auto_type parentTextView = self.parentTextView;
+    BOOL currentlyMarked = (parentTextView.markedTextRange != nil);
 
     self.lastChangeWasSpaceInsertion = NO;
 
@@ -240,16 +241,15 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                     && range.length == 1) {
                     self.shouldIgnoreNextCharacterDeletion = NO;
                     self.state = HKWAbstractionLayerStateQuiescent;
-                    if ([self.delegate
-                         respondsToSelector:@selector(textView:characterDeletionWasIgnoredAtLocation:)]) {
-                        [self.delegate textView:self.parentTextView
-          characterDeletionWasIgnoredAtLocation:range.location];
+                    __strong __auto_type delegate = self.delegate;
+                    if ([delegate respondsToSelector:@selector(textView:characterDeletionWasIgnoredAtLocation:)]) {
+                        [delegate textView:parentTextView characterDeletionWasIgnoredAtLocation:range.location];
                     }
                     return NO;
                 }
                 self.changeType = HKWAbstractionLayerChangeTypeDeletion;
                 self.changeRange = range;
-                self.changeString = [self.parentTextView.text substringWithRange:range];
+                self.changeString = [parentTextView.text substringWithRange:range];
                 self.changeIsPaste = [text isEqualToString:[[UIPasteboard generalPasteboard] string]];
             }
             else if ([text length] > 0 && range.length == 0) {
@@ -258,7 +258,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                 self.changeRange = NSMakeRange(range.location, 0);
                 self.changeString = text;
                 self.lastChangeWasSpaceInsertion = [HKWAbstractionLayer changeIsSpaceInsertion:text range:range];
-                self.textLengthWhenSpaceWasInserted = [self.parentTextView.text length];
+                self.textLengthWhenSpaceWasInserted = [parentTextView.text length];
             }
             else if (range.length > 0 && [text length] > 0) {
                 // User replaced text
@@ -338,7 +338,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
             self.lastMarkedCharactersJustDeleted = NO;
             if ([text length] == 0
                 && range.length > 0
-                && self.parentTextView.markedTextRange) {
+                && parentTextView.markedTextRange) {
                 // We're in marked text mode. We need to check if the last character is going to be deleted, and if it
                 //  is, raise a special flag so that textViewDidChange can distinguish between behaviors.
                 NSRange markedRange = [self markedTextRange];
@@ -363,18 +363,20 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
     if (self.shouldIgnore) {
         return;
     }
-    NSRange selectedRange = self.parentTextView.selectedRange;
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSRange selectedRange = parentTextView.selectedRange;
 //    NSLog(@"textViewDidChangeSelection called. New selected range: location: %ld, length: %ld; marked text: %@; parent text: '%@'",
 //          selectedRange.location, selectedRange.length, self.parentTextView.markedTextRange, self.parentTextView.text);
 
     BOOL previouslyMarked = self.markState == HKWAbstractionLayerMarkStateMarked;
     BOOL cursorActuallyMoved = !NSEqualRanges(selectedRange, self.previousSelectedRange);
-    BOOL currentlyMarked = (self.parentTextView.markedTextRange != nil);
+    BOOL currentlyMarked = (parentTextView.markedTextRange != nil);
 
     if (currentlyMarked) {
         self.changeType = HKWAbstractionLayerChangeTypeNone;
     }
 
+     __strong __auto_type delegate = self.delegate;
     switch (self.state) {
         case HKWAbstractionLayerStateQuiescent:
             if (currentlyMarked) {
@@ -385,16 +387,16 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
             else if (selectedRange.length == 0 && cursorActuallyMoved) {
                 // The user moved the cursor and it's in insertion mode
                 self.selectedRangeWhenTextWasLastSelected = NSMakeRange(NSNotFound, 0);
-                if ([self.delegate respondsToSelector:@selector(textView:cursorChangedToInsertion:)]) {
-                    [self.delegate textView:self.parentTextView cursorChangedToInsertion:selectedRange.location];
+                if ([delegate respondsToSelector:@selector(textView:cursorChangedToInsertion:)]) {
+                    [delegate textView:parentTextView cursorChangedToInsertion:selectedRange.location];
                 }
             }
             else if (selectedRange.length > 0 && cursorActuallyMoved) {
                 // The user moved the cursor and selected text
                 self.selectedRangeWhenTextWasLastSelected = selectedRange;
-                self.textLengthWhenTextWasLastSelected = [self.parentTextView.text length];
-                if ([self.delegate respondsToSelector:@selector(textView:cursorChangedToSelection:)]) {
-                    [self.delegate textView:self.parentTextView cursorChangedToSelection:selectedRange];
+                self.textLengthWhenTextWasLastSelected = [parentTextView.text length];
+                if ([delegate respondsToSelector:@selector(textView:cursorChangedToSelection:)]) {
+                    [delegate textView:parentTextView cursorChangedToSelection:selectedRange];
                 }
             }
             break;
@@ -402,7 +404,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
             // This is the selection change immediately following textViewShouldChangeTextAtRange:...
             self.state = HKWAbstractionLayerStateDidChangeSelectionCalled;
             if (self.lastChangeWasSpaceInsertion &&
-                [self.parentTextView.text length] == self.textLengthWhenSpaceWasInserted) {
+                [parentTextView.text length] == self.textLengthWhenSpaceWasInserted) {
                 NSAssert(self.changeType == HKWAbstractionLayerChangeTypeInsertion, @"Internal error");
                 // The space the user tried to insert was overridden somehow, and we shouldn't report it
                 self.lastChangeWasSpaceInsertion = NO;
@@ -449,7 +451,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
         self.markState = HKWAbstractionLayerMarkStateNone;
     }
     self.previousSelectedRange = selectedRange;
-    self.previousTextLength = [self.parentTextView.text length];
+    self.previousTextLength = [parentTextView.text length];
 }
 
 - (void)textViewDidChange {
@@ -460,8 +462,10 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
 //          self.parentTextView.markedTextRange, self.parentTextView.text);
 
     // Update the marked text state before running logic
+    __strong __auto_type parentTextView = self.parentTextView;
+    __strong __auto_type delegate = self.delegate;
     BOOL previouslyMarked = self.markState == HKWAbstractionLayerMarkStateMarked;
-    BOOL currentlyMarked = (self.parentTextView.markedTextRange != nil);
+    BOOL currentlyMarked = (parentTextView.markedTextRange != nil);
     if (currentlyMarked) {
         self.markState = HKWAbstractionLayerMarkStateMarked;
     }
@@ -489,23 +493,21 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                     // The user selected text and has chosen replacement CJK text using an IME keyboard.
                     NSUInteger location = self.selectedRangeWhenTextWasLastSelected.location;
                     NSAssert(self.selectedRangeWhenTextWasLastSelected.length > 0, @"Internal error");
-                    NSInteger lengthDelta = [self.parentTextView.text length] - self.textLengthWhenTextWasLastSelected;
+                    NSInteger lengthDelta = [parentTextView.text length] - self.textLengthWhenTextWasLastSelected;
                     NSInteger newLength = self.selectedRangeWhenTextWasLastSelected.length + lengthDelta;
                     NSAssert(newLength > 0, @"Internal error");
-                    if ([self.delegate
-                         respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
-                        NSString *newText = [self.parentTextView.text substringWithRange:NSMakeRange(location,
-                                                                                                     newLength)];
-                        BOOL shouldChange = [self.delegate textView:self.parentTextView
-                                                replacedTextAtRange:self.selectedRangeWhenTextWasLastSelected
-                                                            newText:newText
-                                                        autocorrect:NO];
+                    if ([delegate respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
+                        NSString *newText = [parentTextView.text substringWithRange:NSMakeRange(location, newLength)];
+                        BOOL shouldChange = [delegate textView:parentTextView
+                                           replacedTextAtRange:self.selectedRangeWhenTextWasLastSelected
+                                                       newText:newText
+                                                   autocorrect:NO];
                         if (self.changeRejectionEnabled) {
                             if (shouldChange) {
-                                self.previousText = [self.parentTextView.attributedText copy];
+                                self.previousText = [parentTextView.attributedText copy];
                             }
                             else {
-                                self.parentTextView.attributedText = [self.previousText copy];
+                                parentTextView.attributedText = [self.previousText copy];
                                 self.state = HKWAbstractionLayerStateQuiescent;
                             }
                         }
@@ -537,54 +539,51 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                     //  expected.
                     switch (self.changeType) {
                         case HKWAbstractionLayerChangeTypeInsertion:
-                            if ([self.delegate
-                                 respondsToSelector:@selector(textView:textInserted:atLocation:autocorrect:)]) {
+                            if ([delegate respondsToSelector:@selector(textView:textInserted:atLocation:autocorrect:)]) {
                                 NSAssert([self.changeString length] > 0, @"Internal error");
-                                BOOL shouldChange = [self.delegate textView:self.parentTextView
-                                                               textInserted:self.changeString
-                                                                 atLocation:self.changeRange.location
-                                                                autocorrect:!self.changeIsPaste];
+                                BOOL shouldChange = [delegate textView:parentTextView
+                                                          textInserted:self.changeString
+                                                            atLocation:self.changeRange.location
+                                                           autocorrect:!self.changeIsPaste];
                                 if (self.changeRejectionEnabled) {
                                     if (shouldChange) {
-                                        self.previousText = [self.parentTextView.attributedText copy];
+                                        self.previousText = [parentTextView.attributedText copy];
                                     }
                                     else {
-                                        self.parentTextView.attributedText = [self.previousText copy];
+                                        parentTextView.attributedText = [self.previousText copy];
                                         self.state = HKWAbstractionLayerStateQuiescent;
                                     }
                                 }
                             }
                             break;
                         case HKWAbstractionLayerChangeTypeDeletion:
-                            if ([self.delegate
-                                 respondsToSelector:@selector(textView:textDeletedFromLocation:length:)]) {
-                                BOOL shouldChange = [self.delegate textView:self.parentTextView
-                                                    textDeletedFromLocation:self.changeRange.location
-                                                                     length:[self.changeString length]];
+                            if ([delegate respondsToSelector:@selector(textView:textDeletedFromLocation:length:)]) {
+                                BOOL shouldChange = [delegate textView:parentTextView
+                                               textDeletedFromLocation:self.changeRange.location
+                                                                length:[self.changeString length]];
                                 if (self.changeRejectionEnabled) {
                                     if (shouldChange) {
-                                        self.previousText = [self.parentTextView.attributedText copy];
+                                        self.previousText = [parentTextView.attributedText copy];
                                     }
                                     else {
-                                        self.parentTextView.attributedText = [self.previousText copy];
+                                        parentTextView.attributedText = [self.previousText copy];
                                         self.state = HKWAbstractionLayerStateQuiescent;
                                     }
                                 }
                             }
                             break;
                         case HKWAbstractionLayerChangeTypeReplacement:
-                            if ([self.delegate
-                                 respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
-                                BOOL shouldChange = [self.delegate textView:self.parentTextView
-                                                        replacedTextAtRange:self.changeRange
-                                                                    newText:self.changeString
-                                                                autocorrect:!self.changeIsPaste];
+                            if ([delegate respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
+                                BOOL shouldChange = [delegate textView:parentTextView
+                                                   replacedTextAtRange:self.changeRange
+                                                               newText:self.changeString
+                                                           autocorrect:!self.changeIsPaste];
                                 if (self.changeRejectionEnabled) {
                                     if (shouldChange) {
-                                        self.previousText = [self.parentTextView.attributedText copy];
+                                        self.previousText = [parentTextView.attributedText copy];
                                     }
                                     else {
-                                        self.parentTextView.attributedText = [self.previousText copy];
+                                        parentTextView.attributedText = [self.previousText copy];
                                         self.state = HKWAbstractionLayerStateQuiescent;
                                     }
                                 }
@@ -613,7 +612,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                     //    marked text into normal text
                     NSAssert(self.selectedRangeWhenMarkingStarted.location != NSNotFound, @"Internal error");
                     BOOL textWasSelectedWhenMarkingStarted = (self.selectedRangeWhenMarkingStarted.length > 0);
-                    NSInteger currentTextLength = [self.parentTextView.text length];
+                    NSInteger currentTextLength = [parentTextView.text length];
 
                     if (textWasSelectedWhenMarkingStarted) {
                         // The user started out with text selected
@@ -622,18 +621,17 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                         NSUInteger start = self.selectedRangeWhenMarkingStarted.location;
                         if (currentTextLength == textLengthAfterDeletion) {
                             // The user deleted all the marked mode text. Notify of deletion.
-                            if ([self.delegate
-                                 respondsToSelector:@selector(textView:textDeletedFromLocation:length:)]) {
+                            if ([delegate respondsToSelector:@selector(textView:textDeletedFromLocation:length:)]) {
                                 NSUInteger length = self.selectedRangeWhenMarkingStarted.length;
-                                BOOL shouldChange = [self.delegate textView:self.parentTextView
-                                                    textDeletedFromLocation:start
-                                                                     length:length];
+                                BOOL shouldChange = [delegate textView:parentTextView
+                                               textDeletedFromLocation:start
+                                                                length:length];
                                 if (self.changeRejectionEnabled) {
                                     if (shouldChange) {
-                                        self.previousText = [self.parentTextView.attributedText copy];
+                                        self.previousText = [parentTextView.attributedText copy];
                                     }
                                     else {
-                                        self.parentTextView.attributedText = [self.previousText copy];
+                                        parentTextView.attributedText = [self.previousText copy];
                                         self.state = HKWAbstractionLayerStateQuiescent;
                                     }
                                 }
@@ -643,21 +641,20 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                             // Replacement of text.
                             NSAssert(currentTextLength > textLengthAfterDeletion, @"Internal error");
                             NSInteger length = currentTextLength - textLengthAfterDeletion;
-                            NSString *insertedText = [self.parentTextView.text substringWithRange:NSMakeRange(start,
+                            NSString *insertedText = [parentTextView.text substringWithRange:NSMakeRange(start,
                                                                                                               length)];
-                            if ([self.delegate
-                                 respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
+                            if ([delegate respondsToSelector:@selector(textView:replacedTextAtRange:newText:autocorrect:)]) {
                                 NSRange markingRange = self.selectedRangeWhenMarkingStarted;
-                                BOOL shouldChange = [self.delegate textView:self.parentTextView
-                                                        replacedTextAtRange:markingRange
-                                                                    newText:insertedText
-                                                                autocorrect:NO];
+                                BOOL shouldChange = [delegate textView:parentTextView
+                                                   replacedTextAtRange:markingRange
+                                                               newText:insertedText
+                                                           autocorrect:NO];
                                 if (self.changeRejectionEnabled) {
                                     if (shouldChange) {
-                                        self.previousText = [self.parentTextView.attributedText copy];
+                                        self.previousText = [parentTextView.attributedText copy];
                                     }
                                     else {
-                                        self.parentTextView.attributedText = [self.previousText copy];
+                                        parentTextView.attributedText = [self.previousText copy];
                                         self.state = HKWAbstractionLayerStateQuiescent;
                                     }
                                 }
@@ -674,20 +671,19 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                             NSAssert(currentTextLength > self.textLengthWhenMarkingStarted, @"Internal error");
                             NSUInteger start = self.selectedRangeWhenMarkingStarted.location;
                             NSInteger length = currentTextLength - self.textLengthWhenMarkingStarted;
-                            NSString *insertedText = [self.parentTextView.text substringWithRange:NSMakeRange(start,
+                            NSString *insertedText = [parentTextView.text substringWithRange:NSMakeRange(start,
                                                                                                               length)];
-                            if ([self.delegate
-                                 respondsToSelector:@selector(textView:textInserted:atLocation:autocorrect:)]) {
-                                BOOL shouldChange = [self.delegate textView:self.parentTextView
-                                                               textInserted:insertedText
-                                                                 atLocation:start
-                                                                autocorrect:NO];
+                            if ([delegate respondsToSelector:@selector(textView:textInserted:atLocation:autocorrect:)]) {
+                                BOOL shouldChange = [delegate textView:parentTextView
+                                                          textInserted:insertedText
+                                                            atLocation:start
+                                                           autocorrect:NO];
                                 if (self.changeRejectionEnabled) {
                                     if (shouldChange) {
-                                        self.previousText = [self.parentTextView.attributedText copy];
+                                        self.previousText = [parentTextView.attributedText copy];
                                     }
                                     else {
-                                        self.parentTextView.attributedText = [self.previousText copy];
+                                        parentTextView.attributedText = [self.previousText copy];
                                         self.state = HKWAbstractionLayerStateQuiescent;
                                     }
                                 }
@@ -712,18 +708,18 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
             //  inputting pinyin. We should report an insertion.
             NSUInteger location = self.pendingUpdateMarkRange.location;
             NSAssert(location != NSNotFound, @"Internal error");
-            NSString *newText = [self.parentTextView.text substringWithRange:self.pendingUpdateMarkRange];
-            if ([self.delegate respondsToSelector:@selector(textView:textInserted:atLocation:autocorrect:)]) {
-                BOOL shouldChange = [self.delegate textView:self.parentTextView
-                                               textInserted:newText
-                                                 atLocation:location
-                                                autocorrect:NO];
+            NSString *newText = [parentTextView.text substringWithRange:self.pendingUpdateMarkRange];
+            if ([delegate respondsToSelector:@selector(textView:textInserted:atLocation:autocorrect:)]) {
+                BOOL shouldChange = [delegate textView:parentTextView
+                                          textInserted:newText
+                                            atLocation:location
+                                           autocorrect:NO];
                 if (self.changeRejectionEnabled) {
                     if (shouldChange) {
-                        self.previousText = [self.parentTextView.attributedText copy];
+                        self.previousText = [parentTextView.attributedText copy];
                     }
                     else {
-                        self.parentTextView.attributedText = [self.previousText copy];
+                        parentTextView.attributedText = [self.previousText copy];
                         self.state = HKWAbstractionLayerStateQuiescent;
                     }
                 }
@@ -777,14 +773,15 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
  error range otherwise.
  */
 - (NSRange)markedTextRange {
-    UITextRange *markedRange = self.parentTextView.markedTextRange;
-    if (!markedRange || !self.parentTextView) {
+    __strong __auto_type parentTextView = self.parentTextView;
+    UITextRange *markedRange = parentTextView.markedTextRange;
+    if (!markedRange || !parentTextView) {
         return NSMakeRange(NSNotFound, 0);
     }
-    NSInteger start = [self.parentTextView offsetFromPosition:self.parentTextView.beginningOfDocument
-                                                   toPosition:markedRange.start];
-    NSInteger end = [self.parentTextView offsetFromPosition:self.parentTextView.beginningOfDocument
-                                                 toPosition:markedRange.end];
+    NSInteger start = [parentTextView offsetFromPosition:parentTextView.beginningOfDocument
+                                              toPosition:markedRange.start];
+    NSInteger end = [parentTextView offsetFromPosition:parentTextView.beginningOfDocument
+                                            toPosition:markedRange.end];
     NSAssert(end >= start, @"Internal error: marked text range is inconsistent; this is an OS error");
     return NSMakeRange(start, end - start);
 }

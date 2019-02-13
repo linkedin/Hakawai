@@ -80,8 +80,9 @@
         self.selectedRange = originalSelectedRange;
     }
     self.transformInProgress = NO;
-    if ([self.externalDelegate respondsToSelector:@selector(textView:didChangeAttributedTextTo:originalText:originalRange:)]) {
-        [self.externalDelegate textView:self didChangeAttributedTextTo:infixString originalText:originalInfix originalRange:range];
+    __strong __auto_type externalDelegate = self.externalDelegate;
+    if ([externalDelegate respondsToSelector:@selector(textView:didChangeAttributedTextTo:originalText:originalRange:)]) {
+        [externalDelegate textView:self didChangeAttributedTextTo:infixString originalText:originalInfix originalRange:range];
     }
     if (usingAbstraction) {
         [self.abstractionLayer popIgnore];
@@ -126,8 +127,9 @@
         location = [self.attributedText length] - 1;
     }
     [self insertAttributedText:[NSAttributedString attributedStringWithAttachment:attachment] location:location];
-    if ([self.externalDelegate respondsToSelector:@selector(textView:didReceiveNewTextAttachment:)]) {
-        [self.externalDelegate textView:self didReceiveNewTextAttachment:attachment];
+    __strong __auto_type externalDelegate = self.externalDelegate;
+    if ([externalDelegate respondsToSelector:@selector(textView:didReceiveNewTextAttachment:)]) {
+        [externalDelegate textView:self didReceiveNewTextAttachment:attachment];
     }
     if (usingAbstraction) {
         [self.abstractionLayer popIgnore];
