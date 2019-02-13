@@ -441,7 +441,7 @@
         && self.selectedRange.length == 0
         && !self.transformInProgress) {
         // Get the new y-offset, based on the current insertion position
-        UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:self.selectedRange.location];
+        UITextPosition *p = [self positionFromPosition:self.beginningOfDocument offset:(NSInteger)self.selectedRange.location];
         CGRect caretRect = [self caretRectForPosition:p];
         CGFloat newOffsetY = 0;
         switch (self.viewportMode) {

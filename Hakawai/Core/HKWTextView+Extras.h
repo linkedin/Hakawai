@@ -39,7 +39,7 @@
  \param toEnd       whether or not the reported range should encompass the entire word, not just the length from the
  beginning of the word to \c location
  */
-- (NSRange)rangeForWordPrecedingLocation:(NSInteger)location searchToEnd:(BOOL)toEnd;
+- (NSRange)rangeForWordPrecedingLocation:(NSUInteger)location searchToEnd:(BOOL)toEnd;
 
 /*!
  Return the range for the word immediately preceding the current selection range's start location. If there is no word

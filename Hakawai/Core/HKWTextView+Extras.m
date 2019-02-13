@@ -29,9 +29,9 @@
     // Get the bottom-most rect
     NSRange range = [self rangeForWordPrecedingLocation:self.selectedRange.location searchToEnd:YES];
     UITextPosition *start = [self positionFromPosition:self.beginningOfDocument
-                                                offset:range.location];
+                                                offset:(NSInteger)range.location];
     UITextPosition *end = [self positionFromPosition:self.beginningOfDocument
-                                              offset:range.location + range.length - 1];
+                                              offset:(NSInteger)(range.location + range.length - 1)];
     UITextRange *textRange = [self textRangeFromPosition:start toPosition:end];
     NSArray *rects = [self selectionRectsForRange:textRange];
     NSAssert([rects count] > 0, @"Internal error: no selection rects for range.");
@@ -54,26 +54,26 @@
     return [self rangeForWordPrecedingLocation:self.selectedRange.location searchToEnd:YES];
 }
 
-- (NSRange)rangeForWordPrecedingLocation:(NSInteger)location searchToEnd:(BOOL)toEnd {
+- (NSRange)rangeForWordPrecedingLocation:(NSUInteger)location searchToEnd:(BOOL)toEnd {
     NSCharacterSet *whitespaceNewlineSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     if (!self.inInsertionMode
         || location == 0
         || location > [self.text length]
-        || [whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:location]]) {
+        || [whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:(NSInteger)location]]) {
         return NSMakeRange(NSNotFound, 0);
     }
     // Walk backwards through the string to find the first delimiter.
-    NSInteger firstLocation = 0;
-    for (NSInteger i=location - 1; i>=0; i--) {
+    NSUInteger firstLocation = 0;
+    for (NSInteger i=(NSInteger)location - 1; i>=0; i--) {
         if (i > 0) {
-            unichar c = [self.text characterAtIndex:i];
+            unichar c = [self.text characterAtIndex:(NSUInteger)i];
             if ([whitespaceNewlineSet characterIsMember:c]) {
-                firstLocation = i + 1;
+                firstLocation = (NSUInteger)i + 1;
                 break;
             }
         }
     }
-    NSInteger length;
+    NSUInteger length;
     if (location == [self.text length]
         || [whitespaceNewlineSet characterIsMember:[self.text characterAtIndex:location]]
         || !toEnd) {
@@ -82,10 +82,10 @@
     }
     else {
         // Walk forward through the string to find the end, or the next whitespace/newline
-        NSInteger cursor = firstLocation;
+        NSUInteger cursor = firstLocation;
         while (cursor < [self.text length]) {
             cursor++;
-            if ([whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:cursor]]) {
+            if ([whitespaceNewlineSet characterIsMember:[self characterPrecedingLocation:(NSInteger)cursor]]) {
                 cursor--;
                 break;
             }
@@ -97,8 +97,8 @@
 
 - (unichar)characterPrecedingLocation:(NSInteger)location {
     unichar character = (unichar)0;
-    if (location > 0 && location <= [self.text length]) {
-        character = [self.text characterAtIndex:(location - 1)];
+    if (location > 0 && location <= (NSInteger)[self.text length]) {
+        character = [self.text characterAtIndex:(NSUInteger)(location - 1)];
     }
     return character;
 }

@@ -133,7 +133,7 @@ describe(@"characterPrecedingLocation", ^{
     });
 
     it(@"should properly return 0 when location is just out of range", ^{
-        unichar character = [textView characterPrecedingLocation:[baseString length] + 1];
+        unichar character = [textView characterPrecedingLocation:(NSInteger)[baseString length] + 1];
         expect(character).to.equal((unichar)0);
     });
 
