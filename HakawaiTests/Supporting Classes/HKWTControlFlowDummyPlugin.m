@@ -98,14 +98,14 @@
     }
 }
 
-- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
+- (BOOL)textView:(__unused UITextView *)textView shouldInteractWithTextAttachment:(__unused NSTextAttachment *)textAttachment inRange:(__unused NSRange)characterRange interaction:(__unused UITextItemInteraction)interaction {
     if (self.shouldInteractWithTextAttachmentBlock) {
         self.shouldInteractWithTextAttachmentBlock();
     }
     return YES;
 }
 
-- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
+- (BOOL)textView:(__unused UITextView *)textView shouldInteractWithURL:(__unused NSURL *)URL inRange:(__unused NSRange)characterRange interaction:(__unused UITextItemInteraction)interaction {
     if (self.shouldInteractWithURLBlock) {
         self.shouldInteractWithURLBlock();
     }

@@ -471,45 +471,41 @@
     }
 }
 
-- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
+- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
     if (self.firstResponderIsCycling) {
         return YES;
     }
-    if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
-        return [self.controlFlowPlugin textView:textView
-               shouldInteractWithTextAttachment:textAttachment
-                                        inRange:characterRange];
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:interaction:)]) {
+        return [self.controlFlowPlugin textView:textView shouldInteractWithTextAttachment:textAttachment inRange:characterRange interaction:interaction];
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
         return [self.abstractionControlFlowPlugin textView:textView
-               shouldInteractWithTextAttachment:textAttachment
-                                        inRange:characterRange];
+                          shouldInteractWithTextAttachment:textAttachment
+                                                   inRange:characterRange];
     }
 
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
-    if ([externalDelegate respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
-        return [externalDelegate textView:textView
-         shouldInteractWithTextAttachment:textAttachment
-                                  inRange:characterRange];
+    if ([externalDelegate respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:interaction:)]) {
+        return [externalDelegate textView:textView shouldInteractWithTextAttachment:textAttachment inRange:characterRange interaction:interaction];
     }
     return YES;
 }
 
-- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
     if (self.firstResponderIsCycling) {
         return YES;
     }
-    if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)]) {
-        return [self.controlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange];
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
+        return [self.controlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange interaction:interaction];
     }
-    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)]) {
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
         return [self.abstractionControlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange];
     }
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
-    if ([externalDelegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)]) {
-        return [externalDelegate textView:textView shouldInteractWithURL:URL inRange:characterRange];
+    if ([externalDelegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
+        return [externalDelegate textView:textView shouldInteractWithURL:URL inRange:characterRange interaction:interaction];
     }
     return YES;
 }
