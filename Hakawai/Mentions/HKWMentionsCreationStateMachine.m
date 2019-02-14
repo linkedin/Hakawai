@@ -619,7 +619,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
  method may fire another typeahead request to the server immediately. Otherwise, the firing of the timer indicates that
  it is acceptable to send another request at any time.
  */
-- (void)cooldownTimerFired:(NSTimer *)timer {
+- (void)cooldownTimerFired:(__unused NSTimer *)timer {
     switch (self.networkState) {
         case HKWMentionsCreationNetworkStateQuiescent:
             // User not creating a mention right now.
@@ -885,11 +885,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     return [delegate cellForMentionsEntity:entity withMatchString:[self.stringBuffer copy] tableView:tableView atIndexPath:indexPath];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(__unused UITableView *)tableView {
     return (self.delegate.loadingCellSupported && !self.currentQueryIsComplete) ? 2 : 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(__unused UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSAssert(section == 0 || section == 1,
              @"Entity chooser table view can only have up to 2 sections.");
     if (section == 1) {

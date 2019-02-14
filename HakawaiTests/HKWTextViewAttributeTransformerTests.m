@@ -324,7 +324,7 @@ describe(@"transformTypingAttributesWithTransformer API", ^{
         textView.selectedRange = NSMakeRange(0, 0);
         textView.typingAttributes = old;
         expect(textView.typingAttributes).to.equal(old);
-        [textView transformTypingAttributesWithTransformer:^NSDictionary *(NSDictionary *currentAttributes) {
+        [textView transformTypingAttributesWithTransformer:^NSDictionary *(__unused NSDictionary *currentAttributes) {
             return new;
         }];
         expect(textView.typingAttributes).to.equal(new);

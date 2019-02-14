@@ -96,7 +96,7 @@
 
 - (void)insertAttributedText:(NSAttributedString *)text location:(NSUInteger)location {
     if ([text length] == 0) return;
-    NSAttributedString *(^transformer)(NSAttributedString *) = ^(NSAttributedString *input) {
+    NSAttributedString *(^transformer)(NSAttributedString *) = ^(__unused NSAttributedString *input) {
         return text;
     };
     [self transformTextAtRange:NSMakeRange(location, 0) withTransformer:transformer];
@@ -143,7 +143,7 @@
         || range.length == 0) {
         return;
     }
-    NSAttributedString *(^transformer)(NSAttributedString *) = ^(NSAttributedString *input) {
+    NSAttributedString *(^transformer)(NSAttributedString *) = ^(__unused NSAttributedString *input) {
         return (NSAttributedString *)nil;
     };
     [self transformTextAtRange:range withTransformer:transformer];

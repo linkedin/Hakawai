@@ -30,35 +30,35 @@ describe(@"transformTextAtRange with plain text", ^{
     });
 
     it(@"should properly transform text at beginning", ^{
-        [textView transformTextAtRange:NSMakeRange(0, 3) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(0, 3) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"#### TEST ####"];
         }];
         expect(textView.text).to.equal(@"#### TEST #### quick brown fox jumps over the lazy dog");
     });
 
     it(@"should properly transform text in middle", ^{
-        [textView transformTextAtRange:NSMakeRange(5, 12) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(5, 12) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"blah_string"];
         }];
         expect(textView.text).to.equal(@"The qblah_stringox jumps over the lazy dog");
     });
 
     it(@"should properly transform text at end", ^{
-        [textView transformTextAtRange:NSMakeRange(31, 12) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(31, 12) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"a fat bear"];
         }];
         expect(textView.text).to.equal(@"The quick brown fox jumps over a fat bear");
     });
 
     it(@"should properly ignore ranges whose beginnings are out of range", ^{
-        [textView transformTextAtRange:NSMakeRange(9999, 1000) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(9999, 1000) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"~~~~ !!!! ~~~~"];
         }];
         expect(textView.text).to.equal(baseString);
     });
 
     it(@"should properly trim ranges whose ends are out of range", ^{
-        [textView transformTextAtRange:NSMakeRange(10, 1000) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(10, 1000) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"~~~~ !!!! ~~~~"];
         }];
         expect(textView.text).to.equal(@"The quick ~~~~ !!!! ~~~~");
@@ -67,14 +67,14 @@ describe(@"transformTextAtRange with plain text", ^{
     it(@"should properly add text to an empty text view", ^{
         textView.text = @"";
         expect(textView.text).to.equal(@"");
-        [textView transformTextAtRange:NSMakeRange(0, 1) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(0, 1) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:baseString];
         }];
         expect(textView.text).to.equal(baseString);
     });
 
     it(@"should properly handle an empty string for transformed text", ^{
-        [textView transformTextAtRange:NSMakeRange(0, 11) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(0, 11) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return nil;
         }];
         expect(textView.text).to.equal(@"rown fox jumps over the lazy dog");
@@ -100,7 +100,7 @@ describe(@"transformTextAtRange with attributed text", ^{
         textView.attributedText = [[NSMutableAttributedString alloc] initWithString:baseString];
         NSUInteger location = 1;
         NSUInteger length = 12;
-        [textView transformTextAtRange:NSMakeRange(location, length) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(location, length) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             NSAttributedString *buffer = [[NSAttributedString alloc] initWithString:replacementString
                                                                          attributes:@{NSForegroundColorAttributeName: [UIColor redColor]}];
             return buffer;
@@ -122,7 +122,7 @@ describe(@"transformTextAtRange with attributed text", ^{
                                                                          attributes:@{NSForegroundColorAttributeName: [UIColor greenColor]}];
         NSUInteger location = 1;
         NSUInteger length = 12;
-        [textView transformTextAtRange:NSMakeRange(location, length) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(location, length) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             NSAttributedString *buffer = [[NSAttributedString alloc] initWithString:replacementString
                                                                          attributes:@{NSForegroundColorAttributeName: [UIColor redColor]}];
             return buffer;
@@ -140,7 +140,7 @@ describe(@"transformTextAtRange with attributed text", ^{
                                                                          attributes:@{NSForegroundColorAttributeName: [UIColor greenColor]}];
         NSUInteger location = 1;
         NSUInteger length = 12;
-        [textView transformTextAtRange:NSMakeRange(location, length) withTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformTextAtRange:NSMakeRange(location, length) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:replacementString];
         }];
         for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
@@ -170,7 +170,7 @@ describe(@"transformSelectedTextWithTransformer", ^{
 
     it(@"should properly transform selected text with a nonzero selection length", ^{
         textView.selectedRange = NSMakeRange(0, 3);
-        [textView transformSelectedTextWithTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformSelectedTextWithTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"#### TEST ####"];
         }];
         expect(textView.text).to.equal(@"#### TEST #### quick brown fox jumps over the lazy dog");
@@ -178,7 +178,7 @@ describe(@"transformSelectedTextWithTransformer", ^{
 
     it(@"should properly transform selected text with a zero selection length", ^{
         textView.selectedRange = NSMakeRange(4, 0);
-        [textView transformSelectedTextWithTransformer:^NSAttributedString *(NSAttributedString *s) {
+        [textView transformSelectedTextWithTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"#### TEST ####"];
         }];
         expect(textView.text).to.equal(@"The #### TEST ####quick brown fox jumps over the lazy dog");

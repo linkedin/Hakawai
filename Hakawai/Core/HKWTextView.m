@@ -29,7 +29,7 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype _Nonnull)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer {
+- (instancetype _Nonnull)initWithFrame:(CGRect)frame textContainer:(nullable __unused NSTextContainer *)textContainer {
     HKWLayoutManager *manager = [HKWLayoutManager new];
     NSTextContainer *container = [[NSTextContainer alloc] initWithSize:CGSizeMake(frame.size.width, FLT_MAX)];
     container.widthTracksTextView = YES;
@@ -62,7 +62,7 @@
 }
 
 // Build custom text container if the consumer is using a XIB.
-- (id)awakeAfterUsingCoder:(NSCoder *)aDecoder {
+- (id)awakeAfterUsingCoder:(__unused NSCoder *)aDecoder {
     HKWLayoutManager *manager = [HKWLayoutManager new];
 
     NSTextContainer *container = [[NSTextContainer alloc] initWithSize:self.textContainer.size];
