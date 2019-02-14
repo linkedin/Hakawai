@@ -36,8 +36,8 @@
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)replacementText;
 - (void)textViewDidChange:(UITextView *)textView;
 - (void)textViewDidChangeSelection:(UITextView *)textView;
-- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange;
-- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange;
+- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction;
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction;
 @end
 
 SpecBegin(basicPlugins)
@@ -190,13 +190,13 @@ describe(@"control flow plugin API", ^{
         [p1 resetBlocks];
         rightBlockWasCalled = NO;
         p1.shouldInteractWithTextAttachmentBlock = blockToCall;
-        [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0)];
+        [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
         expect(rightBlockWasCalled).to.equal(YES);
 
         [p1 resetBlocks];
         rightBlockWasCalled = NO;
         p1.shouldInteractWithURLBlock = blockToCall;
-        [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10)];
+        [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10) interaction:UITextItemInteractionInvokeDefaultAction];
         expect(rightBlockWasCalled).to.equal(YES);
 
         // Test unregistration
@@ -219,8 +219,8 @@ describe(@"control flow plugin API", ^{
         [textView textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"dummy"];
         [textView textViewDidChange:textView];
         [textView textViewDidChangeSelection:textView];
-        [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0)];
-        [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10)];
+        [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
+        [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10) interaction:UITextItemInteractionInvokeDefaultAction];
     });
 });
 

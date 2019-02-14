@@ -105,8 +105,12 @@ typedef NSMutableArray RectValuesBuffer;
                                  usingBlock:^(NSDictionary *attrs, NSRange range, __unused BOOL *stop) {
                                      for (NSString *attr in attrs) {
                                          if (attr == HKWRoundedRectBackgroundAttributeName) {
-                                             RoundedRectAttributeTuple *tuple = @[[NSValue valueWithRange:range],
-                                                                                  attrs[attr]];
+                                             id const attributeValue = attrs[attr];
+                                             if (!attributeValue) {
+                                                 NSAssert(NO, @"Internal error");
+                                                 continue;
+                                             }
+                                             RoundedRectAttributeTuple *tuple = @[[NSValue valueWithRange:range], attributeValue];
                                              [buffer addObject:tuple];
                                          }
                                      }

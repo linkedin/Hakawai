@@ -317,8 +317,12 @@ describe(@"transformTypingAttributesWithTransformer API", ^{
     });
 
     it(@"should properly transform typing attributes", ^{
+        UIFont *const font = [UIFont fontWithName:@"Helvetica" size:10];
+        if (!font) {
+            expect(font).notTo.beNil();
+        }
         NSDictionary *old = @{NSBackgroundColorAttributeName: [UIColor greenColor],
-                              NSFontAttributeName: [UIFont fontWithName:@"Helvetica" size:10]};
+                              NSFontAttributeName: font};
         NSDictionary *new = @{NSForegroundColorAttributeName: [UIColor blueColor],
                               NSBackgroundColorAttributeName: [UIColor redColor]};
         textView.selectedRange = NSMakeRange(0, 0);
@@ -331,8 +335,12 @@ describe(@"transformTypingAttributesWithTransformer API", ^{
     });
 
     it(@"should properly ignore a nil transformer block", ^{
+        UIFont *const font = [UIFont fontWithName:@"Helvetica" size:10];
+        if (!font) {
+            expect(font).notTo.beNil();
+        }
         NSDictionary *old = @{NSBackgroundColorAttributeName: [UIColor greenColor],
-                              NSFontAttributeName: [UIFont fontWithName:@"Helvetica" size:10]};
+                              NSFontAttributeName: font};
         textView.selectedRange = NSMakeRange(0, 0);
         textView.typingAttributes = old;
         expect(textView.typingAttributes).to.equal(old);
