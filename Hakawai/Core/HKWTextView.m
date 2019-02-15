@@ -123,7 +123,12 @@
                                              constant:constraint.constant];
     }
     else if (constraint.secondItem == original) {
-        return [NSLayoutConstraint constraintWithItem:constraint.firstItem
+        id const constraintFirstItem = constraint.firstItem;
+        if (!constraintFirstItem) {
+            NSAssert(NO, @"constraint's first item should not be nil");
+            return constraint;
+        }
+        return [NSLayoutConstraint constraintWithItem:constraintFirstItem
                                             attribute:constraint.firstAttribute
                                             relatedBy:constraint.relation
                                                toItem:self
@@ -344,15 +349,19 @@
         return [self.abstractionLayer textViewShouldChangeTextInRange:range replacementText:replacementText];
     }
 
-    if (self.shouldRejectAutocorrectInsertions
-        && [replacementText length] > 1
-        && ![replacementText isEqualToString:[[UIPasteboard generalPasteboard] string]]) {
-        // PROVISIONAL FIX
-        // We need some way to distinguish autocorrect insertions from pasting in text. Since currently the only way
-        //  that multiple characters can be inserted at a time is through pasting text from the pasteboard, we can check
-        //  the text in the pasteboard against the string to be inserted to determine whether or not the request is
-        //  coming from the autocorrect module
-        return NO;
+    if (self.shouldRejectAutocorrectInsertions && [replacementText length] > 1) {
+        NSString *const pasteboardString = [[UIPasteboard generalPasteboard] string];
+        if (!pasteboardString) {
+            return NO;
+        }
+        if (![replacementText isEqualToString:pasteboardString]) {
+            // PROVISIONAL FIX
+            // We need some way to distinguish autocorrect insertions from pasting in text. Since currently the only way
+            //  that multiple characters can be inserted at a time is through pasting text from the pasteboard, we can check
+            //  the text in the pasteboard against the string to be inserted to determine whether or not the request is
+            //  coming from the autocorrect module
+            return NO;
+        }
     }
     if (self.firstResponderIsCycling) {
         return NO;

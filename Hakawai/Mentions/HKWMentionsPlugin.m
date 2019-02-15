@@ -323,7 +323,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         NSMutableAttributedString *buffer = [input mutableCopy];
         [buffer addAttribute:HKWMentionAttributeName value:mention range:HKW_FULL_RANGE(input)];
         for (NSString *attributeName in mentionAttributes) {
-            [buffer addAttribute:attributeName value:mentionAttributes[attributeName] range:HKW_FULL_RANGE(input)];
+            id const attributeValue = mentionAttributes[attributeName];
+            if (!attributeValue) {
+                NSAssert(NO, @"Internal error");
+                continue;
+            }
+            [buffer addAttribute:attributeName value:attributeValue range:HKW_FULL_RANGE(input)];
         }
         return buffer;
     }];
@@ -558,7 +563,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
         for (NSString *key in attributesToAdd) {
-            [buffer addAttribute:key value:attributesToAdd[key] range:HKW_FULL_RANGE(input)];
+            id const attributeValue = attributesToAdd[key];
+            if (!attributeValue) {
+                NSAssert(NO, @"Internal error");
+                continue;
+            }
+            [buffer addAttribute:key value:attributeValue range:HKW_FULL_RANGE(input)];
         }
         return [buffer copy];
     }];
@@ -1958,8 +1968,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 - (CGFloat)positionForChooserCursorRelativeToView:(UIView *)view atLocation:(NSUInteger)location {
     __strong __auto_type parentTextView = self.parentTextView;
     UITextView *textView = parentTextView;
-    CGRect rect = [textView caretRectForPosition:[textView positionFromPosition:textView.beginningOfDocument
-                                                                         offset:(NSInteger)location]];
+    UITextPosition *const position = [textView positionFromPosition:textView.beginningOfDocument offset:(NSInteger)location];
+    if (!position) {
+        NSAssert(NO, @"Internal error");
+        return 0;
+    }
+    CGRect rect = [textView caretRectForPosition:position];
     CGPoint correctedPoint = [view convertPoint:rect.origin fromView:parentTextView];
     return correctedPoint.x + rect.size.width/2;
 }

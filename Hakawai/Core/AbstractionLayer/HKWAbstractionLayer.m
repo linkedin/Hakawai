@@ -250,7 +250,12 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                 self.changeType = HKWAbstractionLayerChangeTypeDeletion;
                 self.changeRange = range;
                 self.changeString = [parentTextView.text substringWithRange:range];
-                self.changeIsPaste = [text isEqualToString:[[UIPasteboard generalPasteboard] string]];
+                NSString *const pasteboardString = [[UIPasteboard generalPasteboard] string];
+                if (pasteboardString) {
+                    self.changeIsPaste = [text isEqualToString:pasteboardString];
+                } else {
+                    self.changeIsPaste = NO;
+                }
             }
             else if ([text length] > 0 && range.length == 0) {
                 // User inserted text
@@ -265,7 +270,12 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                 self.changeType = HKWAbstractionLayerChangeTypeReplacement;
                 self.changeRange = range;
                 self.changeString = text;
-                self.changeIsPaste = [text isEqualToString:[[UIPasteboard generalPasteboard] string]];
+                NSString *const pasteboardString = [[UIPasteboard generalPasteboard] string];
+                if (pasteboardString) {
+                    self.changeIsPaste = [text isEqualToString:pasteboardString];
+                } else {
+                    self.changeIsPaste = NO;
+                }
             }
             else {
                 // No change (e.g. user tapped backspace when there was no text)
