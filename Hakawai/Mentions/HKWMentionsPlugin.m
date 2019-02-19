@@ -1899,9 +1899,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         case HKWAccessoryViewModeFreeFloating: {
             // The chooser view is attached to the top level view. Add constraints appropriately.
             __strong __auto_type parentTextView = self.parentTextView;
-            parentTextView.onAccessoryViewAttachmentBlock = ^(UIView *view, __unused BOOL ignored) {
+            parentTextView.onAccessoryViewAttachmentBlock = ^(UIView *accessoryView, __unused BOOL ignored) {
                 if (self.customModeAttachmentBlock) {
-                    self.customModeAttachmentBlock(view);
+                    self.customModeAttachmentBlock(accessoryView);
                 }
             };
             [parentTextView attachFreeFloatingAccessoryView:view absolutePosition:origin];

@@ -102,7 +102,7 @@ typedef NSMutableArray RectValuesBuffer;
     // Go through the attributes in the given range and pick out the ones that correspond to the
     [textStorage enumerateAttributesInRange:adjustedRange
                                     options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
-                                 usingBlock:^(NSDictionary *attrs, NSRange range, __unused BOOL *stop) {
+                                 usingBlock:^(NSDictionary *attrs, NSRange attributeRange, __unused BOOL *stop) {
                                      for (NSString *attr in attrs) {
                                          if (attr == HKWRoundedRectBackgroundAttributeName) {
                                              id const attributeValue = attrs[attr];
@@ -110,7 +110,7 @@ typedef NSMutableArray RectValuesBuffer;
                                                  NSAssert(NO, @"Internal error");
                                                  continue;
                                              }
-                                             RoundedRectAttributeTuple *tuple = @[[NSValue valueWithRange:range], attributeValue];
+                                             RoundedRectAttributeTuple *tuple = @[[NSValue valueWithRange:attributeRange], attributeValue];
                                              [buffer addObject:tuple];
                                          }
                                      }
