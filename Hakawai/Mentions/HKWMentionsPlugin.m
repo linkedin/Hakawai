@@ -1819,13 +1819,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     __weak typeof(self) __self = self;
     __strong __auto_type parentTextView = self.parentTextView;
     CGFloat gapHeight = [parentTextView rectForSingleLineViewportInMode:HKWViewportModeTop].size.height;
-    __weak typeof(parentTextView) __parentTextView = parentTextView;
     parentTextView.onAccessoryViewAttachmentBlock = ^(__unused UIView *view, __unused BOOL isFreeFloating) {
         typeof(self) strongSelf = __self;
-        typeof(parentTextView) strongParentTextView = __parentTextView;
         if (!strongSelf) {
             return;
         }
+        typeof(parentTextView) strongParentTextView = strongSelf.parentTextView;
         // Attach side constraints
         [strongParentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
                                                                                    attribute:NSLayoutAttributeLeft
