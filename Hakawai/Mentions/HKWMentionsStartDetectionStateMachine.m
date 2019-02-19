@@ -84,7 +84,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
                 [self.stringBuffer appendString:string];
                 self.charactersSinceLastWhitespace += [string length];
                 __strong __auto_type delegate = self.delegate;
-                if (self.charactersSinceLastWhitespace >= [delegate implicitSearchLength]) {
+                NSAssert([delegate implicitSearchLength] >= 0, @"Internal error");
+                if (self.charactersSinceLastWhitespace >= (NSUInteger)[delegate implicitSearchLength]) {
                     // The user has fired off enough characters to start a mention.
                     self.state = HKWMentionsStartDetectionStateCreatingMention;
                     [delegate beginMentionsCreationWithString:[self.stringBuffer copy]
@@ -148,7 +149,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
                     self.charactersSinceLastWhitespace++;
                     unichar stackC = c;
                     [self.stringBuffer appendString:[NSString stringWithCharacters:&stackC length:1]];
-                    if (self.charactersSinceLastWhitespace >= [delegate implicitSearchLength]) {
+                    NSAssert([delegate implicitSearchLength] >= 0, @"Internal error");
+                    if (self.charactersSinceLastWhitespace >= (NSUInteger)[delegate implicitSearchLength]) {
                         // The user has fired off enough characters to start a mention.
                         self.state = HKWMentionsStartDetectionStateCreatingMention;
                         [delegate beginMentionsCreationWithString:[self.stringBuffer copy]

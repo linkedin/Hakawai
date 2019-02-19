@@ -879,7 +879,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
         cell.userInteractionEnabled = NO;
         return cell;
     }
-    NSAssert(indexPath.row >= 0 && indexPath.row < [self.entityArray count],
+    NSAssert(indexPath.row >= 0 && (NSUInteger)indexPath.row < [self.entityArray count],
              @"Entity chooser table view requested a cell with an out-of-bounds index path row.");
     id<HKWMentionsEntityProtocol> entity = self.entityArray[(NSUInteger)indexPath.row];
     return [delegate cellForMentionsEntity:entity withMatchString:[self.stringBuffer copy] tableView:tableView atIndexPath:indexPath];
@@ -907,7 +907,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
         // Loading cell
         return [delegate heightForLoadingCellInTableView:tableView];
     }
-    NSAssert(indexPath.row >= 0 && indexPath.row < [self.entityArray count],
+    NSAssert(indexPath.row >= 0 && (NSUInteger)indexPath.row < [self.entityArray count],
              @"Entity chooser table view requested a cell with an out-of-bounds index path row.");
     id<HKWMentionsEntityProtocol> entity = self.entityArray[(NSUInteger)indexPath.row];
     return [delegate heightForCellForMentionsEntity:entity tableView:tableView];
