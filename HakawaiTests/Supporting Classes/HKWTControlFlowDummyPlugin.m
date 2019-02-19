@@ -53,46 +53,46 @@
 
 #pragma mark - Delegate
 
-- (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
+- (BOOL)textViewShouldBeginEditing:(__unused UITextView *)textView {
     if (self.shouldBeginEditingBlock) {
         self.shouldBeginEditingBlock();
     }
     return YES;
 }
 
-- (void)textViewDidBeginEditing:(UITextView *)textView {
+- (void)textViewDidBeginEditing:(__unused UITextView *)textView {
     if (self.didBeginEditingBlock) {
         self.didBeginEditingBlock();
     }
 }
 
-- (BOOL)textViewShouldEndEditing:(UITextView *)textView {
+- (BOOL)textViewShouldEndEditing:(__unused UITextView *)textView {
     if (self.shouldEndEditingBlock) {
         self.shouldEndEditingBlock();
     }
     return YES;
 }
 
-- (void)textViewDidEndEditing:(UITextView *)textView {
+- (void)textViewDidEndEditing:(__unused UITextView *)textView {
     if (self.didEndEditingBlock) {
         self.didEndEditingBlock();
     }
 }
 
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)replacementText {
+- (BOOL)textView:(__unused UITextView *)textView shouldChangeTextInRange:(__unused NSRange)range replacementText:(__unused NSString *)replacementText {
     if (self.shouldChangeTextInRangeBlock) {
         self.shouldChangeTextInRangeBlock();
     }
     return YES;
 }
 
-- (void)textViewDidChange:(UITextView *)textView {
+- (void)textViewDidChange:(__unused UITextView *)textView {
     if (self.didChangeBlock) {
         self.didChangeBlock();
     }
 }
 
-- (void)textViewDidChangeSelection:(UITextView *)textView {
+- (void)textViewDidChangeSelection:(__unused UITextView *)textView {
     if (self.didChangeSelectionBlock) {
         self.didChangeSelectionBlock();
     }
