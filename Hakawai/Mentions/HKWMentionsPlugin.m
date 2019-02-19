@@ -674,7 +674,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                          of the name; if this method returns NO the value of the passed-back string is undefined
  */
 - (BOOL)mentionCanBeTrimmed:(HKWMentionsAttribute *)mention
-              trimmedString:(NSString **)stringPointer {
+              trimmedString:(NSString * __autoreleasing *)stringPointer {
     // See if the mention is valid
     if (!mention) { return NO; }
     // See if the delegate will allow the mention to be trimmed
@@ -1824,58 +1824,59 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         if (!strongSelf) {
             return;
         }
+        typeof(parentTextView) strongParentTextView = strongSelf.parentTextView;
         // Attach side constraints
-        [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
-                                                                             attribute:NSLayoutAttributeLeft
-                                                                             relatedBy:NSLayoutRelationEqual
-                                                                                toItem:parentTextView
-                                                                             attribute:NSLayoutAttributeLeft
-                                                                            multiplier:1.0
-                                                                              constant:insets.left]];
-        [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
-                                                                             attribute:NSLayoutAttributeRight
-                                                                             relatedBy:NSLayoutRelationEqual
-                                                                                toItem:parentTextView
-                                                                             attribute:NSLayoutAttributeRight
-                                                                            multiplier:1.0
-                                                                              constant:-insets.right]];
+        [strongParentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                   attribute:NSLayoutAttributeLeft
+                                                                                   relatedBy:NSLayoutRelationEqual
+                                                                                      toItem:strongParentTextView
+                                                                                   attribute:NSLayoutAttributeLeft
+                                                                                  multiplier:1.0
+                                                                                    constant:insets.left]];
+        [strongParentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                   attribute:NSLayoutAttributeRight
+                                                                                   relatedBy:NSLayoutRelationEqual
+                                                                                      toItem:strongParentTextView
+                                                                                   attribute:NSLayoutAttributeRight
+                                                                                  multiplier:1.0
+                                                                                    constant:-insets.right]];
 
         // Attach top/bottom constraints
         switch (strongSelf.chooserPositionMode) {
             case HKWMentionsChooserPositionModeEnclosedTop: {
                 // Gap is at top
-                [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
-                                                                                     attribute:NSLayoutAttributeTop
-                                                                                     relatedBy:NSLayoutRelationEqual
-                                                                                        toItem:parentTextView
-                                                                                     attribute:NSLayoutAttributeTop
-                                                                                    multiplier:1.0
-                                                                                      constant:gapHeight + insets.top]];
-                [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
-                                                                                     attribute:NSLayoutAttributeBottom
-                                                                                     relatedBy:NSLayoutRelationEqual
-                                                                                        toItem:parentTextView
-                                                                                     attribute:NSLayoutAttributeBottom
-                                                                                    multiplier:1.0
-                                                                                      constant:-insets.bottom]];
+                [strongParentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                           attribute:NSLayoutAttributeTop
+                                                                                           relatedBy:NSLayoutRelationEqual
+                                                                                              toItem:strongParentTextView
+                                                                                           attribute:NSLayoutAttributeTop
+                                                                                          multiplier:1.0
+                                                                                            constant:gapHeight + insets.top]];
+                [strongParentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                           attribute:NSLayoutAttributeBottom
+                                                                                           relatedBy:NSLayoutRelationEqual
+                                                                                              toItem:strongParentTextView
+                                                                                           attribute:NSLayoutAttributeBottom
+                                                                                          multiplier:1.0
+                                                                                            constant:-insets.bottom]];
                 break;
             }
             case HKWMentionsChooserPositionModeEnclosedBottom: {
                 // Gap is at bottom
-                [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
-                                                                                     attribute:NSLayoutAttributeTop
-                                                                                     relatedBy:NSLayoutRelationEqual
-                                                                                        toItem:parentTextView
-                                                                                     attribute:NSLayoutAttributeTop
-                                                                                    multiplier:1.0
-                                                                                      constant:insets.top]];
-                [parentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
-                                                                                     attribute:NSLayoutAttributeBottom
-                                                                                     relatedBy:NSLayoutRelationEqual
-                                                                                        toItem:parentTextView
-                                                                                     attribute:NSLayoutAttributeBottom
-                                                                                    multiplier:1.0
-                                                                                      constant:-gapHeight - insets.bottom]];
+                [strongParentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                           attribute:NSLayoutAttributeTop
+                                                                                           relatedBy:NSLayoutRelationEqual
+                                                                                              toItem:strongParentTextView
+                                                                                           attribute:NSLayoutAttributeTop
+                                                                                          multiplier:1.0
+                                                                                            constant:insets.top]];
+                [strongParentTextView.superview addConstraint:[NSLayoutConstraint constraintWithItem:accessoryView
+                                                                                           attribute:NSLayoutAttributeBottom
+                                                                                           relatedBy:NSLayoutRelationEqual
+                                                                                              toItem:strongParentTextView
+                                                                                           attribute:NSLayoutAttributeBottom
+                                                                                          multiplier:1.0
+                                                                                            constant:-gapHeight - insets.bottom]];
                 break;
             }
             case HKWMentionsChooserPositionModeCustomLockBottomArrowPointingDown:
