@@ -55,7 +55,7 @@
 }
 
 - (void)setArrowPosition:(CGFloat)position {
-    self.borderView.pointerXPercent = fabs(position/self.bounds.size.width);
+    self.borderView.pointerXPercent = (CGFloat)fabs(position/self.bounds.size.width);
     [self updateSubviewsForMode:self.borderMode];
 }
 

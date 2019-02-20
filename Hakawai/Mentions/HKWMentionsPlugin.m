@@ -533,10 +533,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (range.location == NSNotFound || range.length == 0) {
         return;
     }
+    __strong __auto_type parentTextView = self.parentTextView;
 #ifdef DEBUG
     // For development: assert that a mention actually exists
     NSRange dataRange;
-    __strong __auto_type parentTextView = self.parentTextView;
     NSAttributedString *parentText = parentTextView.attributedText;
     id mentionData = [parentText attribute:HKWMentionAttributeName
                                    atIndex:range.location
@@ -631,10 +631,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (range.location == NSNotFound || range.length == 0) {
         return;
     }
+    __strong __auto_type parentTextView = self.parentTextView;
 #ifdef DEBUG
     // For development: assert that a mention actually exists
     NSRange dataRange;
-    __strong __auto_type parentTextView = self.parentTextView;
     NSAttributedString *parentText = parentTextView.attributedText;
     id mentionData = [parentText attribute:HKWMentionAttributeName
                                    atIndex:range.location
