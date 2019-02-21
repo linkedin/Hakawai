@@ -938,18 +938,18 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                         // the string starting from 0 to the deleted character's index
                         NSString *leftString = [parentTextView.text substringToIndex:location];
                         if ([leftString length] > 0) {
-                            NSInteger index = (NSInteger)[leftString length] - 1;
+                            NSUInteger index = [leftString length] - 1;
                             // Grab the start index of word to the left of the cursor by walking backwards through the string
                             // until a whitespace char is hit or the beginning of the string
                             for (; index >= 0; index--) {
-                                unichar c = [leftString characterAtIndex:(NSUInteger)index];
+                                unichar c = [leftString characterAtIndex:index];
                                 if ([whitespaceSet characterIsMember:c]) {
                                     break;
                                 }
                             }
                             index++; // Advance the index to avoid capturing the space or -1 when hitting the lower bound
 
-                            NSString *adjacentWord = [leftString substringFromIndex:(NSUInteger)index];
+                            NSString *adjacentWord = [leftString substringFromIndex:index];
                             if ([adjacentWord length] > 0) {
                                 unichar firstChar = [adjacentWord characterAtIndex:0];
                                 BOOL usesControlChar = [self.controlCharacterSet characterIsMember:firstChar];
@@ -958,7 +958,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                 }
                                 if ([adjacentWord length] > 0) {
                                     [self.startDetectionStateMachine validStringInserted:adjacentWord
-                                                                              atLocation:(NSUInteger)index
+                                                                              atLocation:index
                                                                    usingControlCharacter:usesControlChar
                                                                         controlCharacter:(usesControlChar ? firstChar : 0)];
                                 }
