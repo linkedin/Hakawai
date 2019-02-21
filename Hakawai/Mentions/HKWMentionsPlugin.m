@@ -151,6 +151,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 @synthesize parentTextView = _parentTextView;
 
+@synthesize dictationString;
+
 + (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode {
     static const NSInteger defaultSearchLength = 3;
     return [self mentionsPluginWithChooserMode:mode
@@ -478,13 +480,18 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 #pragma mark - Private
 
 /*!
- Return whether or not a given string is eligible to be appended to the start detection state machine's buffer. Minimum
- requirements include not containing any whitespace or newline characters.
+ Return whether or not a given string is eligible to be appended to the start detection state machine's buffer.
+ Minimum requirements include not containing any whitespace or newline characters or in case of dication string input.
  */
 - (BOOL)stringValidForMentionsCreation:(NSString *)string {
     if ([string length] == 0) {
         return NO;
     }
+
+    if ([self.dictationString isEqualToString:string]) {
+        return YES;
+    }
+
     NSCharacterSet *invalidChars = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     for (NSUInteger i=0; i<[string length]; i++) {
         unichar c = [string characterAtIndex:i];
@@ -533,10 +540,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (range.location == NSNotFound || range.length == 0) {
         return;
     }
+    __strong __auto_type parentTextView = self.parentTextView;
 #ifdef DEBUG
     // For development: assert that a mention actually exists
     NSRange dataRange;
-    __strong __auto_type parentTextView = self.parentTextView;
     NSAttributedString *parentText = parentTextView.attributedText;
     id mentionData = [parentText attribute:HKWMentionAttributeName
                                    atIndex:range.location
@@ -631,10 +638,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (range.location == NSNotFound || range.length == 0) {
         return;
     }
+    __strong __auto_type parentTextView = self.parentTextView;
 #ifdef DEBUG
     // For development: assert that a mention actually exists
     NSRange dataRange;
-    __strong __auto_type parentTextView = self.parentTextView;
     NSAttributedString *parentText = parentTextView.attributedText;
     id mentionData = [parentText attribute:HKWMentionAttributeName
                                    atIndex:range.location

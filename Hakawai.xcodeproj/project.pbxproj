@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		77004FD7B4A6E9EDAD723CA9 /* libPods-Hakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6238CF1B85D9D08466AD7A9C /* libPods-Hakawai.a */; };
 		9C65FBC81F607DEB004A9CB4 /* HKWLayoutManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */; };
 		9C65FBC91F607DEB004A9CB4 /* HKWMentionsPluginTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */; };
 		B149A63E2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m in Sources */ = {isa = PBXBuildFile; fileRef = B149A63D2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m */; };
 		B149A6432106294C00AFEAFB /* HKWTDummyMentionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B149A63F2106294C00AFEAFB /* HKWTDummyMentionsManager.m */; };
 		B149A6442106294C00AFEAFB /* HKWTDummyMentionEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = B149A6422106294C00AFEAFB /* HKWTDummyMentionEntity.m */; };
-		D923C7A86BAE4140B98CE674 /* libPods-HakawaiTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA135592875A450893230734 /* libPods-HakawaiTests.a */; };
 		E11DF8D119EC8DA30072F4AD /* HKWTextView+TextTransformation.m in Sources */ = {isa = PBXBuildFile; fileRef = E11DF8D019EC8DA30072F4AD /* HKWTextView+TextTransformation.m */; };
 		E1233BFC19A303620052217A /* HKWTextViewPluginTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */; };
 		E1233C0019A3089B0052217A /* HKWTBasicDummyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1233BFF19A3089B0052217A /* HKWTBasicDummyPlugin.m */; };
@@ -43,6 +43,7 @@
 		E1D5501A19A2F479001DCF1F /* HKWTextViewAutoXTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501919A2F479001DCF1F /* HKWTextViewAutoXTests.m */; };
 		E1D5501D19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1D5501C19A2F77A001DCF1F /* HKWTextViewAccessoryViewTests.m */; };
 		E1DC1F8D19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E1DC1F8C19A2D38B00BCF8C7 /* HKWTextViewTextTransformerTests.m */; };
+		F8AB7CC9488708A5986C384E /* libPods-HakawaiTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 108C7818835593A0608E8CD0 /* libPods-HakawaiTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,20 +69,23 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		108C7818835593A0608E8CD0 /* libPods-HakawaiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HakawaiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		310429A28E50270CAF668021 /* Pods-HakawaiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.release.xcconfig"; sourceTree = "<group>"; };
 		44A295D52212320C00B73558 /* Hakawai.common.warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.common.warnings.xcconfig; path = xcconfigs/Hakawai.common.warnings.xcconfig; sourceTree = SOURCE_ROOT; };
 		44A295D722124BAB00B73558 /* Hakawai.common.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.common.xcconfig; path = xcconfigs/Hakawai.common.xcconfig; sourceTree = SOURCE_ROOT; };
 		44A295D822134C7600B73558 /* Hakawai.debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.debug.xcconfig; path = xcconfigs/Hakawai.debug.xcconfig; sourceTree = SOURCE_ROOT; };
 		44A295D922134C7600B73558 /* Hakawai.release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.release.xcconfig; path = xcconfigs/Hakawai.release.xcconfig; sourceTree = SOURCE_ROOT; };
+		6238CF1B85D9D08466AD7A9C /* libPods-Hakawai.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Hakawai.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		91FF0C96BCF39C932C98A368 /* Pods-HakawaiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManagerTests.m; sourceTree = "<group>"; };
 		9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWMentionsPluginTests.m; sourceTree = "<group>"; };
-		ADAD3A835F36586553D39C04 /* Pods-HakawaiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B05DA0DBC0625091FC4456C0 /* Pods-Hakawai.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hakawai.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hakawai/Pods-Hakawai.release.xcconfig"; sourceTree = "<group>"; };
 		B149A63D2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWMentionsCreationStateMachineTest.m; sourceTree = "<group>"; };
 		B149A63F2106294C00AFEAFB /* HKWTDummyMentionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTDummyMentionsManager.m; path = "Supporting Classes/HKWTDummyMentionsManager.m"; sourceTree = "<group>"; };
 		B149A6402106294C00AFEAFB /* HKWTDummyMentionEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTDummyMentionEntity.h; path = "Supporting Classes/HKWTDummyMentionEntity.h"; sourceTree = "<group>"; };
 		B149A6412106294C00AFEAFB /* HKWTDummyMentionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTDummyMentionsManager.h; path = "Supporting Classes/HKWTDummyMentionsManager.h"; sourceTree = "<group>"; };
 		B149A6422106294C00AFEAFB /* HKWTDummyMentionEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTDummyMentionEntity.m; path = "Supporting Classes/HKWTDummyMentionEntity.m"; sourceTree = "<group>"; };
-		C6EA852D0C609CF4B630BAD3 /* Pods-HakawaiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.release.xcconfig"; sourceTree = "<group>"; };
-		DA135592875A450893230734 /* libPods-HakawaiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HakawaiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7279F7F7F1F30EF0603FB9B /* Pods-Hakawai.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hakawai.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hakawai/Pods-Hakawai.debug.xcconfig"; sourceTree = "<group>"; };
 		E11DF8CF19EC8DA30072F4AD /* HKWTextView+TextTransformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+TextTransformation.h"; sourceTree = "<group>"; };
 		E11DF8D019EC8DA30072F4AD /* HKWTextView+TextTransformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HKWTextView+TextTransformation.m"; sourceTree = "<group>"; };
 		E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewPluginTests.m; sourceTree = "<group>"; };
@@ -148,6 +152,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1C9676019A2A66000A4AA93 /* Foundation.framework in Frameworks */,
+				77004FD7B4A6E9EDAD723CA9 /* libPods-Hakawai.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,13 +164,24 @@
 				E1C9676E19A2A66000A4AA93 /* XCTest.framework in Frameworks */,
 				E1C9677119A2A66000A4AA93 /* UIKit.framework in Frameworks */,
 				E1C9676F19A2A66000A4AA93 /* Foundation.framework in Frameworks */,
-				D923C7A86BAE4140B98CE674 /* libPods-HakawaiTests.a in Frameworks */,
+				F8AB7CC9488708A5986C384E /* libPods-HakawaiTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		160470F871C18676339D58A7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C7279F7F7F1F30EF0603FB9B /* Pods-Hakawai.debug.xcconfig */,
+				B05DA0DBC0625091FC4456C0 /* Pods-Hakawai.release.xcconfig */,
+				91FF0C96BCF39C932C98A368 /* Pods-HakawaiTests.debug.xcconfig */,
+				310429A28E50270CAF668021 /* Pods-HakawaiTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		E1233BFD19A308790052217A /* Supporting Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -273,7 +289,7 @@
 				E1C9677519A2A66000A4AA93 /* HakawaiTests */,
 				E1C9675E19A2A66000A4AA93 /* Frameworks */,
 				E1C9675D19A2A66000A4AA93 /* Products */,
-				F7DB70E8EF6448CBE34D48FE /* Pods */,
+				160470F871C18676339D58A7 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -292,7 +308,8 @@
 				E1C9675F19A2A66000A4AA93 /* Foundation.framework */,
 				E1C9676D19A2A66000A4AA93 /* XCTest.framework */,
 				E1C9677019A2A66000A4AA93 /* UIKit.framework */,
-				DA135592875A450893230734 /* libPods-HakawaiTests.a */,
+				6238CF1B85D9D08466AD7A9C /* libPods-Hakawai.a */,
+				108C7818835593A0608E8CD0 /* libPods-HakawaiTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -348,15 +365,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		F7DB70E8EF6448CBE34D48FE /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				ADAD3A835F36586553D39C04 /* Pods-HakawaiTests.debug.xcconfig */,
-				C6EA852D0C609CF4B630BAD3 /* Pods-HakawaiTests.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -364,6 +372,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E1C9677F19A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "Hakawai" */;
 			buildPhases = (
+				63921F105064BA327E062814 /* [CP] Check Pods Manifest.lock */,
 				E1C9675819A2A66000A4AA93 /* Sources */,
 				E1C9675919A2A66000A4AA93 /* Frameworks */,
 				E1C9675A19A2A66000A4AA93 /* CopyFiles */,
@@ -381,12 +390,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E1C9678219A2A66000A4AA93 /* Build configuration list for PBXNativeTarget "HakawaiTests" */;
 			buildPhases = (
-				D955317DCA2B4C8697710DD2 /* Check Pods Manifest.lock */,
+				2A58DB91DACF8DAA85F392E3 /* [CP] Check Pods Manifest.lock */,
 				E1C9676819A2A66000A4AA93 /* Sources */,
 				E1C9676919A2A66000A4AA93 /* Frameworks */,
 				E1C9676A19A2A66000A4AA93 /* Resources */,
-				78EF1E9F7A6348EBBC9EC13B /* Copy Pods Resources */,
-				FE97749903D37C42118F6A37 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -442,49 +449,48 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		78EF1E9F7A6348EBBC9EC13B /* Copy Pods Resources */ = {
+		2A58DB91DACF8DAA85F392E3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
+			inputFileListPaths = (
 			);
-			name = "Copy Pods Resources";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HakawaiTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests-resources.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D955317DCA2B4C8697710DD2 /* Check Pods Manifest.lock */ = {
+		63921F105064BA327E062814 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
+			inputFileListPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Hakawai-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		FE97749903D37C42118F6A37 /* Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests-frameworks.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -559,14 +565,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 44A295D822134C7600B73558 /* Hakawai.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 			};
 			name = Debug;
 		};
@@ -574,17 +576,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 44A295D922134C7600B73558 /* Hakawai.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 			};
 			name = Release;
 		};
 		E1C9678019A2A66000A4AA93 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C7279F7F7F1F30EF0603FB9B /* Pods-Hakawai.debug.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/Hakawai.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -592,11 +593,11 @@
 		};
 		E1C9678119A2A66000A4AA93 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B05DA0DBC0625091FC4456C0 /* Pods-Hakawai.release.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/Hakawai.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
-				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -604,7 +605,7 @@
 		};
 		E1C9678319A2A66000A4AA93 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ADAD3A835F36586553D39C04 /* Pods-HakawaiTests.debug.xcconfig */;
+			baseConfigurationReference = 91FF0C96BCF39C932C98A368 /* Pods-HakawaiTests.debug.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -613,10 +614,6 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = "HakawaiTests/HakawaiTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xctest;
@@ -625,7 +622,7 @@
 		};
 		E1C9678419A2A66000A4AA93 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C6EA852D0C609CF4B630BAD3 /* Pods-HakawaiTests.release.xcconfig */;
+			baseConfigurationReference = 310429A28E50270CAF668021 /* Pods-HakawaiTests.release.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",

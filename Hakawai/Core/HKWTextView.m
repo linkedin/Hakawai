@@ -258,6 +258,77 @@
     }
 }
 
+- (void)handleDictationString:(NSString *)dictationString {
+    if ([self.controlFlowPlugin respondsToSelector:@selector(setDictationString:)]) {
+        [self.controlFlowPlugin setDictationString:dictationString];
+    }
+
+    if ([self shouldChangeTextInRange:NSMakeRange(self.text.length, 0) replacementText:dictationString isDictationText:YES textView:self]) {
+        [self insertText:dictationString];
+    }
+}
+
+- (BOOL)shouldChangeTextInRange:(NSRange)range
+                replacementText:(NSString *)replacementText
+                isDictationText:(BOOL)isDictationText
+                       textView:(UITextView *)textView {
+    // Note that the abstraction layer overrides all other behavior
+    if (self.abstractionLayerEnabled) {
+        return [self.abstractionLayer textViewShouldChangeTextInRange:range replacementText:replacementText];
+    }
+
+    if (!isDictationText && self.shouldRejectAutocorrectInsertions && [replacementText length] > 1) {
+        NSString *const pasteboardString = [[UIPasteboard generalPasteboard] string];
+        if (!pasteboardString) {
+            return NO;
+        }
+        if (![replacementText isEqualToString:pasteboardString]) {
+            // PROVISIONAL FIX
+            // We need some way to distinguish autocorrect insertions from pasting in text. Since currently the only way
+            //  that multiple characters can be inserted at a time is through pasting text from the pasteboard, we can check
+            //  the text in the pasteboard against the string to be inserted to determine whether or not the request is
+            //  coming from the autocorrect module
+            return NO;
+        }
+    }
+    if (self.firstResponderIsCycling) {
+        return NO;
+    }
+    // Inform plug-in
+    BOOL customValue = YES;
+    BOOL shouldUseCustomValue = NO;
+
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]) {
+        shouldUseCustomValue = YES;
+        customValue = [self.controlFlowPlugin textView:textView
+                               shouldChangeTextInRange:range
+                                       replacementText:replacementText];
+    }
+    // Forward to external delegate if:
+    // 1) There is no control flow plugin registered OR
+    // 2) Control flow plugin doesn't implement this delegate method OR
+    // 2) Control flow plugin has approved the replacement
+    __strong __auto_type externalDelegate = self.externalDelegate;
+    if ((!shouldUseCustomValue || customValue)
+        && [externalDelegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]) {
+        shouldUseCustomValue = YES;
+        customValue = [externalDelegate textView:textView
+                         shouldChangeTextInRange:range
+                                 replacementText:replacementText];
+    }
+
+    // Update the typing attributes dictionary to support custom attributes
+    if (range.location != NSNotFound) {
+        NSMutableDictionary *newTypingAttributes = [self.typingAttributes mutableCopy];
+        for (NSString *attribute in self.customTypingAttributes) {
+            newTypingAttributes[attribute] = self.customTypingAttributes[attribute];
+        }
+        self.typingAttributes = [newTypingAttributes copy];
+    }
+
+    return shouldUseCustomValue ? customValue : YES;
+}
+
 #pragma mark - UITextViewDelegate
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
@@ -344,61 +415,7 @@
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)replacementText {
-    // Note that the abstraction layer overrides all other behavior
-    if (self.abstractionLayerEnabled) {
-        return [self.abstractionLayer textViewShouldChangeTextInRange:range replacementText:replacementText];
-    }
-
-    if (self.shouldRejectAutocorrectInsertions && [replacementText length] > 1) {
-        NSString *const pasteboardString = [[UIPasteboard generalPasteboard] string];
-        if (!pasteboardString) {
-            return NO;
-        }
-        if (![replacementText isEqualToString:pasteboardString]) {
-            // PROVISIONAL FIX
-            // We need some way to distinguish autocorrect insertions from pasting in text. Since currently the only way
-            //  that multiple characters can be inserted at a time is through pasting text from the pasteboard, we can check
-            //  the text in the pasteboard against the string to be inserted to determine whether or not the request is
-            //  coming from the autocorrect module
-            return NO;
-        }
-    }
-    if (self.firstResponderIsCycling) {
-        return NO;
-    }
-    // Inform plug-in
-    BOOL customValue = YES;
-    BOOL shouldUseCustomValue = NO;
-
-    if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]) {
-        shouldUseCustomValue = YES;
-        customValue = [self.controlFlowPlugin textView:textView
-                               shouldChangeTextInRange:range
-                                       replacementText:replacementText];
-    }
-    // Forward to external delegate if:
-    // 1) There is no control flow plugin registered OR
-    // 2) Control flow plugin doesn't implement this delegate method OR
-    // 2) Control flow plugin has approved the replacement
-    __strong __auto_type externalDelegate = self.externalDelegate;
-    if ((!shouldUseCustomValue || customValue)
-        && [externalDelegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]) {
-        shouldUseCustomValue = YES;
-        customValue = [externalDelegate textView:textView
-                         shouldChangeTextInRange:range
-                                 replacementText:replacementText];
-    }
-
-    // Update the typing attributes dictionary to support custom attributes
-    if (range.location != NSNotFound) {
-        NSMutableDictionary *newTypingAttributes = [self.typingAttributes mutableCopy];
-        for (NSString *attribute in self.customTypingAttributes) {
-            newTypingAttributes[attribute] = self.customTypingAttributes[attribute];
-        }
-        self.typingAttributes = [newTypingAttributes copy];
-    }
-    
-    return shouldUseCustomValue ? customValue : YES;
+    return [self shouldChangeTextInRange:range replacementText:replacementText isDictationText:NO textView:textView];
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
@@ -598,6 +615,15 @@
     }
 }
 
+#pragma mark - UITextInput
+
+- (void)insertDictationResult:(NSArray<UIDictationPhrase *> *)dictationResults {
+    NSMutableString *const dictationString = [[NSMutableString alloc] init];
+    for (UIDictationPhrase *dictationResult in dictationResults) {
+        [dictationString appendString:dictationResult.text];
+    }
+    [self handleDictationString:dictationString];
+}
 
 #pragma mark - Properties
 

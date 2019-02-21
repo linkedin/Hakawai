@@ -48,7 +48,7 @@ class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, 
 
     @IBAction func chooseButtonTapped(_ sender: UIButton) {
         let idx = pickerView.selectedRow(inComponent: 0)
-        delegate?.modelObjectSelected(at: idx)
+        delegate?.modelObjectSelected(at: UInt(idx))
     }
 
     // Reload the data
@@ -59,7 +59,7 @@ class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, 
     // MARK: Picker view delegate and data source
 
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        let model = delegate?.modelObject(for: row) as! HKWMentionsEntityProtocol
+        let model = delegate?.modelObject(for: UInt(row)) as! HKWMentionsEntityProtocol
         return model.entityName()
     }
 
@@ -68,6 +68,6 @@ class SimpleChooserView : UIView, UIPickerViewDataSource, UIPickerViewDelegate, 
     }
 
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return delegate?.numberOfModelObjects() ?? 0
+        return Int(delegate?.numberOfModelObjects() ?? 0)
     }
 }

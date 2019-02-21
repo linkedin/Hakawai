@@ -46,7 +46,7 @@
     CGMutablePathRef path = CGPathCreateMutable();
     CGRect bounds = self.bounds;
 
-    CGFloat currentY = self.borderOnTop ? bounds.size.height - self.strokeThickness/2.0 : (0 + self.strokeThickness/2.0);
+    CGFloat currentY = self.borderOnTop ? bounds.size.height - self.strokeThickness/2.0f : (0 + self.strokeThickness/2.0f);
     CGPathMoveToPoint(path, NULL, 0, currentY);
     CGPathAddLineToPoint(path, NULL, bounds.size.width, currentY);
     CGContextAddPath(context, path);
@@ -60,7 +60,7 @@
 
 - (void)drawBorderWithPointer {
     CGSize size = self.bounds.size;
-    CGFloat baseY = self.borderOnTop ? (size.height - self.strokeThickness/2.0) : (0 + self.strokeThickness/2.0);
+    CGFloat baseY = self.borderOnTop ? (size.height - self.strokeThickness/2.0f) : (0 + self.strokeThickness/2.0f);
     CGFloat topY = baseY + self.arrowTipYOffset;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -87,7 +87,7 @@
 
 - (void)moveArrowToPosition {
     BOOL arrowPointsUp = self.borderOnTop;
-    CGFloat xPosition = floor((self.bounds.size.width * self.pointerXPercent) - (self.arrowWidth/2.0));
+    CGFloat xPosition = (CGFloat)floor((self.bounds.size.width * self.pointerXPercent) - (self.arrowWidth/2.0f));
     CGFloat yPosition = arrowPointsUp ? (self.bounds.size.height - self.arrowHeight) : 0;
     [self.delegate moveArrowViewToPositionRelativeToBorderView:CGPointMake(xPosition, yPosition)];
 }
@@ -108,8 +108,8 @@
 - (void)setPointerXPercent:(CGFloat)pointerXPercent {
     if (_pointerXPercent == pointerXPercent) return;
     // Clamp to bounds
-    static const CGFloat lowerClamp = 0.05;
-    static const CGFloat upperClamp = 0.95;
+    static const CGFloat lowerClamp = 0.05f;
+    static const CGFloat upperClamp = 0.95f;
     if (pointerXPercent < lowerClamp) pointerXPercent = lowerClamp;
     if (pointerXPercent > upperClamp) pointerXPercent = upperClamp;
     _pointerXPercent = pointerXPercent;
@@ -118,7 +118,7 @@
 
 - (UIColor *)strokeColor {
     if (!_strokeColor) {
-        _strokeColor = [UIColor colorWithRed:0.66 green:0.66 blue:0.67 alpha:1.0];
+        _strokeColor = [UIColor colorWithRed:0.66f green:0.66f blue:0.67f alpha:1.0f];
     }
     return _strokeColor;
 }
@@ -142,20 +142,20 @@
 #pragma mark - Computed properties
 
 - (CGFloat)arrowLeftX {
-    return self.arrowMiddleX - self.arrowWidth/2.0;
+    return self.arrowMiddleX - self.arrowWidth/2.0f;
 }
 
 - (CGFloat)arrowMiddleX {
-    return floor(self.pointerXPercent * (self.bounds.size.width));
+    return (CGFloat)floor(self.pointerXPercent * (self.bounds.size.width));
 }
 
 - (CGFloat)arrowRightX {
-    return self.arrowMiddleX + self.arrowWidth/2.0;
+    return self.arrowMiddleX + self.arrowWidth/2.0f;
 }
 
 - (CGFloat)arrowTipYOffset {
     BOOL arrowPointsUp = self.borderOnTop;
-    return arrowPointsUp ? self.strokeThickness/2.0 - self.arrowHeight : self.arrowHeight - self.strokeThickness/2.0;
+    return arrowPointsUp ? self.strokeThickness/2.0f - self.arrowHeight : self.arrowHeight - self.strokeThickness/2.0f;
 }
 
 @end
