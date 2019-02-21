@@ -20,6 +20,10 @@
 #import "HKWMentionsPlugin.h"
 #import "HKWMentionsAttribute.h"
 
+@interface HKWMentionsPlugin ()
+- (BOOL)stringValidForMentionsCreation:(NSString *)string;
+@end
+
 SpecBegin(mentionPluginsSetup)
 
 describe(@"basic mentions plugin setup", ^{
@@ -116,6 +120,30 @@ describe(@"inserting and reading mentions", ^{
         [mentionsPlugin addMention:m2];
 
         expect(mentionsPlugin.mentions.count).to.equal(2);
+    });
+});
+
+describe(@"mentions validation", ^{
+    __block HKWTextView *textView;
+    __block HKWMentionsPlugin *mentionsPlugin;
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        mentionsPlugin = [HKWMentionsPlugin mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
+        [textView setControlFlowPlugin:mentionsPlugin];
+    });
+
+    it(@"check the string validation for dictation string", ^{
+        NSString *const mentionString = @"Alan Perkis";
+
+        // Multi word string should not be valid for mentions creation
+        BOOL isStringValid = [mentionsPlugin stringValidForMentionsCreation:mentionString];
+        expect(isStringValid).to.equal(NO);
+
+        // Multi word string should be valid for mentions creation, only if it matches the dictation string
+        [mentionsPlugin setDictationString:mentionString];
+        isStringValid = [mentionsPlugin stringValidForMentionsCreation:mentionString];
+        expect(isStringValid).to.equal(YES);
     });
 });
 

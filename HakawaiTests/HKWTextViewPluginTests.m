@@ -38,6 +38,7 @@
 - (void)textViewDidChangeSelection:(UITextView *)textView;
 - (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction;
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction;
+- (void)handleDictationString:(NSString *)dictationString;
 @end
 
 SpecBegin(basicPlugins)
@@ -440,6 +441,34 @@ describe(@"control flow plug-in register/unregister hooks", ^{
         textView.controlFlowPlugin = p1;
         // This test needs a bit of work. It only checks that either of the blocks was called, not both
         expect(rightBlockWasCalled).to.beTruthy();
+    });
+});
+
+SpecEnd
+
+SpecBegin(dictationInput)
+
+describe(@"dictationInput", ^{
+    __block HKWTextView *textView;
+    __block HKWTControlFlowDummyPlugin *mentionsPlugin;
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        mentionsPlugin = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p1"];
+        [textView setControlFlowPlugin:mentionsPlugin];
+    });
+
+    it(@"insert text should be called for dictation input", ^{
+        __block BOOL rightBlockWasCalled = NO;
+        void (^blockToCall)(void) = ^{
+            rightBlockWasCalled = YES;
+        };
+
+        mentionsPlugin.shouldChangeTextInRangeBlock = blockToCall;
+        [textView handleDictationString:@"Alan Perlis"];
+
+        expect(rightBlockWasCalled).to.equal(YES);
+        expect(textView.text).to.equal(@"Alan Perlis");
     });
 });
 
