@@ -45,4 +45,7 @@
 
 @optional
 
+/// This property holds the `string` added in the `HKWTextView` via dictation
+@property (nonatomic, strong, readwrite) NSString *dictationString;
+
 @end
