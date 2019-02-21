@@ -119,4 +119,39 @@ describe(@"inserting and reading mentions", ^{
     });
 });
 
+describe(@"deleting and reading mentions", ^{
+    __block HKWTextView *textView;
+    __block HKWMentionsPlugin *mentionsPlugin;
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        mentionsPlugin = [HKWMentionsPlugin mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
+        [textView setControlFlowPlugin:mentionsPlugin];
+    });
+
+    it(@"should properly handle mention deletion", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"Asdf ghjkl" identifier:@"1"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // the first attempt to delete mention should select the mention and modify the state. No changes apply to the mention and text
+        BOOL deletionResult1 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(m1.mentionText.length-1, 1) replacementText:@""];
+        expect(deletionResult1).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // the second attempt deletes the whole mention
+        BOOL deletionResult2 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(m1.mentionText.length-1, 1) replacementText:@""];
+        expect(deletionResult2).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        expect([textView.text length]).to.equal(0);
+
+    });
+});
+
 SpecEnd
