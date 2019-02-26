@@ -1,3 +1,12 @@
+trigger:
+- master
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - master
+
 pool:
   vmImage: Hosted macOS
   demands: xcode
@@ -12,3 +21,16 @@ steps:
     xcWorkspacePath: 'Hakawai.xcworkspace'
     scheme: 'Hakawai'
     xcodeVersion: '10'
+
+- task: Xcode@5
+  displayName: 'Xcode test'
+  inputs:
+    actions: test
+    configuration: Debug
+    sdk: iphonesimulator
+    xcWorkspacePath: 'Hakawai.xcworkspace'
+    scheme: 'Hakawai'
+    xcodeVersion: '10'
+    destinationPlatformOption: iOS
+    destinationSimulators: 'iPhone X'
+    publishJUnitResults: true
