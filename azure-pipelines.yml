@@ -1,0 +1,20 @@
+pool:
+  vmImage: 'macOS 10.13'
+
+trigger:
+- master
+
+steps:
+- task: CocoaPods@0
+  displayName: 'pod install using the CocoaPods task with defaults'
+  inputs:
+    forceRepoUpdate: true
+    workingDirectory: 'Hakawai'
+
+- task: Xcode@5
+  inputs:
+    actions: 'build'
+    scheme: 'Hakawai'
+    sdk: 'iphoneos'
+    configuration: 'Debug'
+    xcWorkspacePath: 'Hakawai.xcworkspace'
