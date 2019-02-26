@@ -1,20 +1,14 @@
 pool:
-  vmImage: 'macOS 10.13'
-
-trigger:
-- master
+  vmImage: Hosted macOS
+  demands: xcode
 
 steps:
 - task: CocoaPods@0
-  displayName: 'pod install using the CocoaPods task with defaults'
-  inputs:
-    forceRepoUpdate: true
-    workingDirectory: 'Hakawai'
+  displayName: 'pod install'
 
 - task: Xcode@5
+  displayName: 'Xcode build'
   inputs:
-    actions: 'build'
-    scheme: 'Hakawai'
-    sdk: 'iphoneos'
-    configuration: 'Debug'
     xcWorkspacePath: 'Hakawai.xcworkspace'
+    scheme: 'Hakawai'
+    xcodeVersion: '10'
