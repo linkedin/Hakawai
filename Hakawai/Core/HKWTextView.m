@@ -263,7 +263,8 @@
         [self.controlFlowPlugin setDictationString:dictationString];
     }
 
-    if ([self shouldChangeTextInRange:NSMakeRange(self.text.length, 0) replacementText:dictationString isDictationText:YES textView:self]) {
+    // Used selected range to get the cursor position. So that text will be replaced after the cursor.
+    if ([self shouldChangeTextInRange:self.selectedRange replacementText:dictationString isDictationText:YES textView:self]) {
         [self insertText:dictationString];
     }
 }

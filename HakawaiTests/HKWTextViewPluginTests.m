@@ -470,6 +470,28 @@ describe(@"dictationInput", ^{
         expect(rightBlockWasCalled).to.equal(YES);
         expect(textView.text).to.equal(@"Alan Perlis");
     });
+
+    it(@"should properly handle mentions for changed cursor position with dictation input", ^{
+        __block BOOL rightBlockWasCalled = NO;
+        void (^blockToCall)(void) = ^{
+            rightBlockWasCalled = YES;
+        };
+
+        mentionsPlugin.shouldChangeTextInRangeBlock = blockToCall;
+        NSString *mentionOneText = @"Alan Perlis";
+        NSString *mentionTwoText = @"Dennis Ritchie";
+        [textView handleDictationString:mentionOneText];
+        expect(rightBlockWasCalled).to.equal(YES);
+        expect(textView.text).to.equal(@"Alan Perlis");
+
+        rightBlockWasCalled = NO;
+        // Simulating the changed cursor position to 8th index in current text where 8 = length of "Alan Per"
+        textView.selectedRange = NSMakeRange(8, 0);
+
+        [textView handleDictationString: mentionTwoText];
+        expect(rightBlockWasCalled).to.equal(YES);
+        expect(textView.text).to.equal(@"Alan PerDennis Ritchielis");
+    });
 });
 
 SpecEnd
