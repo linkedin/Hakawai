@@ -8,7 +8,7 @@ pr:
     - master
 
 pool:
-  vmImage: Hosted macOS
+  vmImage: macOS-10.13
   demands: xcode
 
 steps:
