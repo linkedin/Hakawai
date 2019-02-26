@@ -1,3 +1,5 @@
+[![Build status](https://dev.azure.com/jmkk/Hakawai/_apis/build/status/Hakawai-Xcode-CI)](https://dev.azure.com/jmkk/Hakawai/_build/latest?definitionId=3)
+
 Hakawai
 =======
 
