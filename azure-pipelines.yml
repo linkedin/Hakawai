@@ -18,6 +18,8 @@ steps:
 - task: Xcode@5
   displayName: 'Xcode build'
   inputs:
+    configuration: Release
+    sdk: iphoneos
     xcWorkspacePath: 'Hakawai.xcworkspace'
     scheme: 'Hakawai'
     xcodeVersion: '10'
