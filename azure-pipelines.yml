@@ -11,6 +11,11 @@ pool:
   vmImage: macOS-10.13
   demands: xcode
 
+variables:
+  workspace: 'Hakawai.xcworkspace'
+  scheme: 'Hakawai'
+  xcodeVersion: '10'
+
 steps:
 - task: CocoaPods@0
   displayName: 'pod install'
@@ -18,21 +23,21 @@ steps:
 - task: Xcode@5
   displayName: 'Xcode build'
   inputs:
-    configuration: Release
-    sdk: iphoneos
-    xcWorkspacePath: 'Hakawai.xcworkspace'
-    scheme: 'Hakawai'
-    xcodeVersion: '10'
+    configuration: 'Release'
+    sdk: 'iphoneos'
+    xcWorkspacePath: $(workspace)
+    scheme: $(scheme)
+    xcodeVersion: $(xcodeVersion)
 
 - task: Xcode@5
   displayName: 'Xcode test'
   inputs:
     actions: test
-    configuration: Debug
-    sdk: iphonesimulator
-    xcWorkspacePath: 'Hakawai.xcworkspace'
-    scheme: 'Hakawai'
-    xcodeVersion: '10'
-    destinationPlatformOption: iOS
+    configuration: 'Debug'
+    sdk: 'iphonesimulator'
+    xcWorkspacePath: $(workspace)
+    scheme: $(scheme)
+    xcodeVersion: $(xcodeVersion)
+    destinationPlatformOption: 'iOS'
     destinationSimulators: 'iPhone X'
     publishJUnitResults: true
