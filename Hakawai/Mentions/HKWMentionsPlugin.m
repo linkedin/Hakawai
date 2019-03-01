@@ -1374,7 +1374,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (searchRange.location == NSNotFound) {
         searchRange = NSMakeRange(location, 0);
     }
-    [self toggleAutocorrectAsRequiredForRange:searchRange];
 }
 
 
