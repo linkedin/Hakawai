@@ -121,9 +121,11 @@ See the documentation comments for more information on the relevant classes and 
 Hakawai includes an almost-comprehensive unit test suite for the main text view powered by the [Specta and Expecta libraries](https://github.com/specta/specta). We hope to have test coverage for the abstraction layer and mentions plug-in in the future, although unit tests are probably not sufficient for testing these components.
 
 
-## :pencil: Contributions
+## :pencil: Contributing
 
 Bug reports, feature requests, pull requests, comments, criticism, and honest feedback are all welcome. Please [open an issue](https://github.com/linkedin/Hakawai/issues) if you can't find an existing one that matches.
+
+We currently use version 1.5.0 of Cocoapods to manage dependencies.
 
 Plans/known issues for this library include:
 
