@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		75C5C0EA222D9A2400607020 /* HKWCustomAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 75C5C0E9222D9A2400607020 /* HKWCustomAttributes.m */; };
 		77004FD7B4A6E9EDAD723CA9 /* libPods-Hakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6238CF1B85D9D08466AD7A9C /* libPods-Hakawai.a */; };
 		9C65FBC81F607DEB004A9CB4 /* HKWLayoutManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */; };
 		9C65FBC91F607DEB004A9CB4 /* HKWMentionsPluginTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */; };
@@ -76,6 +77,7 @@
 		44A295D822134C7600B73558 /* Hakawai.debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.debug.xcconfig; path = xcconfigs/Hakawai.debug.xcconfig; sourceTree = SOURCE_ROOT; };
 		44A295D922134C7600B73558 /* Hakawai.release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Hakawai.release.xcconfig; path = xcconfigs/Hakawai.release.xcconfig; sourceTree = SOURCE_ROOT; };
 		6238CF1B85D9D08466AD7A9C /* libPods-Hakawai.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Hakawai.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		75C5C0E9222D9A2400607020 /* HKWCustomAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWCustomAttributes.m; sourceTree = "<group>"; };
 		91FF0C96BCF39C932C98A368 /* Pods-HakawaiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManagerTests.m; sourceTree = "<group>"; };
 		9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWMentionsPluginTests.m; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 			isa = PBXGroup;
 			children = (
 				E1B3087C19A2C0D60096DE0E /* HKWCustomAttributes.h */,
+				75C5C0E9222D9A2400607020 /* HKWCustomAttributes.m */,
 				E1B3087D19A2C0D60096DE0E /* _HKWLayoutManager.h */,
 				E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */,
 				E1B3087F19A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.h */,
@@ -512,6 +515,7 @@
 				E1B3089519A2C1890096DE0E /* HKWMentionsPlugin.m in Sources */,
 				E1B3088219A2C0D60096DE0E /* HKWTextView+Extras.m in Sources */,
 				E1B308A719A2C21A0096DE0E /* HKWDefaultChooserView.m in Sources */,
+				75C5C0EA222D9A2400607020 /* HKWCustomAttributes.m in Sources */,
 				E1B3088319A2C0D60096DE0E /* HKWTextView+Plugins.m in Sources */,
 				E1B308A419A2C21A0096DE0E /* HKWDefaultChooserArrowView.m in Sources */,
 				E1B3089319A2C1890096DE0E /* HKWMentionsAttribute.m in Sources */,
