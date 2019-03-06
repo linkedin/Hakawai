@@ -104,7 +104,7 @@ typedef NSMutableArray RectValuesBuffer;
                                     options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
                                  usingBlock:^(NSDictionary *attrs, NSRange attributeRange, __unused BOOL *stop) {
                                      for (NSString *attr in attrs) {
-                                         if ([attr isEqualToString:HKWRoundedRectBackgroundAttributeName]) {
+                                         if (attr == HKWRoundedRectBackgroundAttributeName) {
                                              id const attributeValue = attrs[attr];
                                              if (!attributeValue) {
                                                  NSAssert(NO, @"Internal error");
