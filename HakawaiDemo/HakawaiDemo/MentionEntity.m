@@ -19,6 +19,7 @@
     MentionEntity *e = [[self class] new];
     e.entityId = entityId;
     e.entityName = name;
+    e.entityMetadata = @{};
     return e;
 }
 

@@ -37,6 +37,13 @@
     return self.metadata;
 }
 
+/**
+ Default to passing back entity identifier as the unique ID.
+ */
+- (NSString *)uniqueId {
+    return self.entityIdentifier;
+}
+
 - (BOOL)isEqualToMentionsAttribute:(HKWMentionsAttribute *)attribute {
     if (!attribute) {
         return NO;

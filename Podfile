@@ -1,7 +1,6 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-# Uncomment this line to define a global platform for your project
-platform :ios, "6.1"
+platform :ios, "10.0"
 
 target "Hakawai" do
 
