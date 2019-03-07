@@ -27,6 +27,8 @@
 
 #import "_HKWMentionsPrivateConstants.h"
 
+NSString* _Nonnull const HKWMentionAttributeName = @"HKWMentionAttributeName";
+
 // Don't confuse this with the public 'HKWMentionsPluginState', which exposes fewer implementation details.
 typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // The user is not creating a mention and not in any of the following states.
