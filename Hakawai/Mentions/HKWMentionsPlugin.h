@@ -20,7 +20,7 @@
  An attribute for \c NSAttributedString objects representing a mention. This attribute by itself confers no special
  formatting on its text; the plug-in is responsible for coloring and highlighting text according to the current state.
  */
-static NSString *const HKWMentionAttributeName = @"HKWMentionAttributeName";
+OBJC_EXTERN NSString* _Nonnull const HKWMentionAttributeName;
 
 /*!
  An enum representing supported modes for positioning the chooser view.
