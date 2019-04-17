@@ -1103,7 +1103,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
  Advance the state machine when a multi-character string is inserted (due to copy-paste).
  */
 - (BOOL)advanceStateForStringInsertionAtRange:(NSRange)range text:(NSString *)text {
-    __strong __auto_type parentTextView = self.parentTextView;
+    __strong HKWTextView *parentTextView = self.parentTextView;
     NSRange originalSelectedRange = parentTextView.selectedRange;
     unichar precedingChar = [text characterAtIndex:[text length] - 1];
     unichar originalPrecedingChar = [parentTextView characterPrecedingLocation:(NSInteger)range.location];
@@ -1137,8 +1137,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0] asInsertedCharacter:YES previousCharacter:precedingChar];
 
                 // Manually notify external delegate that the textView changed
-                if ([self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                    [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+                id<HKWTextViewDelegate> externalDelegate = parentTextView.externalDelegate;
+                if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [externalDelegate textViewDidChange:parentTextView];
                 }
                 return NO;
             }
@@ -1164,8 +1165,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                                     controlCharacter:0];
 
                 // Manually notify external delegate that the textView changed
-                if ([self.parentTextView.externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                    [self.parentTextView.externalDelegate textViewDidChange:self.parentTextView];
+                id<HKWTextViewDelegate> externalDelegate = parentTextView.externalDelegate;
+                if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [externalDelegate textViewDidChange:parentTextView];
                 }
                 return NO;
             }

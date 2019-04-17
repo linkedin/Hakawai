@@ -98,18 +98,18 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 @optional
 
 /// Inform the delegate that the specified mentions plug-in changed its internal state.
-- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
+- (void)mentionsPlugin:(HKWMentionsPlugin *_Null_unspecified)plugin
         stateChangedTo:(HKWMentionsPluginState)newState
                   from:(HKWMentionsPluginState)oldState;
 
 /// Inform the delegate that the specified mentions plug-in is about to activate and display its chooser view.
-- (void)mentionsPluginWillActivateChooserView:(HKWMentionsPlugin *)plugin;
+- (void)mentionsPluginWillActivateChooserView:(HKWMentionsPlugin *_Null_unspecified)plugin;
 
 /// Inform the delegate that the specified mentions plug-in activated and displayed its chooser view.
-- (void)mentionsPluginActivatedChooserView:(HKWMentionsPlugin *)plugin;
+- (void)mentionsPluginActivatedChooserView:(HKWMentionsPlugin *_Null_unspecified)plugin;
 
 /// Inform the delegate that the specified mentions plug-in deactivated and hid its chooser view.
-- (void)mentionsPluginDeactivatedChooserView:(HKWMentionsPlugin *)plugin;
+- (void)mentionsPluginDeactivatedChooserView:(HKWMentionsPlugin *_Null_unspecified)plugin;
 
 /*! 
  Inform the delegate that the specified mentions plug-in created a mention at the given location as a result of user
@@ -117,31 +117,31 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
  \note Mentions created by calling the \c addMention: or \c addMentions: methods will not trigger this method.
  */
-- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
-        createdMention:(id<HKWMentionsEntityProtocol>)entity
+- (void)mentionsPlugin:(HKWMentionsPlugin *_Null_unspecified)plugin
+        createdMention:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
             atLocation:(NSUInteger)location;
 
 /*!
  Inform the delegate that the specified mentions plug-in trimmed a mention at the given location as a result of user
  input.
  */
-- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
-        trimmedMention:(id<HKWMentionsEntityProtocol>)entity
+- (void)mentionsPlugin:(HKWMentionsPlugin *_Null_unspecified)plugin
+        trimmedMention:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
             atLocation:(NSUInteger)location;
 
 /*!
  Inform the delegate that the specified mentions plug-in deleted a mention at the given location as a result of user
  input.
  */
-- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
-        deletedMention:(id<HKWMentionsEntityProtocol>)entity
+- (void)mentionsPlugin:(HKWMentionsPlugin *_Null_unspecified)plugin
+        deletedMention:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
             atLocation:(NSUInteger)location;
 
 /*!
  Inform the delegate an entity was selected as a result of user input.
  */
-- (void)selected:(id<HKWMentionsEntityProtocol>)entity
-     atIndexPath:(NSIndexPath *)indexPath;
+- (void)selected:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
+     atIndexPath:(NSIndexPath *_Null_unspecified)indexPath;
 
 @end
 
@@ -185,10 +185,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
                            the chooser list. Also pass in YES or NO depending on whether you expect to append additional
                            results later (see the notes above).
  */
-- (void)asyncRetrieveEntitiesForKeyString:(NSString *)keyString
+- (void)asyncRetrieveEntitiesForKeyString:(nonnull NSString *)keyString
                                searchType:(HKWMentionsSearchType)type
                          controlCharacter:(unichar)character
-                               completion:(void(^)(NSArray *results, BOOL dedupe, BOOL isComplete))completionBlock;
+                               completion:(void(^_Null_unspecified)(NSArray *_Null_unspecified results, BOOL dedupe, BOOL isComplete))completionBlock;
 
 /*!
  Return a table view cell to be displayed for a given mention entity in the chooser view.
@@ -197,10 +197,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  defined in the \c HKWCustomChooserViewDelegate protocol, you can just return nil. In that case the mentions plug-in
  defers responsibility for preparing the UI entirely to your custom chooser view.
  */
-- (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
-                           withMatchString:(NSString *)matchString
-                                 tableView:(UITableView *)tableView
-                               atIndexPath:(NSIndexPath *)indexPath;
+- (UITableViewCell *_Null_unspecified)cellForMentionsEntity:(_Null_unspecified id<HKWMentionsEntityProtocol>)entity
+                                            withMatchString:(NSString *_Null_unspecified)matchString
+                                                  tableView:(UITableView *_Null_unspecified)tableView
+                                                atIndexPath:(NSIndexPath *_Null_unspecified)indexPath;
 
 /*!
  Return the height of the table view cell for a given mention entity in the chooser view.
@@ -209,8 +209,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  defined in the \c HKWCustomChooserViewDelegate protocol, you can just return 0. In that case the mentions plug-in
  defers responsibility for preparing the UI entirely to your custom chooser view.
  */
-- (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
-                                tableView:(UITableView *)tableView;
+- (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
+                                tableView:(UITableView *_Null_unspecified)tableView;
 
 @optional
 
@@ -220,14 +220,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  is irrelevant for entities that start out with single-word names, unless \c trimmedNameForEntity: is implemented, in
  which case the plug-in will query even for entities with single-word names.
  */
-- (BOOL)entityCanBeTrimmed:(id<HKWMentionsEntityProtocol>)entity;
+- (BOOL)entityCanBeTrimmed:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity;
 
 /*!
  If implemented, this method allows the host to specify how a given entity should be trimmed to an abbreviated form. If
  not implemented, the default behavior is to trim the entity down to the first word in its name, unless the name already
  contains no whitespace or newline characters, in which case the entity is not trimmed.
  */
-- (NSString *)trimmedNameForEntity:(id<HKWMentionsEntityProtocol>)entity;
+- (nonnull NSString *)trimmedNameForEntity:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity;
 
 /*!
  Return a loading cell to be displayed if results still haven't been returned yet.
@@ -235,7 +235,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
  defined in the \c HKWCustomChooserViewDelegate protocol, this method does nothing.
  */
-- (UITableViewCell *)loadingCellForTableView:(UITableView *)tableView;
+- (UITableViewCell *_Null_unspecified)loadingCellForTableView:(UITableView *_Null_unspecified)tableView;
 
 /*!
  Return the height of the loading cell; this must be implemented for the loading cell functionality to be enabled.
@@ -243,7 +243,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
  defined in the \c HKWCustomChooserViewDelegate protocol, this method does nothing.
  */
-- (CGFloat)heightForLoadingCellInTableView:(UITableView *)tableView;
+- (CGFloat)heightForLoadingCellInTableView:(UITableView *_Null_unspecified)tableView;
 
 @end
 
@@ -251,14 +251,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
 @interface HKWMentionsPlugin : NSObject <HKWDirectControlFlowPluginProtocol>
 
-@property (nonatomic, weak) id<HKWMentionsDelegate> delegate;
-@property (nonatomic, weak) id<HKWMentionsStateChangeDelegate> stateChangeDelegate;
+@property (nonatomic, weak, nullable) id<HKWMentionsDelegate> delegate;
+@property (nonatomic, weak, nullable) id<HKWMentionsStateChangeDelegate> stateChangeDelegate;
 
 /*!
  Instantiate a mentions plug-in with the specified chooser mode, no control characters, and a default search length of
  3 characters.
  */
-+ (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode;
++ (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode;
 
 /*!
  Instantiate a mentions plug-in with the specified chooser mode, control character set, and search length.
@@ -268,43 +268,43 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  \param searchLength           the number of characters to wait before beginning an implicit mention, or 0 or a negative
                                value if implicit mentions should not be enabled
  */
-+ (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
-                            controlCharacters:(NSCharacterSet *)controlCharacterSet
++ (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
                                  searchLength:(NSInteger)searchLength;
 
 /*!
  Instantiate a mentions plug-in with the specified chooser mode, control character set, search length, a color for
  unselected mentions text, and a background color and text color for selected mentions text.
  */
-+ (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
-                            controlCharacters:(NSCharacterSet *)controlCharacterSet
++ (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
                                  searchLength:(NSInteger)searchLength
-                              unselectedColor:(UIColor *)unselectedColor
-                                selectedColor:(UIColor *)selectedColor
-                      selectedBackgroundColor:(UIColor *)selectedBackgroundColor;
+                              unselectedColor:(UIColor *_Null_unspecified)unselectedColor
+                                selectedColor:(UIColor *_Null_unspecified)selectedColor
+                      selectedBackgroundColor:(UIColor *_Null_unspecified)selectedBackgroundColor;
 
 /*!
  Instantiate a mentions plug-in with the specified chooser mode, control character set, search length, custom attributes
  to apply to unselected mentions, and custom attributes to apply to selected mentions.
  */
-+ (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
-                            controlCharacters:(NSCharacterSet *)controlCharacterSet
++ (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
                                  searchLength:(NSInteger)searchLength
-                  unselectedMentionAttributes:(NSDictionary *)unselectedAttributes
-                    selectedMentionAttributes:(NSDictionary *)selectedAttributes;
+                  unselectedMentionAttributes:(NSDictionary *_Null_unspecified)unselectedAttributes
+                    selectedMentionAttributes:(NSDictionary *_Null_unspecified)selectedAttributes;
 
 #pragma mark - API
 
 /*!
  Inform the plugin that the textview was programatically updated (e.g. setText: or setAttributedText:)
  */
--(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView;
+-(void) textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
 
 /*!
  Extract mentions attributes from an attributed string. The array of mentions attribute objects returned by this method
  can be passed directly into the \c addMentions: method on the plug-in.
  */
-+ (NSArray *)mentionsAttributesInAttributedString:(NSAttributedString *)attributedString;
++ (NSArray *_Null_unspecified)mentionsAttributesInAttributedString:(NSAttributedString *_Null_unspecified)attributedString;
 
 /*!
  Return an array of \c HKWMentionsAttribute objects corresponding to the mentions attributes which currently exist in
@@ -312,7 +312,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
  \warning This method will return an empty array if the plug-in isn't registered to a text view.
  */
-- (NSArray *)mentions;
+- (NSArray *_Null_unspecified)mentions;
 
 /*!
  Add a mention attribute to the parent text view's text. This method is intended to be called when the text view is
@@ -323,13 +323,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
                    and the existing text in the text view at \c range must exactly match the value of the \c mentionText
                    string. Invalid mentions are ignored.
  */
-- (void)addMention:(HKWMentionsAttribute *)mention;
+- (void)addMention:(HKWMentionsAttribute *_Null_unspecified)mention;
 
 /*!
  Add multiple mentions to the parent text view's text. This is a convenience method that calls the \c addMention: method
  for each element in \c mentions that passes typechecking.
  */
-- (void)addMentions:(NSArray *)mentions;
+- (void)addMentions:(NSArray *_Null_unspecified)mentions;
 
 
 #pragma mark - Behavior Configuration
@@ -381,7 +381,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  Use the former if you want to use the API in \c HKWMentionsDelegate to provide table view cells and cell heights, the
  latter if you want your chooser view to be completely responsible for preparing the UI.
  */
-@property (nonatomic) Class<HKWChooserViewProtocol> chooserViewClass;
+@property (nonatomic) Class<HKWChooserViewProtocol> _Null_unspecified chooserViewClass;
 
 /*!
  Return the frame of the chooser view. If the chooser view hasn't been instantiated, the null rect will be returned.
@@ -391,7 +391,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 /*!
  Return a generic reference to the chooser view.
  */
-@property (nonatomic, readonly) UIView<HKWChooserViewProtocol> *chooserView;
+@property (nonatomic, readonly) UIView<HKWChooserViewProtocol> *_Null_unspecified chooserView;
 
 /*!
  Return the chooser position mode the chooser was configured with.
@@ -402,7 +402,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  The background color of the chooser view. If the chooser view hasn't been instantiated, the color will be applied to
  the chooser view upon instantiation.
  */
-@property (nonatomic, strong) UIColor *chooserViewBackgroundColor;
+@property (nonatomic, strong, nonnull) UIColor *chooserViewBackgroundColor;
 
 @property (nonatomic) UIEdgeInsets chooserViewEdgeInsets;
 
@@ -419,7 +419,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  \warning Attach the plug-in to a text view before calling this method. Calling this method on a plug-in instance that
  hasn't been registered to a text view is a no-op.
  */
-- (void)setChooserTopLevelView:(UIView *)topLevelView attachmentBlock:(void(^)(UIView *))block;
+- (void)setChooserTopLevelView:(UIView *_Null_unspecified)topLevelView attachmentBlock:(void(^_Null_unspecified)(UIView *_Null_unspecified))block;
 
 /*!
  Return a rect describing the frame that would be assigned to the chooser view if in one of the preset modes, or
