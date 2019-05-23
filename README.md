@@ -1,4 +1,4 @@
-[![Build status](https://dev.azure.com/jmkk/Hakawai/_apis/build/status/Hakawai-CI)](https://dev.azure.com/jmkk/Hakawai/_build/latest?definitionId=4)
+[![Build Status](https://dev.azure.com/lnkd-oss/Hakawai/_apis/build/status/linkedin.Hakawai?branchName=master)](https://dev.azure.com/lnkd-oss/Hakawai/_build/latest?definitionId=3&branchName=master)
 
 # Hakawai
 
