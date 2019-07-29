@@ -220,7 +220,9 @@ describe(@"stripAttributeFromTextAtRange API", ^{
         for (NSUInteger i=0; i<baseLength; i++) {
             id observedValue = [textView.attributedText attribute:attributeName atIndex:i effectiveRange:NULL];
             if (i >= stripLocation && i < stripLocation + stripLength) {
-                expect(observedValue).to.equal(nil);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    expect(observedValue).to.equal(nil);
+                });
             }
             else {
                 expect(observedValue).to.equal(attributeValue);

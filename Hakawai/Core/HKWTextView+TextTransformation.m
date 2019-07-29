@@ -34,9 +34,7 @@
         if (usingAbstraction) {
             [self.abstractionLayer pushIgnore];
         }
-        self.shouldRejectAutocorrectInsertions = YES;
-        self.attributedText = transformer(nil);
-        self.shouldRejectAutocorrectInsertions = NO;
+        [self dispatchAttributedTextThroughMainQueue:transformer(nil)];
         if (usingAbstraction) {
             [self.abstractionLayer popIgnore];
         }
@@ -70,9 +68,7 @@
 
     // We turn on 'autocorrect insertion rejection' before we set the text in order to reject a spurious additional
     //  call to the shouldChange... method in the text view delegate
-    self.shouldRejectAutocorrectInsertions = YES;
-    self.attributedText = buffer;
-    self.shouldRejectAutocorrectInsertions = NO;
+    [self dispatchAttributedTextThroughMainQueue:buffer];
 
     if (shouldRestore && range.length == [infixString length]) {
         // If the replacement text and the original text are the same length, restore the insertion cursor to its
@@ -111,9 +107,7 @@
             [self.abstractionLayer pushIgnore];
         }
         if (location == 0) {
-            self.shouldRejectAutocorrectInsertions = YES;
-            self.attributedText = [NSAttributedString attributedStringWithAttachment:attachment];
-            self.shouldRejectAutocorrectInsertions = NO;
+            [self dispatchAttributedTextThroughMainQueue:[NSAttributedString attributedStringWithAttachment:attachment]];
         }
         if (usingAbstraction) {
             [self.abstractionLayer popIgnore];
@@ -133,6 +127,23 @@
     }
     if (usingAbstraction) {
         [self.abstractionLayer popIgnore];
+    }
+}
+/**
+ * QuickPath keyboard will hold a NSConditionLock on attributedText while accessing to it at the same time results in a deadlock. Calling main queue
+ * to make sure it won't be synchronized to cause a deadlock. Apple Feedback Tracking number: [FB6828895]
+ * @param newAttributedString  new string to be assigned.
+ */
+-(void)dispatchAttributedTextThroughMainQueue: (NSAttributedString*) newAttributedString {
+    void (^assignBlock)(void) = ^{
+        self.shouldRejectAutocorrectInsertions = YES;
+        self.attributedText = newAttributedString;
+        self.shouldRejectAutocorrectInsertions = NO;
+    };
+    if (HKWTextView.enableExperimentalDeadLockFix) {
+        dispatch_async(dispatch_get_main_queue(), assignBlock);
+    } else {
+        assignBlock();
     }
 }
 

@@ -25,7 +25,16 @@
 @property (nonatomic, strong) NSMutableDictionary *simplePluginsDictionary;
 @end
 
+static BOOL enableExperimentalDeadLockFix = NO;
+
 @implementation HKWTextView
+
++ (BOOL)enableExperimentalDeadLockFix {
+    return enableExperimentalDeadLockFix;
+}
++ (void)setEnableExperimentalDeadLockFix:(BOOL)enabled {
+    enableExperimentalDeadLockFix = enabled;
+}
 
 #pragma mark - Lifecycle
 

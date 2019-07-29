@@ -41,6 +41,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface HKWTextView : UITextView
 
++ (BOOL) enableExperimentalDeadLockFix;
++ (void) setEnableExperimentalDeadLockFix:(BOOL)enabled;
+
 #pragma mark - Initialization
 
 - (instancetype)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer;
