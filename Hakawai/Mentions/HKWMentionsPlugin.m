@@ -1266,30 +1266,62 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     return YES;
 }
 
-/*!
+/**
  Advance the state machine when the selection changes, or when the text view changes from insertion mode to selection
- mode.
+ mode. If this is occuring because text is being replaced, handle the replacement text
  */
-- (void)advanceStateForSelectionChanged:(NSRange)range {
+- (void)advanceStateForSelectionChanged:(NSRange)range replacementText:(nullable NSString *)replacementText {
+
+    // Determine if current text is being replaced by a mentions string
+    unichar firstReplacementTextCharacter = 0;
+    BOOL isReplacementTextMention = NO;
+    if (replacementText && [replacementText length] > 0) {
+        firstReplacementTextCharacter = [replacementText characterAtIndex:0];
+        isReplacementTextMention = [self.controlCharacterSet characterIsMember:firstReplacementTextCharacter];
+    }
+
     self.previousSelectionRange = NSMakeRange(NSNotFound, 0);
     switch (self.state) {
         case HKWMentionsStateQuiescent:
-        case HKWMentionsStartDetectionStateCreatingMention:
-            [self.creationStateMachine cancelMentionCreation];
-            NSAssert(self.state == HKWMentionsStateQuiescent,
-                     @"Logic error: cancelMentionCreation must always set the state back to quiescent.");
+            if (isReplacementTextMention) {
+                // If we are replacing current text with a mentions string, begin the mention
+                [self beginMentionsCreationWithString:replacementText
+                                           atLocation:range.location
+                                usingControlCharacter:YES
+                                     controlCharacter:firstReplacementTextCharacter];
+            }
             break;
+        case HKWMentionsStartDetectionStateCreatingMention: {
+            NSRange currentMentionsRange = NSMakeRange(self.resumeMentionsPriorPosition, self.resumeMentionsPriorTextLength);
+            if (isReplacementTextMention && NSEqualRanges(range, currentMentionsRange)) {
+                // If we are replacing a mention string with a mentions string, begin the mention
+                [self beginMentionsCreationWithString:replacementText
+                                           atLocation:range.location
+                                usingControlCharacter:YES
+                                     controlCharacter:firstReplacementTextCharacter];
+            } else if (replacementText) {
+                // Else if there's replacement text, treat it like an insertion
+                [self advanceStateForStringInsertionAtRange:range text:replacementText];
+            } else {
+                // Else, cancel the mention
+                [self.creationStateMachine cancelMentionCreation];
+                NSAssert(self.state == HKWMentionsStateQuiescent,
+                         @"Logic error: cancelMentionCreation must always set the state back to quiescent.");
+            }
+            break;
+        }
         case HKWMentionsStateAboutToSelectMention:
+            self.state = HKWMentionsStateQuiescent;
             break;
         case HKWMentionsStateSelectedMention:
             [self toggleMentionsFormattingAtRange:self.currentlySelectedMentionRange selected:NO];
             self.parentTextView.selectedRange = range;
+            self.state = HKWMentionsStateQuiescent;
             break;
         case HKWMentionsStateLosingFocus:
             NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
             return;
     }
-    self.state = HKWMentionsStateQuiescent;
     // TODO: If we can determine whether this method is being called because the selection was changed by the user, or
     //  because fast delete is happening, we shouldn't toggle autocorrect if fast delete is happening.
     [self toggleAutocorrectAsRequiredForRange:range];
@@ -1443,7 +1475,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
     else {
         // Replacing text (e.g. pasting, autocorrect, etc)
-        [self advanceStateForSelectionChanged:NSMakeRange(range.location + ([text length] - range.length), 0)];
+        [self advanceStateForSelectionChanged:NSMakeRange(range.location + ([text length] - range.length), 0) replacementText:text];
     }
     self.previousSelectionRange = textView.selectedRange;
     self.previousTextLength = [textView.text length];
@@ -1470,7 +1502,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
     else if (range.length > 1) {
         // The user selected multiple characters
-        [self advanceStateForSelectionChanged:range];
+        [self advanceStateForSelectionChanged:range replacementText:nil];
     }
     else if (self.previousSelectionRange.location != NSNotFound
              && labs((NSInteger)self.previousSelectionRange.location - (NSInteger)range.location) == 1
