@@ -69,7 +69,10 @@ describe(@"inserting and reading mentions", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        expect(mentionsPlugin.mentions.count).to.equal(1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(mentionsPlugin.mentions.count).to.equal(1);
+        });
+        
 
         [textView insertText:@" "];
 
@@ -77,7 +80,9 @@ describe(@"inserting and reading mentions", ^{
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
 
-        expect(mentionsPlugin.mentions.count).to.equal(2);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(mentionsPlugin.mentions.count).to.equal(2);
+        });
     });
 
     it(@"should properly handle mentions containing emoji", ^{
@@ -90,15 +95,19 @@ describe(@"inserting and reading mentions", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        expect(mentionsPlugin.mentions.count).to.equal(1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(mentionsPlugin.mentions.count).to.equal(1);
+        });
+        
 
         [textView insertText:@" "];
 
         [textView insertText:m2.mentionText];
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
-        
-        expect(mentionsPlugin.mentions.count).to.equal(2);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(mentionsPlugin.mentions.count).to.equal(2);
+        });
     });
 
     it(@"should properly handle mentions containing only emoji", ^{
@@ -111,7 +120,9 @@ describe(@"inserting and reading mentions", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        expect(mentionsPlugin.mentions.count).to.equal(1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(mentionsPlugin.mentions.count).to.equal(1);
+        });
 
         [textView insertText:@" "];
 
@@ -119,7 +130,9 @@ describe(@"inserting and reading mentions", ^{
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
 
-        expect(mentionsPlugin.mentions.count).to.equal(2);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(mentionsPlugin.mentions.count).to.equal(2);
+        });
     });
 });
 
@@ -166,18 +179,26 @@ describe(@"deleting and reading mentions", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        expect(mentionsPlugin.mentions.count).to.equal(1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(mentionsPlugin.mentions.count).to.equal(1);
+        });
 
         // the first attempt to delete mention should select the mention and modify the state. No changes apply to the mention and text
         BOOL deletionResult1 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(m1.mentionText.length-1, 1) replacementText:@""];
-        expect(deletionResult1).to.equal(NO);
-        expect(mentionsPlugin.mentions.count).to.equal(1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(deletionResult1).to.equal(NO);
+            expect(mentionsPlugin.mentions.count).to.equal(1);
+        });
+        
 
         // the second attempt deletes the whole mention
         BOOL deletionResult2 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(m1.mentionText.length-1, 1) replacementText:@""];
-        expect(deletionResult2).to.equal(NO);
-        expect(mentionsPlugin.mentions.count).to.equal(0);
-        expect([textView.text length]).to.equal(0);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            expect(deletionResult2).to.equal(NO);
+            expect(mentionsPlugin.mentions.count).to.equal(0);
+            expect([textView.text length]).to.equal(0);
+        });
+        
 
     });
 });
