@@ -26,15 +26,32 @@
     [self transformTextAtRange:selectedRange withTransformer:transformer];
 }
 
+/**
+ QuickPath keyboard will hold a NSConditionLock on attributedText while accessing it at the same time results in a deadlock. Calling main queue
+ to make sure it won't be synchronized to cause a deadlock. Apple Feedback Tracking number: [OpenRadar:6828895]
+ */
 - (void)transformTextAtRange:(NSRange)range
              withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
+    if (HKWTextView.enableExperimentalDeadLockFix) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self transformTextAtRangeImpl:range withTransformer:transformer];
+        });
+    } else {
+        [self transformTextAtRangeImpl:range withTransformer:transformer];
+    }
+}
+
+- (void)transformTextAtRangeImpl:(NSRange)range
+                 withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
     BOOL usingAbstraction = self.abstractionLayerEnabled;
     if (transformer && [self.attributedText length] == 0 && range.location == 0) {
         // Special case: text view text is empty; beginning is valid
         if (usingAbstraction) {
             [self.abstractionLayer pushIgnore];
         }
-        [self dispatchAttributedTextThroughMainQueue:transformer(nil)];
+        self.shouldRejectAutocorrectInsertions = YES;
+        self.attributedText = transformer(nil);
+        self.shouldRejectAutocorrectInsertions = NO;
         if (usingAbstraction) {
             [self.abstractionLayer popIgnore];
         }
@@ -68,7 +85,9 @@
 
     // We turn on 'autocorrect insertion rejection' before we set the text in order to reject a spurious additional
     //  call to the shouldChange... method in the text view delegate
-    [self dispatchAttributedTextThroughMainQueue:buffer];
+    self.shouldRejectAutocorrectInsertions = YES;
+    self.attributedText = buffer;
+    self.shouldRejectAutocorrectInsertions = NO;
 
     if (shouldRestore && range.length == [infixString length]) {
         // If the replacement text and the original text are the same length, restore the insertion cursor to its
@@ -98,7 +117,21 @@
     [self transformTextAtRange:NSMakeRange(location, 0) withTransformer:transformer];
 }
 
-- (void)insertTextAttachment:(NSTextAttachment *)attachment location:(NSUInteger)location {
+/**
+ QuickPath keyboard will hold a NSConditionLock on attributedText while accessing to it at the same time results in a deadlock. Calling main queue
+ to make sure it won't be synchronized to cause a deadlock. Apple Feedback Tracking number: [FB6828895]
+ */
+-(void)insertTextAttachment:(NSTextAttachment *)attachment location:(NSUInteger)location {
+    if (HKWTextView.enableExperimentalDeadLockFix) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self insertTextAttachmentImpl:attachment location:location];
+        });
+    } else {
+        [self insertTextAttachmentImpl:attachment location:location];
+    }
+}
+
+- (void)insertTextAttachmentImpl:(NSTextAttachment *)attachment location:(NSUInteger)location {
     if (!attachment) return;
     BOOL usingAbstraction = self.abstractionLayerEnabled;
     if ([self.attributedText length] == 0) {
@@ -107,7 +140,9 @@
             [self.abstractionLayer pushIgnore];
         }
         if (location == 0) {
-            [self dispatchAttributedTextThroughMainQueue:[NSAttributedString attributedStringWithAttachment:attachment]];
+            self.shouldRejectAutocorrectInsertions = YES;
+            self.attributedText = [NSAttributedString attributedStringWithAttachment:attachment];
+            self.shouldRejectAutocorrectInsertions = NO;
         }
         if (usingAbstraction) {
             [self.abstractionLayer popIgnore];
@@ -127,23 +162,6 @@
     }
     if (usingAbstraction) {
         [self.abstractionLayer popIgnore];
-    }
-}
-/**
- * QuickPath keyboard will hold a NSConditionLock on attributedText while accessing to it at the same time results in a deadlock. Calling main queue
- * to make sure it won't be synchronized to cause a deadlock. Apple Feedback Tracking number: [FB6828895]
- * @param newAttributedString  new string to be assigned.
- */
--(void)dispatchAttributedTextThroughMainQueue: (NSAttributedString*) newAttributedString {
-    void (^assignBlock)(void) = ^{
-        self.shouldRejectAutocorrectInsertions = YES;
-        self.attributedText = newAttributedString;
-        self.shouldRejectAutocorrectInsertions = NO;
-    };
-    if (HKWTextView.enableExperimentalDeadLockFix) {
-        dispatch_async(dispatch_get_main_queue(), assignBlock);
-    } else {
-        assignBlock();
     }
 }
 
