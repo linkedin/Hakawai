@@ -40,6 +40,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
 
 @property (nonatomic, readonly) BOOL implicitMentionsEnabled;
 
+@property (nonatomic, strong, nonnull, class, readonly) NSCharacterSet *whitespaceSet;
+@property (nonatomic, strong, nonnull, class, readonly) NSCharacterSet *punctuationSet;
+@property (nonatomic, strong, nonnull, class, readonly) NSCharacterSet *separatorSet;
+
 @end
 
 @implementation HKWMentionsStartDetectionStateMachine
@@ -108,29 +112,33 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     }
 }
 
-- (void)characterTyped:(unichar)c asInsertedCharacter:(BOOL)inserted previousCharacter:(unichar)previousCharacter {
-    NSCharacterSet *whitespaceSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+- (void)characterTyped:(unichar)c
+   asInsertedCharacter:(BOOL)inserted
+     previousCharacter:(unichar)previousCharacter
+   queryMentionForText:(NSString *)queryMentionForText {
     __strong __auto_type delegate = self.delegate;
     // Determine the type of the character
     enum CharacterType {
-        CharacterTypeWhitespace = 0,
+        CharacterTypeSeparator = 0,
         CharacterTypeControlCharacter,
         CharacterTypeNormal
     };
     enum CharacterType currentCharacterType = CharacterTypeNormal;
-    if ([whitespaceSet characterIsMember:c]) {
-        currentCharacterType = CharacterTypeWhitespace;
+    if ([HKWMentionsStartDetectionStateMachine.whitespaceSet characterIsMember:c]) {
+        currentCharacterType = CharacterTypeSeparator;
     }
     else {
         // Get the control character set and see if the typed character is a control character
         NSCharacterSet *controlCharacterSet = [delegate controlCharacterSet];
         if (controlCharacterSet && [controlCharacterSet characterIsMember:c]) {
             currentCharacterType = CharacterTypeControlCharacter;
+        } else if ([HKWMentionsStartDetectionStateMachine.punctuationSet characterIsMember:c]) {
+            currentCharacterType = CharacterTypeSeparator;
         }
     }
     enum CharacterType previousCharacterType = CharacterTypeNormal;
-    if ([whitespaceSet characterIsMember:previousCharacter]) {
-        previousCharacterType = CharacterTypeWhitespace;
+    if ([HKWMentionsStartDetectionStateMachine.separatorSet characterIsMember:previousCharacter]) {
+        previousCharacterType = CharacterTypeSeparator;
     } else {
         // Get the control character set and see if the typed character is a control character
         NSCharacterSet *controlCharacterSet = [delegate controlCharacterSet];
@@ -161,17 +169,25 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
                 }
             }
             else if ((currentCharacterType == CharacterTypeControlCharacter)
-                     && (previousCharacterType == CharacterTypeWhitespace || previousCharacter == 0)) {
-                if (self.charactersSinceLastWhitespace == 0) {
+                     && (previousCharacterType == CharacterTypeSeparator || previousCharacter == 0)) {
+                if (previousCharacter == 0 || previousCharacterType == CharacterTypeSeparator) {
                     // Start an EXPLICIT MENTION
+                    NSString *keyString;
+                    if (queryMentionForText) {
+                        keyString = [queryMentionForText mutableCopy];
+                    } else if (previousCharacterType == CharacterTypeSeparator) {
+                        keyString = @"";
+                    } else {
+                        keyString = [self.stringBuffer copy];
+                    }
                     self.state = HKWMentionsStartDetectionStateCreatingMention;
-                    [delegate beginMentionsCreationWithString:[self.stringBuffer copy]
-                                                   alreadyInserted:inserted
-                                             usingControlCharacter:YES
-                                                  controlCharacter:c];
+                    [delegate beginMentionsCreationWithString:keyString
+                                              alreadyInserted:inserted
+                                        usingControlCharacter:YES
+                                             controlCharacter:c];
                 }
             }
-            else if (currentCharacterType == CharacterTypeWhitespace) {
+            else if ([HKWMentionsStartDetectionStateMachine.whitespaceSet characterIsMember:c]) {
                 // User typed a whitespace/newline. Reset the counter.
                 self.charactersSinceLastWhitespace = 0;
                 self.stringBuffer = [@"" mutableCopy];
@@ -180,8 +196,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
         }
         case HKWMentionsStartDetectionStateQuiescentStalled: {
             // STATE: User is not creating mention, and can't start one without additional help
-            if (currentCharacterType == CharacterTypeWhitespace) {
-                // User typed a whitespace. This means they can now try to create a mention.
+            if (currentCharacterType == CharacterTypeSeparator) {
+                // User typed a whitespace or a punctuation character. This means they can now try to create a mention.
                 self.state = HKWMentionsStartDetectionStateQuiescentReady;
             }
             break;
@@ -193,23 +209,46 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     }
 }
 
-- (void)deleteTypedCharacter:(unichar)deletedChar withCharacterNowPrecedingCursor:(unichar)precedingChar {
-    NSCharacterSet *whitespaceSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+- (void)deleteTypedCharacter:(unichar)deletedChar
+withCharacterNowPrecedingCursor:(unichar)precedingChar
+                    location:(NSUInteger)location
+                textViewText:(NSString *)textViewText {
     // Determine the type of the character
     enum CharacterType {
-        CharacterTypeWhitespace = 0,
-        CharacterTypeNormal
+        CharacterTypeSeparator = 0,
+        CharacterTypeNormal,
+        CharacterTypeControlCharacter
     };
-    enum CharacterType deletedCharacterType = ([whitespaceSet characterIsMember:deletedChar] || deletedChar == 0)
-                                                ? CharacterTypeWhitespace
-                                                : CharacterTypeNormal;
-    enum CharacterType currentCharacterType = ([whitespaceSet characterIsMember:precedingChar] || precedingChar == 0)
-                                                ? CharacterTypeWhitespace
-                                                : CharacterTypeNormal;
+    enum CharacterType deletedCharacterType = ([HKWMentionsStartDetectionStateMachine.separatorSet characterIsMember:deletedChar] || deletedChar == 0)
+    ? CharacterTypeSeparator
+    : CharacterTypeNormal;
+    __strong __auto_type delegate = self.delegate;
 
+    // Determine the type of the character
+    enum CharacterType currentCharacterType = CharacterTypeNormal;
+    if ([HKWMentionsStartDetectionStateMachine.whitespaceSet characterIsMember:precedingChar] || precedingChar == 0) {
+        currentCharacterType = CharacterTypeSeparator;
+    } else {
+        // Check first for control character because punctuation character can be control character.
+        // e.g "@" and "#" are punctuation char and might be control character.
+        NSCharacterSet *const controlCharacterSet = [delegate controlCharacterSet];
+        if (controlCharacterSet && [controlCharacterSet characterIsMember:precedingChar]) {
+            currentCharacterType = CharacterTypeControlCharacter;
+        } else if ([HKWMentionsStartDetectionStateMachine.punctuationSet characterIsMember:precedingChar]) {
+            currentCharacterType = CharacterTypeSeparator;
+        }
+    }
     switch (self.state) {
         case HKWMentionsStartDetectionStateQuiescentReady: {
-            if (currentCharacterType == CharacterTypeNormal) {
+            // If user deletes white-space between control character and word, then query mention with word next to whitepace.
+            if (currentCharacterType == CharacterTypeControlCharacter && deletedCharacterType == CharacterTypeSeparator) {
+                self.state = HKWMentionsStartDetectionStateCreatingMention;
+                NSString *const keyword = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location + 1 text:textViewText];
+                [delegate beginMentionsCreationWithString:keyword
+                                               atLocation:location - 1
+                                    usingControlCharacter:YES
+                                         controlCharacter:precedingChar];
+            } else if (currentCharacterType == CharacterTypeNormal) {
                 if (self.charactersSinceLastWhitespace == 0) {
                     // Being here means the user deleted enough characters to move the cursor into the previous word.
                     self.state = HKWMentionsStartDetectionStateQuiescentStalled;
@@ -220,16 +259,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
                     [self.stringBuffer deleteCharactersInRange:NSMakeRange([self.stringBuffer length]-1, 1)];
                 }
             }
-            else if (currentCharacterType == CharacterTypeWhitespace) {
+            else if ([HKWMentionsStartDetectionStateMachine.whitespaceSet characterIsMember:precedingChar]) {
                 self.charactersSinceLastWhitespace = 0;
                 self.stringBuffer = [@"" mutableCopy];
             }
+            break;
         }
         case HKWMentionsStartDetectionStateQuiescentStalled: {
             // Change state to QuiescentReady when either:
             //   1. A whitespace character is encountered
             //   2. A NON-whitespace character is encountered and a whitespace character was deleted
-            if (currentCharacterType == CharacterTypeWhitespace || deletedCharacterType == CharacterTypeWhitespace) {
+            //   3. A punctuation character is encountered
+            if (currentCharacterType == CharacterTypeSeparator
+                || deletedCharacterType == CharacterTypeSeparator) {
                 self.state = HKWMentionsStartDetectionStateQuiescentReady;
             }
             break;
@@ -242,23 +284,23 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
 }
 
 - (void)cursorMovedWithCharacterNowPrecedingCursor:(unichar)c {
-    NSCharacterSet *whitespaceSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     // Determine the type of the character
     enum CharacterType {
-        CharacterTypeWhitespace = 0,
+        CharacterTypeSeparator = 0,
         CharacterTypeNormal
     };
     enum CharacterType currentCharacterType = CharacterTypeNormal;
-    if ([whitespaceSet characterIsMember:c] || c == 0) currentCharacterType = CharacterTypeWhitespace;
-
+    if ([HKWMentionsStartDetectionStateMachine.separatorSet characterIsMember:c] || c == 0) {
+        currentCharacterType = CharacterTypeSeparator;
+    }
     switch (self.state) {
         case HKWMentionsStartDetectionStateQuiescentReady:
         case HKWMentionsStartDetectionStateQuiescentStalled: {
             // Reset the string buffer
             self.stringBuffer = [@"" mutableCopy];
             self.charactersSinceLastWhitespace = 0;
-            if (currentCharacterType == CharacterTypeWhitespace) {
-                // The user moved the cursor to the beginning of the text region, or right after a newline or whitespace
+            if (currentCharacterType == CharacterTypeSeparator) {
+                // The user moved the cursor to the beginning of the text region, or right after a newline or whitespace or punctuation
                 //  character. This puts the user in the ready state.
                 self.state = HKWMentionsStartDetectionStateQuiescentReady;
             }
@@ -288,6 +330,20 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     self.state = HKWMentionsStartDetectionStateCreatingMention;
 }
 
+#pragma mark - Public helper method
+
++ (NSString *)wordAfterLocation:(NSUInteger)location text:(NSString *)text {
+    NSString *charString;
+    NSMutableString *const word = [[NSMutableString alloc] init];
+    for(NSUInteger i = location; i < text.length ; i++) {
+        charString =  [text substringWithRange:NSMakeRange(i, 1)];
+        if([text isEqualToString:@" "]) {
+            break;
+        }
+        [word appendString:charString];
+    }
+    return [word copy];
+}
 
 #pragma mark - Properties and Constants
 
@@ -300,6 +356,45 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
 
 - (BOOL)implicitMentionsEnabled {
     return [self.delegate implicitSearchLength] > 0;
+}
+
+/**
+ Character set of whitespace and new line
+ */
++ (nonnull NSCharacterSet *)whitespaceSet {
+    static NSCharacterSet *whitespaceSet;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        whitespaceSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    });
+    return whitespaceSet;
+}
+
+/**
+ Character set of punctuations
+ */
++ (nonnull NSCharacterSet *)punctuationSet {
+    static NSCharacterSet *punctuationSet;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        punctuationSet = [NSCharacterSet punctuationCharacterSet];
+    });
+    return punctuationSet;
+}
+
+/**
+ Union set of whitespace set and punctuation set whose contents are treated as separators
+ Mentions trigger after these separators
+ */
++ (nonnull NSCharacterSet *)separatorSet {
+    static NSCharacterSet *separatorSet;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSMutableCharacterSet *const mutableSeparatorSet = [HKWMentionsStartDetectionStateMachine.punctuationSet mutableCopy];
+        [mutableSeparatorSet formUnionWithCharacterSet:HKWMentionsStartDetectionStateMachine.whitespaceSet];
+        separatorSet = [mutableSeparatorSet copy];
+    });
+    return separatorSet;
 }
 
 

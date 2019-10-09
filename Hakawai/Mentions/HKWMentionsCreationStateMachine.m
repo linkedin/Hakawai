@@ -145,7 +145,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     return sm;
 }
 
-- (void)characterTyped:(unichar)c {
+- (void)characterTyped:(unichar)c previousCharacterIsControl:(BOOL)previousCharacterIsControl {
     BOOL isNewline = [[NSCharacterSet newlineCharacterSet] characterIsMember:c];
     BOOL isWhitespace = [[NSCharacterSet whitespaceCharacterSet] characterIsMember:c];
     __strong __auto_type delegate = self.delegate;
@@ -164,7 +164,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                 return;
             }
     }
-    if ([self.stringBuffer length] == 0 && isWhitespace) {
+    // When whitespace is typed during mention creation state and previous char is control character
+    // then mention creation should to stalled. e.g "@@ " will stop mention current creation.
+    const BOOL shouldCreateNewMentionState = previousCharacterIsControl && isWhitespace;
+    if (([self.stringBuffer length] == 0 && isWhitespace) || shouldCreateNewMentionState) {
         self.state = HKWMentionsCreationStateQuiescent;
         [delegate cancelMentionFromStartingLocation:self.startingLocation];
         return;
@@ -239,7 +242,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
 }
 
-- (void)stringDeleted:(NSString *)deleteString {
+- (void)stringDeleted:(NSString *)deleteString isControlCharacterDeleted:(BOOL)isControlCharacterDeleted {
     // State transition
     NSAssert([deleteString length] > 0, @"Logic error: string to be deleted must not be empty.");
 
@@ -276,6 +279,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
             // User not creating a mention right now
             return;
         case HKWMentionsCreationStateCreatingMention:
+            if (isControlCharacterDeleted) {
+                // When user deletes control character during mention creation state, then end mention creation.
+                self.state = HKWMentionsCreationStateQuiescent;
+                [delegate cancelMentionFromStartingLocation:self.startingLocation];
+                return;
+            }
+
             if (deleteStringIsTransient) {
                 // Delete was typed, but for some sort of transient state (e.g. keyboard suggestions); don't do anything
                 return;
