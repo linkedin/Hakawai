@@ -789,8 +789,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                      atLocation:(NSUInteger)location
                      inTextView:(HKWTextView *)textView {
     unichar stackC = character;
-    [textView insertPlainText:[NSString stringWithCharacters:&stackC length:1] location:location];
-    textView.selectedRange = NSMakeRange(location + 1, 0);
+    [textView insertPlainText:[NSString stringWithCharacters:&stackC length:1] location:location completion:^{
+        textView.selectedRange = NSMakeRange(location + 1, 0);
+    }];
 }
 
 - (void)resetCurrentMentionsData {
@@ -1198,7 +1199,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self resetCurrentMentionsData];
             [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:precedingChar];
             break;
-        case HKWMentionsStateSelectedMention:
+        case HKWMentionsStateSelectedMention: {
             // Either add the text to the end of the mention, or bleach the mention and add the text to the middle
             if (parentTextView.selectedRange.length == 0) {
                 if (range.location == self.currentlySelectedMentionRange.location + self.currentlySelectedMentionRange.length) {
@@ -1210,12 +1211,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                     [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
                 }
             }
-            [parentTextView insertPlainText:text location:range.location];
-            // Manually move the cursor to the 'expected' position, otherwise the cursor will jump to the end.
-            parentTextView.selectedRange = NSMakeRange(range.location + [text length], 0);
-            [self resetCurrentMentionsData];
+            [parentTextView insertPlainText:text location:range.location completion: ^{
+                // Manually move the cursor to the 'expected' position, otherwise the cursor will jump to the end.
+                parentTextView.selectedRange = NSMakeRange(range.location + [text length], 0);
+                [self resetCurrentMentionsData];
+            }];
             self.state = HKWMentionsStateQuiescent;
             return NO;
+        }
         case HKWMentionsStateLosingFocus:
             NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
             break;

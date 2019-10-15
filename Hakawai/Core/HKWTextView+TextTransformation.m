@@ -26,23 +26,30 @@
     [self transformTextAtRange:selectedRange withTransformer:transformer];
 }
 
+- (void)transformTextAtRange:(NSRange)range
+             withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
+    [self transformTextAtRange:range withTransformer:transformer completion:^{}];
+}
+
 /**
  QuickPath keyboard will hold a NSConditionLock on attributedText while accessing it at the same time results in a deadlock. Calling main queue
  to make sure it won't be synchronized to cause a deadlock. Apple Feedback Tracking number: [OpenRadar:6828895]
  */
 - (void)transformTextAtRange:(NSRange)range
-             withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
+             withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer
+                  completion:(void(^)(void))completion {
     if (HKWTextView.enableExperimentalDeadLockFix) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self transformTextAtRangeImpl:range withTransformer:transformer];
+            [self transformTextAtRangeImpl:range withTransformer:transformer completion:completion];
         });
     } else {
-        [self transformTextAtRangeImpl:range withTransformer:transformer];
+        [self transformTextAtRangeImpl:range withTransformer:transformer completion:completion];
     }
 }
 
 - (void)transformTextAtRangeImpl:(NSRange)range
-                 withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
+                 withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer
+                      completion:(void(^)(void))completion {
     BOOL usingAbstraction = self.abstractionLayerEnabled;
     if (transformer && [self.attributedText length] == 0 && range.location == 0) {
         // Special case: text view text is empty; beginning is valid
@@ -55,11 +62,17 @@
         if (usingAbstraction) {
             [self.abstractionLayer popIgnore];
         }
+        if (completion) {
+            completion();
+        }
         return;
     }
     if (!transformer
         || range.location == NSNotFound
         || range.location > [self.attributedText length]) {
+        if (completion) {
+            completion();
+        }
         return;
     }
 
@@ -102,19 +115,23 @@
     if (usingAbstraction) {
         [self.abstractionLayer popIgnore];
     }
+    if (completion) {
+        completion();
+    }
 }
 
-- (void)insertPlainText:(NSString *)text location:(NSUInteger)location {
+- (void)insertPlainText:(NSString *)text location:(NSUInteger)location completion:(void(^)(void))completion {
     [self insertAttributedText:[[NSAttributedString alloc] initWithString:text attributes:self.typingAttributes]
-                      location:location];
+                      location:location
+                    completion:completion];
 }
 
-- (void)insertAttributedText:(NSAttributedString *)text location:(NSUInteger)location {
+- (void)insertAttributedText:(NSAttributedString *)text location:(NSUInteger)location completion:(void(^)(void))completion {
     if ([text length] == 0) return;
     NSAttributedString *(^transformer)(NSAttributedString *) = ^(__unused NSAttributedString *input) {
         return text;
     };
-    [self transformTextAtRange:NSMakeRange(location, 0) withTransformer:transformer];
+    [self transformTextAtRange:NSMakeRange(location, 0) withTransformer:transformer completion:completion];
 }
 
 /**
@@ -155,7 +172,7 @@
     if (location >= [self.attributedText length]) {
         location = [self.attributedText length] - 1;
     }
-    [self insertAttributedText:[NSAttributedString attributedStringWithAttachment:attachment] location:location];
+    [self insertAttributedText:[NSAttributedString attributedStringWithAttachment:attachment] location:location completion:^{}];
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textView:didReceiveNewTextAttachment:)]) {
         [externalDelegate textView:self didReceiveNewTextAttachment:attachment];
