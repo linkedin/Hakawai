@@ -117,7 +117,7 @@
 /*!
  Inform the state machine that a single character was typed by the user into the text view.
  */
-- (void)characterTyped:(unichar)c;
+- (void)characterTyped:(unichar)c previousCharacterIsControl:(BOOL)previousCharacterIsControl;
 
 /*!
  Inform the state machine that a valid string was inserted into the text view (no spaces, newlines, or forbidden
@@ -128,7 +128,7 @@
 /*!
  Inform the state machine that a character or string was deleted from the text view.
  */
-- (void)stringDeleted:(NSString *)deleteString;
+- (void)stringDeleted:(NSString *)deleteString isControlCharacterDeleted:(BOOL)isControlCharacterDeleted;
 
 /*!
  Inform the state machine that the cursor was moved from its prior position and is now in insertion mode.

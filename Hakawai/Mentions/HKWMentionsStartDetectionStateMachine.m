@@ -112,7 +112,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     }
 }
 
-- (void)characterTyped:(unichar)c asInsertedCharacter:(BOOL)inserted previousCharacter:(unichar)previousCharacter {
+- (void)characterTyped:(unichar)c
+   asInsertedCharacter:(BOOL)inserted
+     previousCharacter:(unichar)previousCharacter
+   queryMentionForText:(NSString *)queryMentionForText {
     __strong __auto_type delegate = self.delegate;
     // Determine the type of the character
     enum CharacterType {
@@ -169,15 +172,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
                      && (previousCharacterType == CharacterTypeSeparator || previousCharacter == 0)) {
                 if (previousCharacter == 0 || previousCharacterType == CharacterTypeSeparator) {
                     // Start an EXPLICIT MENTION
-                    if ([HKWMentionsStartDetectionStateMachine.punctuationSet characterIsMember:previousCharacter]) {
-                        // Empty string buffer when previous character is a punctuation
-                        self.stringBuffer = [@"" mutableCopy];
+                    NSString *keyString;
+                    if (queryMentionForText) {
+                        keyString = [queryMentionForText mutableCopy];
+                    } else if (previousCharacterType == CharacterTypeSeparator) {
+                        keyString = @"";
+                    } else {
+                        keyString = [self.stringBuffer copy];
                     }
                     self.state = HKWMentionsStartDetectionStateCreatingMention;
-                    [delegate beginMentionsCreationWithString:[self.stringBuffer copy]
-                                                   alreadyInserted:inserted
-                                             usingControlCharacter:YES
-                                                  controlCharacter:c];
+                    [delegate beginMentionsCreationWithString:keyString
+                                              alreadyInserted:inserted
+                                        usingControlCharacter:YES
+                                             controlCharacter:c];
                 }
             }
             else if ([HKWMentionsStartDetectionStateMachine.whitespaceSet characterIsMember:c]) {
@@ -202,22 +209,46 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     }
 }
 
-- (void)deleteTypedCharacter:(unichar)deletedChar withCharacterNowPrecedingCursor:(unichar)precedingChar {
+- (void)deleteTypedCharacter:(unichar)deletedChar
+withCharacterNowPrecedingCursor:(unichar)precedingChar
+                    location:(NSUInteger)location
+                textViewText:(NSString *)textViewText {
     // Determine the type of the character
     enum CharacterType {
         CharacterTypeSeparator = 0,
-        CharacterTypeNormal
+        CharacterTypeNormal,
+        CharacterTypeControlCharacter
     };
     enum CharacterType deletedCharacterType = ([HKWMentionsStartDetectionStateMachine.separatorSet characterIsMember:deletedChar] || deletedChar == 0)
     ? CharacterTypeSeparator
     : CharacterTypeNormal;
-    enum CharacterType currentCharacterType = ([HKWMentionsStartDetectionStateMachine.separatorSet characterIsMember:precedingChar] || precedingChar == 0)
-    ? CharacterTypeSeparator
-    : CharacterTypeNormal;
+    __strong __auto_type delegate = self.delegate;
 
+    // Determine the type of the character
+    enum CharacterType currentCharacterType = CharacterTypeNormal;
+    if ([HKWMentionsStartDetectionStateMachine.whitespaceSet characterIsMember:precedingChar] || precedingChar == 0) {
+        currentCharacterType = CharacterTypeSeparator;
+    } else {
+        // Check first for control character because punctuation character can be control character.
+        // e.g "@" and "#" are punctuation char and might be control character.
+        NSCharacterSet *const controlCharacterSet = [delegate controlCharacterSet];
+        if (controlCharacterSet && [controlCharacterSet characterIsMember:precedingChar]) {
+            currentCharacterType = CharacterTypeControlCharacter;
+        } else if ([HKWMentionsStartDetectionStateMachine.punctuationSet characterIsMember:precedingChar]) {
+            currentCharacterType = CharacterTypeSeparator;
+        }
+    }
     switch (self.state) {
         case HKWMentionsStartDetectionStateQuiescentReady: {
-            if (currentCharacterType == CharacterTypeNormal) {
+            // If user deletes white-space between control character and word, then query mention with word next to whitepace.
+            if (currentCharacterType == CharacterTypeControlCharacter && deletedCharacterType == CharacterTypeSeparator) {
+                self.state = HKWMentionsStartDetectionStateCreatingMention;
+                NSString *const keyword = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location + 1 text:textViewText];
+                [delegate beginMentionsCreationWithString:keyword
+                                               atLocation:location - 1
+                                    usingControlCharacter:YES
+                                         controlCharacter:precedingChar];
+            } else if (currentCharacterType == CharacterTypeNormal) {
                 if (self.charactersSinceLastWhitespace == 0) {
                     // Being here means the user deleted enough characters to move the cursor into the previous word.
                     self.state = HKWMentionsStartDetectionStateQuiescentStalled;
@@ -232,6 +263,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
                 self.charactersSinceLastWhitespace = 0;
                 self.stringBuffer = [@"" mutableCopy];
             }
+            break;
         }
         case HKWMentionsStartDetectionStateQuiescentStalled: {
             // Change state to QuiescentReady when either:
@@ -298,6 +330,20 @@ typedef NS_ENUM(NSInteger, HKWMentionsStartDetectionState) {
     self.state = HKWMentionsStartDetectionStateCreatingMention;
 }
 
+#pragma mark - Public helper method
+
++ (NSString *)wordAfterLocation:(NSUInteger)location text:(NSString *)text {
+    NSString *charString;
+    NSMutableString *const word = [[NSMutableString alloc] init];
+    for(NSUInteger i = location; i < text.length ; i++) {
+        charString =  [text substringWithRange:NSMakeRange(i, 1)];
+        if([text isEqualToString:@" "]) {
+            break;
+        }
+        [word appendString:charString];
+    }
+    return [word copy];
+}
 
 #pragma mark - Properties and Constants
 
