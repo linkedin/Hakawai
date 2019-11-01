@@ -845,9 +845,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             // Inform the start detection state machine that a character was inserted. Also, override the double space
             //  to period auto-substitution if the substitution would place a period right after a preceding mention.
 
-            // When control character is inserted before existing word in text view, then query mention with that word.
+            // When control character is inserted before existing word in text view, then query for mention with that word.
             NSString *textAfterControlCharacter = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:parentTextView.text];
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar queryMentionForText:textAfterControlCharacter];
+            [self.startDetectionStateMachine characterTyped:newChar
+                                        asInsertedCharacter:NO
+                                          previousCharacter:precedingChar
+                                                 nextString:textAfterControlCharacter];
             NSRange r;
             id mentionTwoPreceding = [self mentionAttributePrecedingLocation:(location-1) range:&r];
             BOOL shouldSuppress = (mentionTwoPreceding != nil) && (r.location + r.length == location-1);
@@ -873,7 +876,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             //  insert a new character and continue in the quiescent state. Do not allow auto-substitution.
             self.state = HKWMentionsStateQuiescent;
             [self resetCurrentMentionsData];
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar queryMentionForText:nil];
+            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar nextString:nil];
             if (isSecondSpace) {
                 [self manuallyInsertCharacter:newChar atLocation:location inTextView:parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
@@ -895,7 +898,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self resetCurrentMentionsData];
             self.state = HKWMentionsStateQuiescent;
             self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES previousCharacter:precedingChar queryMentionForText:nil];
+            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES previousCharacter:precedingChar nextString:nil];
             returnValue = NO;
             break;
         case HKWMentionsStateLosingFocus:
@@ -1149,7 +1152,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 self.previousSelectionRange = newSelectionRange;
                 self.previousTextLength = [[parentTextView text] length];
 
-                [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0] asInsertedCharacter:YES previousCharacter:precedingChar queryMentionForText:nil];
+                [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0]
+                                            asInsertedCharacter:YES
+                                              previousCharacter:precedingChar
+                                                     nextString:nil];
                 // Manually notify external delegate that the textView changed
                 id<HKWTextViewDelegate> externalDelegate = parentTextView.externalDelegate;
                 if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
@@ -1807,8 +1813,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     NSAssert(self.mentionUnselectedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
 
-    // When control char is inserted before word and user select mention for that word,
-    // then we want to replace word after control char with mention text.
+    // When control character is inserted before word and user selects mention for that word,
+    // we want to replace word after control character with mention text.
     // e.g "hey @|john" will be replaced as "hey John Doe". '|' indicates cursor.
     NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:currentLocation text:parentTextView.text];
     NSRange rangeToTransform = NSMakeRange(location, currentLocation + wordAfterCurrentLocation.length - location);

@@ -94,12 +94,15 @@
  Inform the state machine that a character was typed by the user into the text view.
  \param inserted    whether the character was already inserted into the text view's text buffer
  */
-- (void)characterTyped:(unichar)c asInsertedCharacter:(BOOL)inserted previousCharacter:(unichar)previousCharacter queryMentionForText:(NSString *)queryMentionForText;
+- (void)characterTyped:(unichar)c asInsertedCharacter:(BOOL)inserted previousCharacter:(unichar)previousCharacter nextString:(NSString *)nextString;
 
 /*!
  Inform the state machine that a character was deleted by the user from the text view.
  */
-- (void)deleteTypedCharacter:(unichar)deletedChar withCharacterNowPrecedingCursor:(unichar)precedingChar location:(NSUInteger)location textViewText:(NSString *)textViewText;
+- (void)deleteTypedCharacter:(unichar)deletedChar
+withCharacterNowPrecedingCursor:(unichar)precedingChar
+                    location:(NSUInteger)location
+                textViewText:(NSString *)textViewText;
 
 /*!
  Inform the state machine that the cursor was moved from its prior position and is now in insertion mode.

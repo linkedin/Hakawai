@@ -164,8 +164,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                 return;
             }
     }
-    // When whitespace is typed during mention creation state and previous char is control character
-    // then metion creation should to stalled. e.g "@@ " will stop mention current creation.
+    // When whitespace is typed during mention creation state and previous character is control character
+    // then mention creation should be ended. e.g "@@ " will stop mention current creation.
     const BOOL shouldCreateNewMentionState = previousCharacterIsControl && isWhitespace;
     if (([self.stringBuffer length] == 0 && isWhitespace) || shouldCreateNewMentionState) {
         self.state = HKWMentionsCreationStateQuiescent;
