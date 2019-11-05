@@ -1749,7 +1749,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     NSCharacterSet *whitespaces = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     BOOL canRestart = ([whitespaces characterIsMember:[parentTextView characterPrecedingLocation:(NSInteger)currentLocation]]
                        || (self.characterForAdvanceStateForCharacterInsertion != 0
-                           && [whitespaces characterIsMember:self.characterForAdvanceStateForCharacterInsertion]));
+                           && [whitespaces characterIsMember:self.characterForAdvanceStateForCharacterInsertion])
+                       || [[NSCharacterSet punctuationCharacterSet]
+                           characterIsMember:[parentTextView characterPrecedingLocation:(NSInteger)currentLocation]]);
     [self performMentionCreationEndCleanup:canRestart];
     [parentTextView restoreOriginalAutocorrection:(self.state != HKWMentionsStateLosingFocus)];
 }
