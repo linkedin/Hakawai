@@ -92,9 +92,15 @@
 
 /*!
  Inform the state machine that a character was typed by the user into the text view.
- \param inserted    whether the character was already inserted into the text view's text buffer
+ \param c                                   Character typed
+ \param inserted                            Whether the character was already inserted into the text view's text buffer
+ \param previousCharacter                   Character preceding typed character
+ \param wordFollowingTypedCharacter         Word following the typed character
  */
-- (void)characterTyped:(unichar)c asInsertedCharacter:(BOOL)inserted previousCharacter:(unichar)previousCharacter nextString:(NSString *)nextString;
+- (void)characterTyped:(unichar)c
+   asInsertedCharacter:(BOOL)inserted
+     previousCharacter:(unichar)previousCharacter
+wordFollowingTypedCharacter:(NSString *)wordFollowingTypedCharacter;
 
 /*!
  Inform the state machine that a character was deleted by the user from the text view.

@@ -126,7 +126,7 @@ typedef NS_ENUM(NSInteger, CharacterType) {
 - (void)characterTyped:(unichar)c
    asInsertedCharacter:(BOOL)inserted
      previousCharacter:(unichar)previousCharacter
-            nextString:(nullable NSString *)nextString {
+wordFollowingTypedCharacter:(nullable NSString *)wordFollowingTypedCharacter {
     __strong __auto_type delegate = self.delegate;
     // Determine character types
     enum CharacterType currentCharacterType = [self characterTypeOfCharacter:c];
@@ -157,8 +157,8 @@ typedef NS_ENUM(NSInteger, CharacterType) {
                      && (previousCharacterType == CharacterTypeSeparator || previousCharacter == 0)) {
                 if (previousCharacter == 0 || previousCharacterType == CharacterTypeSeparator) {
                     // Start an EXPLICIT MENTION
-                    if (nextString) {
-                        self.stringBuffer = [nextString mutableCopy];
+                    if (wordFollowingTypedCharacter) {
+                        self.stringBuffer = [wordFollowingTypedCharacter mutableCopy];
                     } else if (previousCharacterType == CharacterTypeSeparator) {
                         self.stringBuffer = [@"" mutableCopy];
                     }
@@ -197,21 +197,22 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
                 textViewText:(nonnull NSString *)textViewText {
     // Determine the character types
     enum CharacterType deletedCharacterType = [self characterTypeOfCharacter:deletedChar];
-    enum CharacterType currentCharacterType = [self characterTypeOfCharacter:precedingChar];
+    enum CharacterType precedingCharacterType = [self characterTypeOfCharacter:precedingChar];
 
     __strong __auto_type delegate = self.delegate;
 
     switch (self.state) {
         case HKWMentionsStartDetectionStateQuiescentReady: {
-            BOOL shouldCreateMention = NO;
+            BOOL canCreateMention = NO;
             if (location > 1 && textViewText.length > location - 2) {
-                const unichar characterBeforePrecedingChar = [textViewText characterAtIndex:location-2];
-                shouldCreateMention = [HKWMentionsStartDetectionStateMachine.separatorSet characterIsMember:characterBeforePrecedingChar];
+                const unichar characterBeforePrecedingChar = [textViewText characterAtIndex:location - 2];
+                canCreateMention = [HKWMentionsStartDetectionStateMachine.separatorSet characterIsMember:characterBeforePrecedingChar]
+                && precedingCharacterType == CharacterTypeControlCharacter;
+            } else if (location > 0 && precedingCharacterType == CharacterTypeControlCharacter) {
+                canCreateMention = YES;
             }
-            // If user deletes white-space between control character and word, then query mention with word next to whitepace.
-            if (currentCharacterType == CharacterTypeControlCharacter
-                && (deletedCharacterType == CharacterTypeSeparator || deletedCharacterType == CharacterTypeControlCharacter)
-                && shouldCreateMention) {
+            // If user deletes white-space or separators between control character and word, then query mention with word next to whitepace.
+            if ((deletedCharacterType == CharacterTypeSeparator || deletedCharacterType == CharacterTypeControlCharacter) && canCreateMention) {
                 if (location > 0 && location <= [textViewText length]) {
                     self.state = HKWMentionsStartDetectionStateCreatingMention;
                     NSString *const keyword = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location + 1 text:textViewText];
@@ -220,7 +221,7 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
                                         usingControlCharacter:YES
                                              controlCharacter:precedingChar];
                 }
-            } else if (currentCharacterType == CharacterTypeNormal) {
+            } else if (precedingCharacterType == CharacterTypeNormal) {
                 if (self.charactersSinceLastWhitespace == 0) {
                     // Being here means the user deleted enough characters to move the cursor into the previous word.
                     self.state = HKWMentionsStartDetectionStateQuiescentStalled;
@@ -242,7 +243,7 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
             //   1. A whitespace character is encountered
             //   2. A NON-whitespace character is encountered and a whitespace character was deleted
             //   3. A punctuation character is encountered
-            if (currentCharacterType == CharacterTypeSeparator
+            if (precedingCharacterType == CharacterTypeSeparator
                 || deletedCharacterType == CharacterTypeSeparator) {
                 self.state = HKWMentionsStartDetectionStateQuiescentReady;
             }

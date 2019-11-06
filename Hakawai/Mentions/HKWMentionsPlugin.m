@@ -845,12 +845,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             // Inform the start detection state machine that a character was inserted. Also, override the double space
             //  to period auto-substitution if the substitution would place a period right after a preceding mention.
 
-            // When control character is inserted before existing word in text view, then query for mention with that word.
-            NSString *textAfterControlCharacter = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:parentTextView.text];
+            // Word following typed character would be used to trigger matching mentions menu when possible.
+            NSString *wordFollowingTypedCharacter = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:parentTextView.text];
             [self.startDetectionStateMachine characterTyped:newChar
                                         asInsertedCharacter:NO
                                           previousCharacter:precedingChar
-                                                 nextString:textAfterControlCharacter];
+                                wordFollowingTypedCharacter:wordFollowingTypedCharacter];
             NSRange r;
             id mentionTwoPreceding = [self mentionAttributePrecedingLocation:(location-1) range:&r];
             BOOL shouldSuppress = (mentionTwoPreceding != nil) && (r.location + r.length == location-1);
@@ -876,7 +876,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             //  insert a new character and continue in the quiescent state. Do not allow auto-substitution.
             self.state = HKWMentionsStateQuiescent;
             [self resetCurrentMentionsData];
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar nextString:nil];
+            [self.startDetectionStateMachine characterTyped:newChar
+                                        asInsertedCharacter:NO
+                                          previousCharacter:precedingChar
+                                wordFollowingTypedCharacter:nil];
             if (isSecondSpace) {
                 [self manuallyInsertCharacter:newChar atLocation:location inTextView:parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
@@ -898,7 +901,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self resetCurrentMentionsData];
             self.state = HKWMentionsStateQuiescent;
             self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES previousCharacter:precedingChar nextString:nil];
+            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES previousCharacter:precedingChar wordFollowingTypedCharacter:nil];
             returnValue = NO;
             break;
         case HKWMentionsStateLosingFocus:
@@ -996,14 +999,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             //  is a mention right before the mention creation point.
             unichar stackC = deletedChar;
 
-            // This check is used to stop mention creation when control character is deleted.
-            // Also check if second previous character is control, it YES then don't stop mention creation.
-            BOOL secondPreviousCaracterIsControl = NO;
-            if (location >= 1) {
-                unichar secondPreviousCharacter = [parentTextView.text characterAtIndex:location - 1];
-                secondPreviousCaracterIsControl = [self.controlCharacterSet characterIsMember:secondPreviousCharacter];
-            }
-            BOOL isControlCharacterDeleted = !secondPreviousCaracterIsControl && [self.controlCharacterSet characterIsMember:deletedChar];
+            // This check is used to stop mention creation when control character triggering mentions is deleted.
+            BOOL isControlCharacterDeleted = (precedingChar == 0 || [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:precedingChar])
+            && [self.controlCharacterSet characterIsMember:deletedChar];
 
             [self.creationStateMachine stringDeleted:[NSString stringWithCharacters:&stackC length:1] isControlCharacterDeleted:isControlCharacterDeleted];
             // Get prior character to properly prime start detection state machine
@@ -1155,7 +1153,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0]
                                             asInsertedCharacter:YES
                                               previousCharacter:precedingChar
-                                                     nextString:nil];
+                                    wordFollowingTypedCharacter:nil];
                 // Manually notify external delegate that the textView changed
                 id<HKWTextViewDelegate> externalDelegate = parentTextView.externalDelegate;
                 if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
@@ -1259,13 +1257,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             self.state = HKWMentionsStateQuiescent;
             break;
         case HKWMentionsStartDetectionStateCreatingMention: {
-            const BOOL precedingCharacterIsWhitepace = [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:precedingCharacter];
+            const BOOL precedingCharacterIsSeparator = [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:precedingCharacter]
+            || [[NSCharacterSet punctuationCharacterSet] characterIsMember:precedingCharacter];
             const BOOL deletedStringFirstCharacterIsControl = deletedString.length > 0
             ? [self.controlCharacterSet characterIsMember:[deletedString characterAtIndex:0]]
             : NO;
 
             BOOL isControlCharacterDeleted = NO;
-            if (precedingCharacterIsWhitepace && deletedStringFirstCharacterIsControl) {
+            if (precedingCharacterIsSeparator && deletedStringFirstCharacterIsControl) {
                 isControlCharacterDeleted = YES;
             }
 
