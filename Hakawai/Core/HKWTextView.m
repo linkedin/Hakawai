@@ -149,7 +149,10 @@ static BOOL enableKoreanMentionsFix = NO;
         if (self.textStateBeforeDeletion == nil) {
             self.textStateBeforeDeletion = change;
         } else {
-            [self padTexStorageForRangeInsertionAtLocation:editedRange.location ofLength:delta];
+            // This line is needed because text storage works by replacing a certiain number of characters in a given range.
+            // In order to have the correct number of characters to replace in our text state string, we pad it at the correct location
+            // with the given delta.
+            [self padTextStorageForRangeInsertionAtLocation:editedRange.location withLength:delta];
             self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:editedRange withString:change];
         }
     }
@@ -765,10 +768,14 @@ static BOOL enableKoreanMentionsFix = NO;
     return _touchCaptureOverlayView;
 }
 
-- (void)padTexStorageForRangeInsertionAtLocation:(NSUInteger)location ofLength:(NSInteger)length {
+/**
+ Adds padding of a given @c length at a given @c location, to make string replacement in the text storage delegate work correctly
+ */
+- (void)padTextStorageForRangeInsertionAtLocation:(NSUInteger)location withLength:(NSInteger)length {
     NSString *string = @"";
-    for (int i = 0; i < length; i++)
+    for (int i = 0; i < length; i++) {
         string = [string stringByAppendingString:@" "];
+    }
     self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:NSMakeRange(location, 0) withString:string];
 }
 
