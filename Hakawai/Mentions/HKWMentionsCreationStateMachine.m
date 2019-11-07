@@ -232,7 +232,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
             else {
                 [self.stringBuffer appendString:string];
                 // Move the state to 'pending request'. This will cause another request to be fired as soon as the
-                //  timer expires.
+                // timer expires.
                 self.networkState = HKWMentionsCreationNetworkStatePendingRequestAfterCooldown;
             }
             break;
@@ -245,7 +245,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
     // Whether or not the buffer is empty (no characters to search upon).
     // Note that, if the mention is an explicit mention (use control character), user can back out to beginning. But if
-    //  the mention is implicit, backing out to the beginning will cancel mentions creation.
+    // the mention is implicit, backing out to the beginning will cancel mentions creation.
     BOOL bufferAlreadyEmpty = ([self.stringBuffer length] == 0
                                || (self.searchType == HKWMentionsSearchTypeImplicit
                                    && [self.stringBuffer length] == 1));

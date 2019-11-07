@@ -21,8 +21,15 @@
 
 #import "_HKWPrivateConstants.h"
 
-@interface HKWTextView () <UITextViewDelegate, HKWAbstractionLayerDelegate>
-@property (nonatomic, strong) NSMutableDictionary *simplePluginsDictionary;
+@interface HKWTextView () <UITextViewDelegate, HKWAbstractionLayerDelegate, NSTextStorageDelegate>
+
+@property NSMutableDictionary *simplePluginsDictionary;
+/*!
+ String that saves the state of the text in the text view so that it can be accessed in the NSTextStorageDelegate, which will
+ already have deleted the character by the time it's trying to process said deletion
+ */
+@property (nonatomic) NSString *textStateBeforeDeletion;
+
 @end
 
 static BOOL enableExperimentalDeadLockFix = NO;
@@ -121,11 +128,52 @@ static BOOL enableKoreanMentionsFix = NO;
     return replacement;
 }
 
+- (void)textStorage:(__unused NSTextStorage *)textStorage
+  didProcessEditing:(__unused NSTextStorageEditActions)editedMask
+              range:(NSRange)editedRange
+     changeInLength:(NSInteger)delta {
+    if (!enableKoreanMentionsFix) {
+        // If this mentions fix is not enabled, don't do anything in text storage
+        return;
+    }
+
+    if (delta > 0) {
+        // If the delta is greater than 0, this is an insertion
+        NSString *change = [self.text substringFromIndex:self.text.length-(NSUInteger)delta];
+        [self.controlFlowPlugin textView:self
+                 shouldChangeTextInRange:NSMakeRange(editedRange.location, 0)
+                         replacementText:change
+                             isInsertion:true];
+        // Update the saved text state so that it can be accessed in the case of deletion
+        if (self.textStateBeforeDeletion.length == 0) {
+            self.textStateBeforeDeletion = change;
+        } else {
+            self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByAppendingString:change];
+        }
+    }
+    else if (delta < 0) {
+        // If the delta is less than 0, this is a deletion
+        NSUInteger absoluteDelta = (NSUInteger)labs((long)delta);
+        NSUInteger differential = self.textStateBeforeDeletion.length-absoluteDelta;
+        // Retrieve the string to delete
+        NSString *toDelete = [self.textStateBeforeDeletion substringFromIndex:differential];
+        [self.controlFlowPlugin textView:self
+                 shouldChangeTextInRange:NSMakeRange(editedRange.location, absoluteDelta)
+                         replacementText:toDelete
+                             isInsertion:false];
+        // Update the text state for the deletion
+        self.textStateBeforeDeletion = [self.textStateBeforeDeletion substringToIndex:differential];
+    }
+}
+
 - (void)setup {
     self.delegate = self;
     self.firstResponderIsCycling = NO;
     self.translatesAutoresizingMaskIntoConstraints = NO;
 
+    if (enableKoreanMentionsFix) {
+        self.textStorage.delegate = self;
+    }
     self.abstractionLayer = [HKWAbstractionLayer instanceWithTextView:self changeRejection:YES];
 }
 
@@ -284,6 +332,8 @@ static BOOL enableKoreanMentionsFix = NO;
     if ([self shouldChangeTextInRange:self.selectedRange replacementText:dictationString isDictationText:YES textView:self]) {
         [self insertText:dictationString];
     }
+
+    // TODO: Handle dictation string with korean mentions fix
 }
 
 - (BOOL)shouldChangeTextInRange:(NSRange)range

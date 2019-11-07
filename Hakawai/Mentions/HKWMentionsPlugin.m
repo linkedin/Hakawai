@@ -1101,6 +1101,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 /*!
  Advance the state machine when a multi-character string is inserted (due to copy-paste).
+ OR Korean Mentions Fix
  */
 - (BOOL)advanceStateForStringInsertionAtRange:(NSRange)range text:(NSString *)text {
     __strong HKWTextView *parentTextView = self.parentTextView;
@@ -1226,6 +1227,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 /*!
  Advance the state machine when multiple characters are deleted (due to copy-paste or selection delete).
+ OR Korean Mentions Fix
  */
 - (BOOL)advanceStateForStringDeletionAtRange:(NSRange)range
                                deletedString:(NSString *)deletedString
@@ -1242,6 +1244,47 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self.creationStateMachine stringDeleted:deletedString];
             self.nextSelectionChangeShouldBeIgnored = YES;
             self.nextInsertionShouldBeIgnored = YES;
+            break;
+        case HKWMentionsStateAboutToSelectMention:
+        case HKWMentionsStateSelectedMention:
+            [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:precedingCharacter];
+            [self resetCurrentMentionsData];
+            self.state = HKWMentionsStateQuiescent;
+            break;
+        case HKWMentionsStateLosingFocus:
+            NSAssert(NO, @"Logic error: state machine cannot be in LosingFocus at this point.");
+            break;
+    }
+
+    // If mentions were deleted, notify the text view's external delegate as appropriate.
+    __strong __auto_type parentTextView = self.parentTextView;
+    __strong __auto_type externalDelegate = parentTextView.externalDelegate;
+    if (self.notifyTextViewDelegateOnMentionDeletion
+        && numberOfMentionsDestroyed > 0
+        && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [externalDelegate textViewDidChange:parentTextView];
+    }
+
+    return YES;
+}
+
+/*!
+ Advance the state machine when multiple characters are deleted with the Korean Mentions Fix on
+ */
+- (BOOL)korean_mentions_fix_advanceStateForStringDeletionAtRange:(NSRange)range
+                                                   deletedString:(NSString *)deletedString
+                                              precedingCharacter:(unichar)precedingCharacter {
+    // Remove all mentions within the selection range before continuing
+    NSUInteger numberOfMentionsDestroyed = [self bleachMentionsWithinRange:range];
+    switch (self.state) {
+        case HKWMentionsStateQuiescent:
+            [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:precedingCharacter];
+            [self resetCurrentMentionsData];
+            self.state = HKWMentionsStateQuiescent;
+            break;
+        case HKWMentionsStartDetectionStateCreatingMention:
+            [self.creationStateMachine stringDeleted:deletedString];
+            // Usually there's a hack here with "nextInsertionShouldBeIgnored", but the bug that the hack addresses isn't present with korean mentions fix on
             break;
         case HKWMentionsStateAboutToSelectMention:
         case HKWMentionsStateSelectedMention:
@@ -1426,7 +1469,89 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     [self resetAuxiliaryState];
 }
 
+- (void)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text isInsertion:(BOOL)isInsertion {
+    BOOL isCreatingOrStartingMention = self.state == HKWMentionsStartDetectionStateCreatingMention || [self isStringControlCharacter:text];
+    if (!isCreatingOrStartingMention) {
+        // Only implement Korean mentions fix when creating or starting mentions
+        // We will revisit a longer term alignment of using the fix in non-mentions cases, after we ramp the mentions fix
+        return;
+    }
+    self.suppressSelectionChangeNotifications = YES;
+    __strong __auto_type parentTextView = self.parentTextView;
+    unichar precedingChar = [parentTextView characterPrecedingLocation:(NSInteger)range.location];
+
+    if (self.nextInsertionShouldBeIgnored) {
+        self.nextInsertionShouldBeIgnored = NO;
+        self.previousSelectionRange = textView.selectedRange;
+        self.previousTextLength = [textView.text length];
+        self.suppressSelectionChangeNotifications = NO;
+        return;
+    }
+
+    if (isInsertion && [text length] == 1) {
+        // Inserting a character
+        [self advanceStateForCharacterInsertion:[text characterAtIndex:0]
+                             precedingCharacter:precedingChar
+                                       location:range.location];
+    }
+    else if (!isInsertion) {
+        // Deleting text
+        NSString *toDeleteString = text;
+        if (range.length == 0) {
+            // At the beginning, and delete was tapped
+            self.suppressSelectionChangeNotifications = NO;
+            return;
+        }
+        else if (range.length == 1) {
+            // Deleting a single character
+            [self advanceStateForCharacterDeletion:precedingChar
+                                  deletedCharacter:[toDeleteString characterAtIndex:0]
+                                          location:range.location];
+        }
+        else {
+            // Deleting multiple characters
+            [self korean_mentions_fix_advanceStateForStringDeletionAtRange:range
+                                                             deletedString:toDeleteString
+                                                        precedingCharacter:precedingChar];
+            // Reset the selection range
+            textView.selectedRange = range;
+        }
+    }
+    else if (isInsertion && [text length] > 1) {
+        // Inserting text (e.g. pasting)
+        [self advanceStateForStringInsertionAtRange:range text:text];
+    }
+    else {
+        // Replacing text (e.g. pasting, autocorrect, etc)
+        [self advanceStateForSelectionChanged:NSMakeRange(range.location + ([text length] - range.length), 0) replacementText:text];
+    }
+    // Since text view has already updated when text storage delegate is called, determine previous length programatically
+    // via the type and size of the change, and the current state
+    if (isInsertion) {
+        self.previousTextLength = textView.text.length - text.length;
+    } else {
+        self.previousTextLength = textView.text.length + text.length;
+    }
+    self.previousSelectionRange = textView.selectedRange;
+    [self stripCustomAttributesFromTypingAttributes];
+    self.suppressSelectionChangeNotifications = NO;
+}
+
+/*!
+ Returns whether a string is a single control character
+ */
+- (BOOL)isStringControlCharacter:(NSString *)text {
+    return text.length == 1 && [self.controlCharacterSet characterIsMember:[text characterAtIndex:0]];
+}
+
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    BOOL isCreatingOrStartingMention = self.state == HKWMentionsStartDetectionStateCreatingMention || [self isStringControlCharacter:text];
+    // If korean mentions fix is on, don't respond to text edits during or at the beginning of mention creation in this method
+    // do so only through the text storage delegate
+    if (HKWTextView.enableKoreanMentionsFix && isCreatingOrStartingMention) {
+        // YES is the default return
+        return YES;
+    }
     BOOL returnValue = YES;
     self.suppressSelectionChangeNotifications = YES;
     __strong __auto_type parentTextView = self.parentTextView;
