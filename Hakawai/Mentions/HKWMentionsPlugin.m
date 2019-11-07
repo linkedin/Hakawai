@@ -128,9 +128,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
  character being inserted. Otherwise, it contains the NULL character, 0.
 
  This property is intended to allow the data-retrieved callback code to determine whether the callback was called
- synchronously or asynchronously, and therefore determine which character to use to determine whether mentions creation, 
+ synchronously or asynchronously, and therefore determine which character to use to determine whether mentions creation,
  if cancelled, should be allowed to immediately restart.
- 
+
  (If the callback was made asynchronously, then the text in the text view should be used to determine the last character
  typed. If the callback was made synchronously, then the character in this property should be used to determine whether
  or not to allow immediate restart. However, sometimes the callback will be deferred until the next runloop anyways, so
@@ -425,8 +425,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                                   // This won't ever happen if the proper library methods are used to
                                                   //  work with mentions.
                                                   HKWLOG(@"WARNING: mentionsAttributesInAttributedString found \
-                                                          invalid data attached to a mentions attribute. Only use the \
-                                                          methods provided to work with mentions attributes.");
+                                                         invalid data attached to a mentions attribute. Only use the \
+                                                         methods provided to work with mentions attributes.");
                                                   continue;
                                               }
                                               HKWMentionsAttribute *attributeData = (HKWMentionsAttribute *)object;
@@ -466,7 +466,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                              edgeInsets:(UIEdgeInsets)edgeInsets {
     if (!self.parentTextView) {
         HKWLOG(@"WARNING! No parent text view set. Don't call calculatedChooserViewFrameForMode until the mentions \
-                plug-in has been registered to an editor text view.");
+               plug-in has been registered to an editor text view.");
     }
     CGRect frame = [self.creationStateMachine frameForMode:mode];
     if (!CGRectIsNull(frame)) {
@@ -498,7 +498,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     for (NSUInteger i=0; i<[string length]; i++) {
         unichar c = [string characterAtIndex:i];
         if ([invalidChars characterIsMember:c]) { return NO; }
-        if (self.controlCharacterSet && [self.controlCharacterSet characterIsMember:c]) { return NO; }
+        // We should allow insertion of control characters as a valid mention string
+        if (!HKWTextView.enableKoreanMentionsFix) {
+            if (self.controlCharacterSet && [self.controlCharacterSet characterIsMember:c]) { return NO; }
+        }
     }
     return YES;
 }
@@ -842,6 +845,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     BOOL isSecondSpace = (location > 1) && (precedingChar == ' ' && newChar == ' ');
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
+            if (HKWTextView.enableKoreanMentionsFix) {
+                // Update the location of the selected range for this insertion here
+                // (since the text view will already be updated when utilizing the text storage delegate in the korean mentions fix)
+                // This should replace other settings of this range when the fix is ramped
+                parentTextView.selectedRange = NSMakeRange(location, parentTextView.selectedRange.length);
+            }
             // Inform the start detection state machine that a character was inserted. Also, override the double space
             //  to period auto-substitution if the substitution would place a period right after a preceding mention.
             [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar];
@@ -930,7 +939,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             if (location > 0) {
                 NSRange mentionRange;
                 HKWMentionsAttribute *precedingMention = [self mentionAttributePrecedingLocation:location
-                                                                                            range:&mentionRange];
+                                                                                           range:&mentionRange];
                 if (precedingMention) {
                     // There is a mention right before the cursor's current position.
                     // If the user taps 'delete' again, they will actually select the mention.
@@ -1022,7 +1031,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                                                                  [trimmedString length]);
                 // Move the cursor into position.
                 parentTextView.selectedRange = NSMakeRange(self.currentlySelectedMentionRange.location + [trimmedString length],
-                                                                0);
+                                                           0);
                 location = parentTextView.selectedRange.location;
 
                 // Notify the plugin's state change delegate that a mention was trimmed.
@@ -1049,8 +1058,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 [self stripCustomAttributesFromTypingAttributes];
                 parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
 
-				// Store current mention before reset
-				HKWMentionsAttribute *currentMention = self.currentlySelectedMention;
+                // Store current mention before reset
+                HKWMentionsAttribute *currentMention = self.currentlySelectedMention;
                 [self resetCurrentMentionsData];
                 self.state = HKWMentionsStateQuiescent;
                 // Update selection state
@@ -1063,7 +1072,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 if (locationAfterDeletion > 0) {
                     NSRange mentionRange;
                     HKWMentionsAttribute *precedingMention = [self mentionAttributePrecedingLocation:locationAfterDeletion
-                                                                                                range:&mentionRange];
+                                                                                               range:&mentionRange];
                     if (precedingMention) {
                         // There is a mention right before the cursor's current position.
                         // If the user taps 'delete' again, they will actually select the mention.
@@ -1178,21 +1187,40 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             }
             break;
         }
-        case HKWMentionsStartDetectionStateCreatingMention:
+        case HKWMentionsStartDetectionStateCreatingMention: {
             // If one or more characters are inserted automatically (e.g. pasting in text, certain types of keyboards),
-            //  insert the text, but only if it's valid. Otherwise, treat it as if the cursor moved and the mention
-            //  creation process was cancelled.
-            if ([self stringValidForMentionsCreation:text]) {
-                self.characterForAdvanceStateForCharacterInsertion = [text characterAtIndex:[text length] - 1];
-                [self.creationStateMachine validStringInserted:text];
-                self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-                break;
+            // insert the text, but only if it's valid.
+            // Begin a mention if the control character was replaced by another.
+            // Otherwise, treat it as if the cursor moved and the mention  creation process was cancelled.
+            BOOL didBeginMentionsCreation = NO;
+            if (HKWTextView.enableKoreanMentionsFix) {
+                if (text && [text length] > 0) {
+                    unichar firstReplacementTextCharacter = [text characterAtIndex:0];
+                    BOOL isReplacementTextMention = [self.controlCharacterSet characterIsMember:firstReplacementTextCharacter];
+                    if (isReplacementTextMention && self.resumeMentionsPriorPosition == range.location) {
+                        // If we are replacing a mention string with a mentions string, begin the mention
+                        [self beginMentionsCreationWithString:[text substringFromIndex:1]
+                                                   atLocation:range.location
+                                        usingControlCharacter:YES
+                                             controlCharacter:firstReplacementTextCharacter];
+                        didBeginMentionsCreation = YES;
+                    }
+                }
             }
-            else {
-                [self.creationStateMachine cursorMoved];
-                self.state = HKWMentionsStateQuiescent;
+            if (!didBeginMentionsCreation) {
+                if ([self stringValidForMentionsCreation:text]) {
+                    self.characterForAdvanceStateForCharacterInsertion = [text characterAtIndex:[text length] - 1];
+                    [self.creationStateMachine validStringInserted:text];
+                    self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
+                    break;
+                }
+                else {
+                    [self.creationStateMachine cursorMoved];
+                    self.state = HKWMentionsStateQuiescent;
+                }
             }
             break;
+        }
         case HKWMentionsStateAboutToSelectMention:
             // Leave the 'about to select' state and resume scanning
             self.state = HKWMentionsStateQuiescent;
@@ -1417,7 +1445,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self assertMentionsDataExists];
             NSRange mentionRange;
             HKWMentionsAttribute *precedingMention = [self mentionAttributePrecedingLocation:location
-                                                                                                range:&mentionRange];
+                                                                                       range:&mentionRange];
             if (!precedingMention) {
                 // User moved cursor away from the current mention and to a position with no mention
                 [self toggleMentionsFormattingAtRange:self.currentlySelectedMentionRange selected:NO];
@@ -1462,15 +1490,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
         [self.creationStateMachine cancelMentionCreation];
     } else {
-       self.state = HKWMentionsStateQuiescent;
+        self.state = HKWMentionsStateQuiescent;
     }
 
     [self.startDetectionStateMachine resetStateUsingString:[textView.text copy]];
     [self resetAuxiliaryState];
 }
 
-- (void)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text isInsertion:(BOOL)isInsertion {
-    BOOL isCreatingOrStartingMention = self.state == HKWMentionsStartDetectionStateCreatingMention || [self isStringControlCharacter:text];
+- (void)textView:(UITextView *)textView
+shouldChangeTextInRange:(NSRange)range
+      changeText:(NSString *)text
+     isInsertion:(BOOL)isInsertion
+  previousLength:(NSUInteger)previousLength {
+    BOOL isCreatingOrStartingMention = self.state == HKWMentionsStartDetectionStateCreatingMention || ([self isStringControlCharacter:text] && isInsertion);
     if (!isCreatingOrStartingMention) {
         // Only implement Korean mentions fix when creating or starting mentions
         // We will revisit a longer term alignment of using the fix in non-mentions cases, after we ramp the mentions fix
@@ -1479,6 +1511,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     self.suppressSelectionChangeNotifications = YES;
     __strong __auto_type parentTextView = self.parentTextView;
     unichar precedingChar = [parentTextView characterPrecedingLocation:(NSInteger)range.location];
+    self.previousTextLength = previousLength;
 
     if (self.nextInsertionShouldBeIgnored) {
         self.nextInsertionShouldBeIgnored = NO;
@@ -1525,13 +1558,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         // Replacing text (e.g. pasting, autocorrect, etc)
         [self advanceStateForSelectionChanged:NSMakeRange(range.location + ([text length] - range.length), 0) replacementText:text];
     }
-    // Since text view has already updated when text storage delegate is called, determine previous length programatically
-    // via the type and size of the change, and the current state
-    if (isInsertion) {
-        self.previousTextLength = textView.text.length - text.length;
-    } else {
-        self.previousTextLength = textView.text.length + text.length;
-    }
     self.previousSelectionRange = textView.selectedRange;
     [self stripCustomAttributesFromTypingAttributes];
     self.suppressSelectionChangeNotifications = NO;
@@ -1545,7 +1571,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    BOOL isCreatingOrStartingMention = self.state == HKWMentionsStartDetectionStateCreatingMention || [self isStringControlCharacter:text];
+    BOOL isCreatingOrStartingMention = self.state == HKWMentionsStartDetectionStateCreatingMention || ([self isStringControlCharacter:text] && [text length] > 0);
     // If korean mentions fix is on, don't respond to text edits during or at the beginning of mention creation in this method
     // do so only through the text storage delegate
     if (HKWTextView.enableKoreanMentionsFix && isCreatingOrStartingMention) {
@@ -2129,10 +2155,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         }
     }
     else {
-      // Tell state change delegate that the chooser view has been closed.
-      if ([stateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
-        [stateChangeDelegate mentionsPluginDeactivatedChooserView:self];
-      }
+        // Tell state change delegate that the chooser view has been closed.
+        if ([stateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
+            [stateChangeDelegate mentionsPluginDeactivatedChooserView:self];
+        }
     }
 }
 
