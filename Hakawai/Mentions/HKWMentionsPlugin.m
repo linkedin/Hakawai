@@ -864,7 +864,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         case HKWMentionsStartDetectionStateCreatingMention:
             // Inform the mentions creation state machine that a character was typed. Do not allow the double space to
             //  period auto-substitution while the user is creating a mention.
-            [self.creationStateMachine characterTyped:newChar previousCharacterIsControl:[self.controlCharacterSet characterIsMember:precedingChar]];
+            [self.creationStateMachine characterTyped:newChar];
             if (isSecondSpace) {
                 [self manuallyInsertCharacter:newChar atLocation:location inTextView:parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;

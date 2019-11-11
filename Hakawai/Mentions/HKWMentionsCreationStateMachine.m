@@ -145,7 +145,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     return sm;
 }
 
-- (void)characterTyped:(unichar)c previousCharacterIsControl:(BOOL)previousCharacterIsControl {
+- (void)characterTyped:(unichar)c {
     BOOL isNewline = [[NSCharacterSet newlineCharacterSet] characterIsMember:c];
     BOOL isWhitespace = [[NSCharacterSet whitespaceCharacterSet] characterIsMember:c];
     __strong __auto_type delegate = self.delegate;
@@ -164,9 +164,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                 return;
             }
     }
-    // When whitespace is typed during mention creation state and previous character is control character
-    // then mention creation should end. e.g "@@ " will stop mention current creation.
-    if (([self.stringBuffer length] == 0 || previousCharacterIsControl) && isWhitespace) {
+    if ([self.stringBuffer length] == 0 && isWhitespace) {
         self.state = HKWMentionsCreationStateQuiescent;
         [delegate cancelMentionFromStartingLocation:self.startingLocation];
         return;

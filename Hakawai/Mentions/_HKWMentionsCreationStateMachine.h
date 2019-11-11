@@ -117,7 +117,7 @@
 /*!
  Inform the state machine that a single character was typed by the user into the text view.
  */
-- (void)characterTyped:(unichar)c previousCharacterIsControl:(BOOL)previousCharacterIsControl;
+- (void)characterTyped:(unichar)c;
 
 /*!
  Inform the state machine that a valid string was inserted into the text view (no spaces, newlines, or forbidden
