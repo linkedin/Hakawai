@@ -21,8 +21,15 @@
 
 #import "_HKWPrivateConstants.h"
 
-@interface HKWTextView () <UITextViewDelegate, HKWAbstractionLayerDelegate>
-@property (nonatomic, strong) NSMutableDictionary *simplePluginsDictionary;
+@interface HKWTextView () <UITextViewDelegate, HKWAbstractionLayerDelegate, NSTextStorageDelegate>
+
+@property (nonatomic) NSMutableDictionary *simplePluginsDictionary;
+/*!
+ String that saves the state of the text in the text view so that it can be accessed in the NSTextStorageDelegate, which will
+ already have deleted the character by the time it's trying to process said deletion
+ */
+@property (nonatomic, strong, readwrite) NSString *textStateBeforeDeletion;
+
 @end
 
 static BOOL enableExperimentalDeadLockFix = NO;
@@ -110,7 +117,7 @@ static BOOL enableKoreanMentionsFix = NO;
     replacement.clearsOnInsertion = NO;
     replacement.selectable = self.selectable;
     replacement.editable = self.editable;
-    
+
     replacement.textAlignment = self.textAlignment;
     replacement.textColor = self.textColor;
     replacement.textColorSetByApp = self.textColor;
@@ -121,11 +128,58 @@ static BOOL enableKoreanMentionsFix = NO;
     return replacement;
 }
 
+- (void)textStorage:(__unused NSTextStorage *)textStorage
+  didProcessEditing:(__unused NSTextStorageEditActions)editedMask
+              range:(NSRange)editedRange
+     changeInLength:(NSInteger)delta {
+    if (!enableKoreanMentionsFix) {
+        // If this mentions fix is not enabled, don't do anything in text storage
+        return;
+    }
+
+    if (delta > 0) {
+        // If the delta is greater than 0, this is an insertion
+        NSString *change = [self.text substringWithRange:editedRange];
+        [self.controlFlowPlugin textView:self
+                 shouldChangeTextInRange:editedRange
+                              changeText:change
+                             isInsertion:true
+                          previousLength:self.textStateBeforeDeletion.length];
+        // Update the saved text state so that it can be accessed in the case of deletion
+        if (self.textStateBeforeDeletion == nil) {
+            self.textStateBeforeDeletion = change;
+        } else {
+            // This line is needed because text storage works by replacing a certiain number of characters in a given range.
+            // In order to have the correct number of characters to replace in our text state string, we pad it at the correct location
+            // with the given delta.
+            [self padTextStorageForRangeInsertionAtLocation:editedRange.location withLength:delta];
+            self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:editedRange withString:change];
+        }
+    }
+    else if (delta < 0) {
+        // If the delta is less than 0, this is a deletion
+        NSUInteger absoluteDelta = (NSUInteger)labs((long)delta);
+        // Retrieve the string to delete
+        NSRange range = NSMakeRange(editedRange.location, absoluteDelta);
+        NSString *toDelete = [self.textStateBeforeDeletion substringWithRange:range];
+        [self.controlFlowPlugin textView:self
+                 shouldChangeTextInRange:range
+                              changeText:toDelete
+                             isInsertion:false
+                          previousLength:self.textStateBeforeDeletion.length];
+        // Update the text state for the deletion
+        self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:range withString:@""];
+    }
+}
+
 - (void)setup {
     self.delegate = self;
     self.firstResponderIsCycling = NO;
     self.translatesAutoresizingMaskIntoConstraints = NO;
 
+    if (enableKoreanMentionsFix) {
+        self.textStorage.delegate = self;
+    }
     self.abstractionLayer = [HKWAbstractionLayer instanceWithTextView:self changeRejection:YES];
 }
 
@@ -257,8 +311,8 @@ static BOOL enableKoreanMentionsFix = NO;
     CGPoint tapLocation = [gestureRecognizer locationInView:self];
 
     NSUInteger characterIndex = [self.layoutManager characterIndexForPoint:tapLocation
-                                                    inTextContainer:self.textContainer
-                                                    fractionOfDistanceBetweenInsertionPoints:NULL];
+                                                           inTextContainer:self.textContainer
+                                  fractionOfDistanceBetweenInsertionPoints:NULL];
 
     if (characterIndex < self.textStorage.length) {
         self.selectedRange = NSMakeRange(characterIndex, 0);
@@ -266,7 +320,7 @@ static BOOL enableKoreanMentionsFix = NO;
 }
 
 -(void) textViewDidProgrammaticallyUpdate {
-    
+
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
         [self.controlFlowPlugin textViewDidProgrammaticallyUpdate:self];
     }
@@ -284,6 +338,8 @@ static BOOL enableKoreanMentionsFix = NO;
     if ([self shouldChangeTextInRange:self.selectedRange replacementText:dictationString isDictationText:YES textView:self]) {
         [self insertText:dictationString];
     }
+
+    // TODO: Handle dictation string with korean mentions fix
 }
 
 - (BOOL)shouldChangeTextInRange:(NSRange)range
@@ -712,18 +768,29 @@ static BOOL enableKoreanMentionsFix = NO;
     return _touchCaptureOverlayView;
 }
 
+/**
+ Adds padding of a given @c length at a given @c location, to make string replacement in the text storage delegate work correctly
+ */
+- (void)padTextStorageForRangeInsertionAtLocation:(NSUInteger)location withLength:(NSInteger)length {
+    NSString *string = @"";
+    for (int i = 0; i < length; i++) {
+        string = [string stringByAppendingString:@" "];
+    }
+    self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:NSMakeRange(location, 0) withString:string];
+}
+
 @end
 
 
 # pragma mark - Miscellaneous utilities
 
 BOOL HKW_systemVersionIsAtLeast(NSString *version) {
-  /*
-   let deviceSystemVersion = self.currentDevice().systemVersion
-   let osVersionCompareResult = deviceSystemVersion.compare(version, options: .NumericSearch)
-   return osVersionCompareResult == .OrderedSame || osVersionCompareResult == .OrderedDescending
-   */
-  NSString *systemVersion = [UIDevice currentDevice].systemVersion;
-  NSComparisonResult result = [systemVersion compare:version options:NSNumericSearch];
-  return result == NSOrderedDescending || result == NSOrderedSame;
+    /*
+     let deviceSystemVersion = self.currentDevice().systemVersion
+     let osVersionCompareResult = deviceSystemVersion.compare(version, options: .NumericSearch)
+     return osVersionCompareResult == .OrderedSame || osVersionCompareResult == .OrderedDescending
+     */
+    NSString *systemVersion = [UIDevice currentDevice].systemVersion;
+    NSComparisonResult result = [systemVersion compare:version options:NSNumericSearch];
+    return result == NSOrderedDescending || result == NSOrderedSame;
 }

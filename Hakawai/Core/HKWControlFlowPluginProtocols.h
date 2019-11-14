@@ -47,6 +47,16 @@
  */
 -(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView;
 
+/*!
+ The new delegate method that's used in the Korean Mentions fix case. Mimics most of the functionality of the current override
+ for the Apple-provided method, with differences in deletion and insertion because it's being called via the NSTextStorageDelegate
+ */
+- (void)textView:(UITextView *)textView
+shouldChangeTextInRange:(NSRange)range
+      changeText:(NSString *)text
+     isInsertion:(BOOL)isInsertion
+  previousLength:(NSUInteger)previousLength;
+
 @end
 
 @protocol HKWAbstractionLayerControlFlowPluginProtocol <HKWAbstractionLayerDelegate, HKWSimplePluginProtocol>

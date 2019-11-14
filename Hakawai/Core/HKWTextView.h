@@ -44,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL) enableExperimentalDeadLockFix;
 + (BOOL) enableKoreanMentionsFix;
 + (void) setEnableExperimentalDeadLockFix:(BOOL)enabled;
++ (void) setEnableKoreanMentionsFix:(BOOL)enabled;
 
 #pragma mark - Initialization
 
