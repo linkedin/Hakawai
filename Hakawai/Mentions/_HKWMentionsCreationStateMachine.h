@@ -128,7 +128,7 @@
 /*!
  Inform the state machine that a character or string was deleted from the text view.
  */
-- (void)stringDeleted:(NSString *)deleteString isControlCharacterDeleted:(BOOL)isControlCharacterDeleted;
+- (void)stringDeleted:(NSString *)deleteString;
 
 /*!
  Inform the state machine that the cursor was moved from its prior position and is now in insertion mode.

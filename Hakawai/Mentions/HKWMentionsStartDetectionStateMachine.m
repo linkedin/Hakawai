@@ -203,12 +203,16 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
 
     switch (self.state) {
         case HKWMentionsStartDetectionStateQuiescentReady: {
+            // Mention can be triggered upon character deletion:
+            // 1. when deleted character location is greater than 1 -> When previous character is a control character and character before previous character is a separator.
+            // 2. when deleted character location is 1 -> If preceding character is a control character
+            // 3. when deleted character location is 0 -> Does not trigger mentions
             BOOL canCreateMention = NO;
             if (location > 1 && textViewText.length > location - 2) {
                 const unichar characterBeforePrecedingChar = [textViewText characterAtIndex:location - 2];
                 canCreateMention = [HKWMentionsStartDetectionStateMachine.separatorSet characterIsMember:characterBeforePrecedingChar]
                 && precedingCharacterType == CharacterTypeControlCharacter;
-            } else if (location > 0 && precedingCharacterType == CharacterTypeControlCharacter) {
+            } else if (precedingCharacterType == CharacterTypeControlCharacter) {
                 canCreateMention = YES;
             }
             // If user deletes white-space or separators between control character and word, then query mention with word next to whitepace.

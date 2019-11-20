@@ -998,12 +998,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             //  is a space/newline preceding, but if this is changed then the state machine must be primed in case there
             //  is a mention right before the mention creation point.
             unichar stackC = deletedChar;
-
-            // This check is used to stop mention creation when control character triggering mentions is deleted.
-            BOOL isControlCharacterDeleted = (precedingChar == 0 || [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:precedingChar])
-            && [self.controlCharacterSet characterIsMember:deletedChar];
-
-            [self.creationStateMachine stringDeleted:[NSString stringWithCharacters:&stackC length:1] isControlCharacterDeleted:isControlCharacterDeleted];
+            [self.creationStateMachine stringDeleted:[NSString stringWithCharacters:&stackC length:1]];
             // Get prior character to properly prime start detection state machine
             if (self.state == HKWMentionsStateQuiescent) {
                 // If we're in here, the mention creation ended (and by extension, we moved back to Quiescent)
@@ -1256,23 +1251,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self resetCurrentMentionsData];
             self.state = HKWMentionsStateQuiescent;
             break;
-        case HKWMentionsStartDetectionStateCreatingMention: {
-            const BOOL precedingCharacterIsSeparator = [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:precedingCharacter]
-            || [[NSCharacterSet punctuationCharacterSet] characterIsMember:precedingCharacter];
-            const BOOL deletedStringFirstCharacterIsControl = deletedString.length > 0
-            ? [self.controlCharacterSet characterIsMember:[deletedString characterAtIndex:0]]
-            : NO;
-
-            BOOL isControlCharacterDeleted = NO;
-            if (precedingCharacterIsSeparator && deletedStringFirstCharacterIsControl) {
-                isControlCharacterDeleted = YES;
-            }
-
-            [self.creationStateMachine stringDeleted:deletedString isControlCharacterDeleted:isControlCharacterDeleted];
+        case HKWMentionsStartDetectionStateCreatingMention:
+            [self.creationStateMachine stringDeleted:deletedString];
             self.nextSelectionChangeShouldBeIgnored = YES;
             self.nextInsertionShouldBeIgnored = YES;
             break;
-        }
         case HKWMentionsStateAboutToSelectMention:
         case HKWMentionsStateSelectedMention:
             [self.startDetectionStateMachine cursorMovedWithCharacterNowPrecedingCursor:precedingCharacter];

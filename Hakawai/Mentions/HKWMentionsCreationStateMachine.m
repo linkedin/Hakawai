@@ -239,7 +239,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
 }
 
-- (void)stringDeleted:(NSString *)deleteString isControlCharacterDeleted:(BOOL)isControlCharacterDeleted {
+- (void)stringDeleted:(NSString *)deleteString {
     // State transition
     NSAssert([deleteString length] > 0, @"Logic error: string to be deleted must not be empty.");
 
@@ -269,6 +269,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
 
     __strong __auto_type delegate = self.delegate;
+
+    BOOL isControlCharacterDeleted = NO;
+    if (deleteString.length == 1
+        &&[deleteString containsString:[NSString stringWithFormat:@"%C", self.explicitSearchControlCharacter]]
+        && self.stringBuffer.length > 0
+        && [self.stringBuffer characterAtIndex:self.stringBuffer.length - 1] != self.explicitSearchControlCharacter) {
+        isControlCharacterDeleted = YES;
+    }
 
     // Switch on the overall state
     switch (self.state) {
