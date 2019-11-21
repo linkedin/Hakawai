@@ -270,9 +270,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
     __strong __auto_type delegate = self.delegate;
 
+    /**
+     For cases when mentions is triggered when whitespace between control character and word is deleted,
+     for example "@|John"('|'represents cursor), string buffer is not empty but mentions has to stop when control character is deleted.
+     Using isControlCharacterDeleted flag to decide control character deletion for such case.
+     */
     BOOL isControlCharacterDeleted = NO;
     if (deleteString.length == 1
-        &&[deleteString containsString:[NSString stringWithFormat:@"%C", self.explicitSearchControlCharacter]]
+        && [deleteString containsString:[NSString stringWithFormat:@"%C", self.explicitSearchControlCharacter]]
         && self.stringBuffer.length > 0
         && [self.stringBuffer characterAtIndex:self.stringBuffer.length - 1] != self.explicitSearchControlCharacter) {
         isControlCharacterDeleted = YES;

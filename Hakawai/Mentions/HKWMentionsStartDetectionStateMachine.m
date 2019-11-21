@@ -206,7 +206,7 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
             // Mention can be triggered upon character deletion:
             // 1. when deleted character location is greater than 1 -> When previous character is a control character and character before previous character is a separator.
             // 2. when deleted character location is 1 -> If preceding character is a control character
-            // 3. when deleted character location is 0 -> Does not trigger mentions
+            // (NOTE: When deleted character location is 0, mentions is never triggered)
             BOOL canCreateMention = NO;
             if (location > 1 && textViewText.length > location - 2) {
                 const unichar characterBeforePrecedingChar = [textViewText characterAtIndex:location - 2];
@@ -271,7 +271,7 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
             self.charactersSinceLastWhitespace = 0;
             if (currentCharacterType == CharacterTypeSeparator || currentCharacterType == CharacterTypeControlCharacter) {
                 // The user moved the cursor to the beginning of the text region, or right after a newline or whitespace or punctuation
-                //  character. This puts the user in the ready state.
+                //  character or control character. This puts the user in the ready state.
                 self.state = HKWMentionsStartDetectionStateQuiescentReady;
             }
             else if (currentCharacterType == CharacterTypeNormal) {

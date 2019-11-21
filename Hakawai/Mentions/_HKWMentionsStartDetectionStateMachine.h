@@ -104,6 +104,10 @@ wordFollowingTypedCharacter:(NSString *)wordFollowingTypedCharacter;
 
 /*!
  Inform the state machine that a character was deleted by the user from the text view.
+ \param deletedChar                         Character to be deleted
+ \param precedingChar                       Character before character to be deleted
+ \param location                            Location of character to be deleted
+ \param textViewText                        Text displayed by text view
  */
 - (void)deleteTypedCharacter:(unichar)deletedChar
 withCharacterNowPrecedingCursor:(unichar)precedingChar
