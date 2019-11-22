@@ -140,11 +140,13 @@ static BOOL enableKoreanMentionsFix = NO;
     if (delta > 0) {
         // If the delta is greater than 0, this is an insertion
         NSString *change = [self.text substringWithRange:editedRange];
-        [self.controlFlowPlugin textView:self
-                 shouldChangeTextInRange:editedRange
-                              changeText:change
-                             isInsertion:true
-                          previousLength:self.textStateBeforeDeletion.length];
+        if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldChangeTextInRange:changeText:isInsertion:previousLength:)]) {
+            [self.controlFlowPlugin textView:self
+                     shouldChangeTextInRange:editedRange
+                                  changeText:change
+                                 isInsertion:true
+                              previousLength:self.textStateBeforeDeletion.length];
+        }
         // Update the saved text state so that it can be accessed in the case of deletion
         if (self.textStateBeforeDeletion == nil) {
             self.textStateBeforeDeletion = change;
@@ -162,11 +164,13 @@ static BOOL enableKoreanMentionsFix = NO;
         // Retrieve the string to delete
         NSRange range = NSMakeRange(editedRange.location, absoluteDelta);
         NSString *toDelete = [self.textStateBeforeDeletion substringWithRange:range];
-        [self.controlFlowPlugin textView:self
-                 shouldChangeTextInRange:range
-                              changeText:toDelete
-                             isInsertion:false
-                          previousLength:self.textStateBeforeDeletion.length];
+        if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldChangeTextInRange:changeText:isInsertion:previousLength:)]) {
+            [self.controlFlowPlugin textView:self
+                     shouldChangeTextInRange:range
+                                  changeText:toDelete
+                                 isInsertion:false
+                              previousLength:self.textStateBeforeDeletion.length];
+        }
         // Update the text state for the deletion
         self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:range withString:@""];
     }
