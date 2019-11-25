@@ -34,6 +34,7 @@
 
 static BOOL enableExperimentalDeadLockFix = NO;
 static BOOL enableKoreanMentionsFix = NO;
+static BOOL enableMentionSelectFix = NO;
 
 @implementation HKWTextView
 
@@ -49,6 +50,13 @@ static BOOL enableKoreanMentionsFix = NO;
 }
 + (void)setEnableKoreanMentionsFix:(BOOL)enabled {
     enableKoreanMentionsFix = enabled;
+}
+
++ (BOOL)enableMentionSelectFix {
+    return enableMentionSelectFix;
+}
++ (void)setEnableMentionSelectFix:(BOOL)enabled {
+    enableMentionSelectFix = enabled;
 }
 
 #pragma mark - Lifecycle
