@@ -176,7 +176,14 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     // Reset viewport to original value
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textViewDidExitSingleLineViewportMode:)]) {
-        [externalDelegate textViewDidExitSingleLineViewportMode:self];
+        if (HKWTextView.enableKoreanMentionsFix) {
+            // With the korean mentions fix we have to make sure this call is made on the main thread since it may originate from the text storage delegate
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [externalDelegate textViewDidExitSingleLineViewportMode:self];
+            });
+        } else {
+            [externalDelegate textViewDidExitSingleLineViewportMode:self];
+        }
     }
     [self setContentOffset:self.originalContentOffset animated:NO];
 }
