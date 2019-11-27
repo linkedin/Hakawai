@@ -845,17 +845,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     BOOL isSecondSpace = (location > 1) && (precedingChar == ' ' && newChar == ' ');
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
+            // Word following typed character would be used to trigger matching mentions menu when possible.
+            NSString *wordFollowingTypedCharacter;
             if (HKWTextView.enableKoreanMentionsFix) {
                 // Update the location of the selected range for this insertion here
                 // (since the text view will already be updated when utilizing the text storage delegate in the korean mentions fix)
                 // This should replace other settings of this range when the fix is ramped
                 parentTextView.selectedRange = NSMakeRange(location, parentTextView.selectedRange.length);
+                wordFollowingTypedCharacter = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:parentTextView.textStateBeforeDeletion];
+            } else {
+                wordFollowingTypedCharacter = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:parentTextView.text];
             }
             // Inform the start detection state machine that a character was inserted. Also, override the double space
             //  to period auto-substitution if the substitution would place a period right after a preceding mention.
-
-            // Word following typed character would be used to trigger matching mentions menu when possible.
-            NSString *wordFollowingTypedCharacter = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:parentTextView.text];
             [self.startDetectionStateMachine characterTyped:newChar
                                         asInsertedCharacter:NO
                                           previousCharacter:precedingChar
