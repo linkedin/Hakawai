@@ -270,12 +270,33 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
     __strong __auto_type delegate = self.delegate;
 
+    /**
+     When mentions was originally triggered because the whitespace between a control character and a word was deleted,
+     the cursor is next to the control character (like "@|John", where '|' represents the cursor-state). If the user then deletes the control character,
+     the string buffer will not be empty (it will have "John" in it), but mentions has to stop, because control character is deleted.
+     We use the isControlCharacterDeleted flag to decide what to do in this case of control character deletion.
+     */
+    BOOL isControlCharacterDeleted = NO;
+    if (deleteString.length == 1
+        && [deleteString containsString:[NSString stringWithFormat:@"%C", self.explicitSearchControlCharacter]]
+        && self.stringBuffer.length > 0
+        && [self.stringBuffer characterAtIndex:self.stringBuffer.length - 1] != self.explicitSearchControlCharacter) {
+        isControlCharacterDeleted = YES;
+    }
+
     // Switch on the overall state
     switch (self.state) {
         case HKWMentionsCreationStateQuiescent:
             // User not creating a mention right now
             return;
         case HKWMentionsCreationStateCreatingMention:
+            if (isControlCharacterDeleted) {
+                // When user deletes control character during mention creation state, then end mention creation.
+                self.state = HKWMentionsCreationStateQuiescent;
+                [delegate cancelMentionFromStartingLocation:self.startingLocation];
+                return;
+            }
+
             if (deleteStringIsTransient) {
                 // Delete was typed, but for some sort of transient state (e.g. keyboard suggestions); don't do anything
                 return;

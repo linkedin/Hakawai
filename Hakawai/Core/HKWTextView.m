@@ -24,10 +24,7 @@
 @interface HKWTextView () <UITextViewDelegate, HKWAbstractionLayerDelegate, NSTextStorageDelegate>
 
 @property (nonatomic) NSMutableDictionary *simplePluginsDictionary;
-/*!
- String that saves the state of the text in the text view so that it can be accessed in the NSTextStorageDelegate, which will
- already have deleted the character by the time it's trying to process said deletion
- */
+
 @property (nonatomic, strong, readwrite) NSString *textStateBeforeDeletion;
 
 @end
