@@ -845,15 +845,23 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     BOOL isSecondSpace = (location > 1) && (precedingChar == ' ' && newChar == ' ');
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
+            // Word following typed character would be used to trigger matching mentions menu when possible.
+            NSString *wordFollowingTypedCharacter;
             if (HKWTextView.enableKoreanMentionsFix) {
                 // Update the location of the selected range for this insertion here
                 // (since the text view will already be updated when utilizing the text storage delegate in the korean mentions fix)
                 // This should replace other settings of this range when the fix is ramped
                 parentTextView.selectedRange = NSMakeRange(location, parentTextView.selectedRange.length);
+                wordFollowingTypedCharacter = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:parentTextView.textStateBeforeDeletion];
+            } else {
+                wordFollowingTypedCharacter = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:parentTextView.text];
             }
             // Inform the start detection state machine that a character was inserted. Also, override the double space
             //  to period auto-substitution if the substitution would place a period right after a preceding mention.
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar];
+            [self.startDetectionStateMachine characterTyped:newChar
+                                        asInsertedCharacter:NO
+                                          previousCharacter:precedingChar
+                                wordFollowingTypedCharacter:wordFollowingTypedCharacter];
             NSRange r;
             id mentionTwoPreceding = [self mentionAttributePrecedingLocation:(location-1) range:&r];
             BOOL shouldSuppress = (mentionTwoPreceding != nil) && (r.location + r.length == location-1);
@@ -879,7 +887,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             //  insert a new character and continue in the quiescent state. Do not allow auto-substitution.
             self.state = HKWMentionsStateQuiescent;
             [self resetCurrentMentionsData];
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:NO previousCharacter:precedingChar];
+            [self.startDetectionStateMachine characterTyped:newChar
+                                        asInsertedCharacter:NO
+                                          previousCharacter:precedingChar
+                                wordFollowingTypedCharacter:nil];
             if (isSecondSpace) {
                 [self manuallyInsertCharacter:newChar atLocation:location inTextView:parentTextView];
                 self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
@@ -901,7 +912,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
             [self resetCurrentMentionsData];
             self.state = HKWMentionsStateQuiescent;
             self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES previousCharacter:precedingChar];
+            [self.startDetectionStateMachine characterTyped:newChar asInsertedCharacter:YES previousCharacter:precedingChar wordFollowingTypedCharacter:nil];
             returnValue = NO;
             break;
         case HKWMentionsStateLosingFocus:
@@ -932,7 +943,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
             [self.startDetectionStateMachine deleteTypedCharacter:deletedChar
-                                  withCharacterNowPrecedingCursor:precedingChar];
+                                  withCharacterNowPrecedingCursor:precedingChar
+                                                         location:location
+                                                     textViewText:parentTextView.text];
             self.nextSelectionChangeShouldBeIgnored = YES;
 
             // Look for a mention
@@ -1144,8 +1157,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
                 self.previousSelectionRange = newSelectionRange;
                 self.previousTextLength = [[parentTextView text] length];
 
-                [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0] asInsertedCharacter:YES previousCharacter:precedingChar];
-
+                [self.startDetectionStateMachine characterTyped:[text characterAtIndex:0]
+                                            asInsertedCharacter:YES
+                                              previousCharacter:precedingChar
+                                    wordFollowingTypedCharacter:nil];
                 // Manually notify external delegate that the textView changed
                 id<HKWTextViewDelegate> externalDelegate = parentTextView.externalDelegate;
                 if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
@@ -1932,7 +1947,12 @@ shouldChangeTextInRange:(NSRange)range
     UIColor *parentColor = parentTextView.textColorSetByApp;
     NSAssert(self.mentionUnselectedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
-    NSRange rangeToTransform = NSMakeRange(location, currentLocation - location);
+
+    // When control character is inserted before word and user selects mention for that word,
+    // we want to replace word after control character with mention text.
+    // e.g "hey @|john" will be replaced as "hey John Doe". '|' indicates cursor.
+    NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:currentLocation text:parentTextView.text];
+    NSRange rangeToTransform = NSMakeRange(location, currentLocation + wordAfterCurrentLocation.length - location);
 
     /*
      When the textview text that matches the mention text is not the first part of the mention text,
