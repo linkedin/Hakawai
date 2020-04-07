@@ -10,6 +10,7 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
+#import "HKWTextView.h"
 #import "_HKWMentionsStartDetectionStateMachine.h"
 
 #import "_HKWPrivateConstants.h"
@@ -261,6 +262,12 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
 }
 
 - (void)cursorMovedWithCharacterNowPrecedingCursor:(unichar)c {
+    if (HKWTextView.enableKoreanMentionsFix) {
+        // The assumptions Hakawai makes here are incorrect when we using the korean mentions fix,
+        // because the cursor movement happens in a different order because of the delegate we're using.
+        // We will need to refactor this logic alongside other longerterm integrations of this fix.
+        return;
+    }
     // Determine the type of the character
     enum CharacterType currentCharacterType = [self characterTypeOfCharacter:c];
     switch (self.state) {

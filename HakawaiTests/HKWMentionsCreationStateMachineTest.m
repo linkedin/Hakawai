@@ -83,6 +83,22 @@ describe(@"Showing mentions list for explicit search only", ^{
         expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(5);
     });
 
+    it(@"should show mention list for non email - korean fix on", ^{
+        HKWTextView.enableKoreanMentionsFix = YES;
+        [textView setText:@"A"];
+        [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) changeText:@"A" isInsertion:YES previousLength:0];
+        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(0);
+
+        [textView setText:@"A "];
+        [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) changeText:@" " isInsertion:YES previousLength:1];
+        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(0);
+
+        [textView setText:@"A @"];
+        [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) changeText:@"@" isInsertion:YES previousLength:2];
+        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(5);
+        HKWTextView.enableKoreanMentionsFix = NO;
+    });
+
     it(@"should show mentions list for explicit search(when typed control character `@`)", ^{
         [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"@"];
         [textView setText:@"@"];
