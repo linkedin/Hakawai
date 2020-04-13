@@ -2309,6 +2309,29 @@ shouldChangeTextInRange:(NSRange)range
     self.creationStateMachine.chooserViewClass = chooserViewClass;
 }
 
+/*!
+ Shows chooser view.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+- (void)showChooserView {
+    [self.creationStateMachine showChooserView];
+}
+
+/*!
+ Handles the selection from the user.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+- (void)handleSelectionForEntity:(id<HKWMentionsEntityProtocol>)entity indexPath:(NSIndexPath *)indexPath {
+    [self handleSelectionForEntity:entity indexPath:indexPath];
+}
+
+/*!
+ Gets the input made by the user for both @ mentions or # hashtag.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+- (unichar)getExplicitSearchControlCharacter {
+    return self.creationStateMachine.explicitSearchControlCharacter;
+}
 
 #pragma mark - Developer
 

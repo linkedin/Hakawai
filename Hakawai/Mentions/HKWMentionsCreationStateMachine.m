@@ -115,7 +115,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 @property (nonatomic) BOOL currentQueryIsComplete;
 
 @property (nonatomic) HKWMentionsSearchType searchType;
-@property (nonatomic) unichar explicitSearchControlCharacter;
 
 /*!
  A buffer containing the text typed by the user since mentions creation began, used to query the data source for
@@ -943,12 +942,14 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
     // Create the mention
     id<HKWMentionsEntityProtocol> entity = self.entityArray[(NSUInteger)indexPath.row];
+    [self handleSelectionForEntity:entity indexPath:indexPath];
+}
+- (void)handleSelectionForEntity:(id<HKWMentionsEntityProtocol>)entity indexPath:(NSIndexPath *)indexPath {
     HKWMentionsAttribute *mention = [HKWMentionsAttribute mentionWithText:[entity entityName]
                                                                identifier:[entity entityId]];
     mention.metadata = [entity entityMetadata];
     self.state = HKWMentionsCreationStateQuiescent;
     __strong __auto_type delegate = self.delegate;
-
     if (HKWTextView.enableMentionSelectFix) {
         // Delegate selected callback should fire prior to creationMention which triggers textView callbacks
         [delegate selected:entity atIndexPath:indexPath];

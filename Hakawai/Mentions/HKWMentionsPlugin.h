@@ -89,6 +89,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 };
 
 @class HKWMentionsPlugin;
+
 /*!
  A protocol providing a way for listeners to be informed when the state of the mentions plug-in changes. This allows
  a host application to know when the plug-in is creating a mention, and when it is quiescent.
@@ -430,5 +431,23 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  */
 - (CGRect)calculatedChooserFrameForMode:(HKWMentionsChooserPositionMode)mode
                              edgeInsets:(UIEdgeInsets)edgeInsets;
+
+/*!
+ Shows chooser view.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+- (void)showChooserView;
+
+/*!
+ Shows the chooser view.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+- (void)handleSelectionForEntity:(nonnull id<HKWMentionsEntityProtocol>)entity indexPath:(nonnull NSIndexPath *)indexPath;
+
+/*!
+ Gets the input made by the user for both @ mentions or # hashtag.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+- (unichar)getExplicitSearchControlCharacter;
 
 @end
