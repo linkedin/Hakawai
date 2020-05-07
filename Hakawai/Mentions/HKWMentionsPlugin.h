@@ -431,4 +431,16 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 - (CGRect)calculatedChooserFrameForMode:(HKWMentionsChooserPositionMode)mode
                              edgeInsets:(UIEdgeInsets)edgeInsets;
 
+/*!
+ Shows chooser view.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+- (void)showChooserView;
+
+/*!
+ Gets the input made by the user for both @ mentions or # hashtag.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+- (unichar)getExplicitSearchControlCharacter;
+
 @end

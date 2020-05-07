@@ -110,6 +110,12 @@
 @property (nonatomic) Class<HKWChooserViewProtocol> chooserViewClass;
 
 /*!
+ Character control search explicit inputted in the chooser view.
+ Needs to be public for integration between Hakawai and HotPot.
+*/
+@property (nonatomic) unichar explicitSearchControlCharacter;
+
+/*!
  Return a new, initialized state machine instance.
  */
 + (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate;
@@ -185,5 +191,11 @@
  \c CGRectNull otherwise.
  */
 - (CGRect)frameForMode:(HKWMentionsChooserPositionMode)mode;
+
+/*!
+ Shows the chooser view.
+ Needs to be public for integration between Hakawai and HotPot.
+ */
+- (void)showChooserView;
 
 @end

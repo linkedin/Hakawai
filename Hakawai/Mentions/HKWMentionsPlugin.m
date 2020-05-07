@@ -2309,6 +2309,21 @@ shouldChangeTextInRange:(NSRange)range
     self.creationStateMachine.chooserViewClass = chooserViewClass;
 }
 
+/*!
+ Shows chooser view.
+ Needs to be public for integration between Hakawai and HotPot.
+ */
+- (void)showChooserView {
+    [self.creationStateMachine showChooserView];
+}
+
+/*!
+ Gets the input made by the user for both @ mentions or # hashtag.
+ Needs to be public for integration between Hakawai and HotPot.
+ */
+- (unichar)getExplicitSearchControlCharacter {
+    return self.creationStateMachine.explicitSearchControlCharacter;
+}
 
 #pragma mark - Developer
 

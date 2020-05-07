@@ -115,7 +115,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 @property (nonatomic) BOOL currentQueryIsComplete;
 
 @property (nonatomic) HKWMentionsSearchType searchType;
-@property (nonatomic) unichar explicitSearchControlCharacter;
 
 /*!
  A buffer containing the text typed by the user since mentions creation began, used to query the data source for
