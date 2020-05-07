@@ -198,4 +198,10 @@
  */
 - (void)showChooserView;
 
+/*!
+ Handles the selection from the user.
+ Needs to be public for integration between Hakawai and HotPot.
+ */
+- (void)handleSelectionForEntity:(id<HKWMentionsEntityProtocol>)entity indexPath:(NSIndexPath *)indexPath;
+
 @end

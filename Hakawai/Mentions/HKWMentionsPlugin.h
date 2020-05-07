@@ -434,13 +434,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 /*!
  Shows chooser view.
  Needs to be public for integration between Hakawai and HotPot.
-*/
+ */
 - (void)showChooserView;
+
+/*!
+Handles the selection from the user.
+Needs to be public for integration between Hakawai and HotPot.
+*/
+- (void)handleSelectionForEntity:(nonnull id<HKWMentionsEntityProtocol>)entity indexPath:(nonnull NSIndexPath *)indexPath;
 
 /*!
  Gets the input made by the user for both @ mentions or # hashtag.
  Needs to be public for integration between Hakawai and HotPot.
-*/
+ */
 - (unichar)getExplicitSearchControlCharacter;
 
 @end

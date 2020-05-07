@@ -942,6 +942,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
     // Create the mention
     id<HKWMentionsEntityProtocol> entity = self.entityArray[(NSUInteger)indexPath.row];
+    [self handleSelectionForEntity:entity indexPath:indexPath];
+}
+
+- (void)handleSelectionForEntity:(id<HKWMentionsEntityProtocol>)entity indexPath:(NSIndexPath *)indexPath {
     HKWMentionsAttribute *mention = [HKWMentionsAttribute mentionWithText:[entity entityName]
                                                                identifier:[entity entityId]];
     mention.metadata = [entity entityMetadata];
