@@ -1501,6 +1501,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 #pragma mark - Plug-in protocol
 
+- (void)dataReturnedWithEmptyResults:(BOOL)isEmptyResults
+         keystringEndsWithWhiteSpace:(BOOL)keystringEndsWithWhiteSpace {
+    [self.creationStateMachine dataReturnedWithEmptyResults:isEmptyResults keystringEndsWithWhiteSpace:keystringEndsWithWhiteSpace];
+}
+
 -(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView {
     if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
         [self.creationStateMachine cancelMentionCreation];

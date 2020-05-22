@@ -296,6 +296,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 #pragma mark - API
 
 /*!
+ Informs the plugin typeahead results are returned, so it can update its internal state accordingly.
+ It's meant to be an experimental feature. This function will be updated.
+*/
+- (void)dataReturnedWithEmptyResults:(BOOL)isEmptyResults
+         keystringEndsWithWhiteSpace:(BOOL)keystringEndsWithWhiteSpace;
+/*!
  Inform the plugin that the textview was programatically updated (e.g. setText: or setAttributedText:)
  */
 -(void) textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
