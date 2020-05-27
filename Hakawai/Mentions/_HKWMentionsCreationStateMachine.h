@@ -166,6 +166,11 @@
  */
 - (void)cancelMentionCreation;
 
+/**
+ Setup chooser view if needed.
+ */
+- (void)setupChooserViewIfNeeded;
+
 /*!
  Completely reset the chooser view. This is useful if the parent plug-in is detached from its editor text view.
  */
