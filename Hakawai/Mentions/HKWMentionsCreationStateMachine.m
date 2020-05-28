@@ -124,6 +124,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 @property (nonatomic, readonly) BOOL chooserViewInsideTextView;
 
+@property (nonatomic, readwrite) BOOL chooserViewDidSetup;
+
 @end
 
 @implementation HKWMentionsCreationStateMachine
@@ -525,6 +527,21 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 #pragma mark - Private (chooser view related)
 
+- (void)setupChooserViewIfNeeded {
+    if (self.chooserViewDidSetup) {
+        return;
+    }
+    HKWAccessoryViewMode mode = (self.chooserViewInsideTextView
+                                 ? HKWAccessoryViewModeSibling
+                                 : HKWAccessoryViewModeFreeFloating);
+    [self.delegate attachViewToParentEditor:self.entityChooserView
+                                     origin:self.entityChooserView.frame.origin
+                                       mode:mode];
+    // hide chooser view initially
+    self.entityChooserView.hidden = YES;
+    self.chooserViewDidSetup = YES;
+}
+
 - (void)showChooserView {
     __strong __auto_type delegate = self.delegate;
     [delegate accessoryViewStateWillChange:YES];
@@ -534,14 +551,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     if ([self.entityChooserView respondsToSelector:@selector(setInsertionPointMarkerEnabled:)]) {
         self.entityChooserView.insertionPointMarkerEnabled = YES;
     }
-    HKWAccessoryViewMode mode = (self.chooserViewInsideTextView
-                                 ? HKWAccessoryViewModeSibling
-                                 : HKWAccessoryViewModeFreeFloating);
-    [delegate attachViewToParentEditor:self.entityChooserView
-                                origin:self.entityChooserView.frame.origin
-                                  mode:mode];
     [delegate accessoryViewActivated:YES];
-
     // Force entityChooserView to be laid out before calculating the right cursor position.
     [self.entityChooserView layoutIfNeeded];
 

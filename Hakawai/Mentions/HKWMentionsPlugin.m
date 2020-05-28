@@ -1863,6 +1863,8 @@ shouldChangeTextInRange:(NSRange)range
                                searchType:(HKWMentionsSearchType)type
                          controlCharacter:(unichar)character
                                completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
+    // set up the chooser view prior to data request in order to support fully customized view
+    [self.creationStateMachine setupChooserViewIfNeeded];
     [self.delegate asyncRetrieveEntitiesForKeyString:keyString
                                           searchType:type
                                     controlCharacter:character

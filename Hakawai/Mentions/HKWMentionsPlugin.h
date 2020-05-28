@@ -437,11 +437,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 - (CGRect)calculatedChooserFrameForMode:(HKWMentionsChooserPositionMode)mode
                              edgeInsets:(UIEdgeInsets)edgeInsets;
 
-/*!
- Shows chooser view.
- Needs to be public for integration between Hakawai and HotPot.
- */
-- (void)showChooserView;
 
 /*!
 Handles the selection from the user.
