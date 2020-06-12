@@ -181,6 +181,8 @@
  */
 - (CGRect)chooserViewFrame;
 
+- (void)hideChooserView;
+
 /*!
  A reference to the entity chooser view, or nil if it hasn't yet been instantiated.
  */

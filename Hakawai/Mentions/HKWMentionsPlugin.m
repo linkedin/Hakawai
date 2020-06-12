@@ -1650,7 +1650,39 @@ shouldChangeTextInRange:(NSRange)range
     return returnValue;
 }
 
+- (NSString *)mentionsQuery:(NSString *)text location:(NSUInteger)location {
+    if (text.length <= 0) {
+        return nil;
+    }
+
+    NSString *until = [text substringToIndex:location];
+    NSString *search = [until substringFromIndex:(NSUInteger)MAX((int)location-100, 0)];
+    NSRange rangeOfControlChar = [search rangeOfString:@"@" options:NSBackwardsSearch];
+    if (rangeOfControlChar.location != NSNotFound) {
+        NSString *query = [search substringFromIndex:rangeOfControlChar.location + 1];
+        return query;
+    }
+    return nil;
+}
+
 - (void)textViewDidChangeSelection:(UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        NSRange range = textView.selectedRange;
+        if (range.length > 0) {
+            return;
+        }
+        NSString *query = [self mentionsQuery:textView.text location:range.location];
+        if (query) {
+            [self beginMentionsCreationWithString:query
+                                       atLocation:range.location
+                            usingControlCharacter:YES
+                                 controlCharacter:[@"@" characterAtIndex:0]];
+            return;
+        } else {
+            [self.creationStateMachine hideChooserView];
+            return;
+        }
+    }
     if (self.suppressSelectionChangeNotifications) {
         // Don't run the 'selection change' code as a result of the user entering, deleting, or modifying the text.
         return;

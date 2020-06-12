@@ -32,6 +32,7 @@
 static BOOL enableExperimentalDeadLockFix = NO;
 static BOOL enableKoreanMentionsFix = NO;
 static BOOL enableMentionSelectFix = NO;
+static BOOL enableSimpleRefactor = YES;
 
 @implementation HKWTextView
 
@@ -54,6 +55,13 @@ static BOOL enableMentionSelectFix = NO;
 }
 + (void)setEnableMentionSelectFix:(BOOL)enabled {
     enableMentionSelectFix = enabled;
+}
+
++ (BOOL)enableSimpleRefactor {
+    return enableSimpleRefactor;
+}
++ (void)setEnableSimpleRefactor:(BOOL)enabled {
+    enableSimpleRefactor = enabled;
 }
 
 #pragma mark - Lifecycle
@@ -137,6 +145,9 @@ static BOOL enableMentionSelectFix = NO;
   didProcessEditing:(__unused NSTextStorageEditActions)editedMask
               range:(NSRange)editedRange
      changeInLength:(NSInteger)delta {
+    if (HKWTextView.enableSimpleRefactor) {
+        return;
+    }
     if (!enableKoreanMentionsFix) {
         // If this mentions fix is not enabled, don't do anything in text storage
         return;
@@ -330,7 +341,11 @@ static BOOL enableMentionSelectFix = NO;
 
 -(void) textViewDidProgrammaticallyUpdate {
 
+    if (HKWTextView.enableSimpleRefactor) {
+        return;
+    }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
+        
         [self.controlFlowPlugin textViewDidProgrammaticallyUpdate:self];
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
@@ -340,7 +355,9 @@ static BOOL enableMentionSelectFix = NO;
 
 - (void)handleDictationString:(NSString *)dictationString {
     if ([self.controlFlowPlugin respondsToSelector:@selector(setDictationString:)]) {
-        [self.controlFlowPlugin setDictationString:dictationString];
+        if (!HKWTextView.enableSimpleRefactor) {
+            [self.controlFlowPlugin setDictationString:dictationString];
+        }
     }
 
     // Used selected range to get the cursor position. So that text will be replaced after the cursor.
@@ -383,9 +400,12 @@ static BOOL enableMentionSelectFix = NO;
 
     if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]) {
         shouldUseCustomValue = YES;
-        customValue = [self.controlFlowPlugin textView:textView
-                               shouldChangeTextInRange:range
-                                       replacementText:replacementText];
+
+        if (HKWTextView.enableSimpleRefactor) {
+            customValue = [self.controlFlowPlugin textView:textView
+                                   shouldChangeTextInRange:range
+                                           replacementText:replacementText];
+        }
     }
     // Forward to external delegate if:
     // 1) There is no control flow plugin registered OR
@@ -421,7 +441,9 @@ static BOOL enableMentionSelectFix = NO;
         shouldBeginEditing = YES;
     }
     else if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
-        shouldBeginEditing = [self.controlFlowPlugin textViewShouldBeginEditing:textView];
+        if (!HKWTextView.enableSimpleRefactor) {
+            shouldBeginEditing = [self.controlFlowPlugin textViewShouldBeginEditing:textView];
+        }
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
         shouldBeginEditing = [self.abstractionControlFlowPlugin textViewShouldBeginEditing:textView];
@@ -443,7 +465,9 @@ static BOOL enableMentionSelectFix = NO;
         return;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
-        [self.controlFlowPlugin textViewDidBeginEditing:textView];
+        if (!HKWTextView.enableSimpleRefactor) {
+            [self.controlFlowPlugin textViewDidBeginEditing:textView];
+        }
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
         [self.abstractionControlFlowPlugin textViewDidBeginEditing:textView];
@@ -462,7 +486,9 @@ static BOOL enableMentionSelectFix = NO;
         shouldEndEditing = YES;
     }
     else if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
-        shouldEndEditing = [self.controlFlowPlugin textViewShouldEndEditing:textView];
+        if (!HKWTextView.enableSimpleRefactor) {
+            shouldEndEditing = [self.controlFlowPlugin textViewShouldEndEditing:textView];
+        }
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
         shouldEndEditing = [self.abstractionControlFlowPlugin textViewShouldEndEditing:textView];
@@ -485,7 +511,9 @@ static BOOL enableMentionSelectFix = NO;
         return;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
-        [self.controlFlowPlugin textViewDidEndEditing:textView];
+        if (!HKWTextView.enableSimpleRefactor) {
+            [self.controlFlowPlugin textViewDidEndEditing:textView];
+        }
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
         [self.abstractionControlFlowPlugin textViewDidEndEditing:textView];
@@ -511,7 +539,9 @@ static BOOL enableMentionSelectFix = NO;
         return;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidChange:)]) {
-        [self.controlFlowPlugin textViewDidChange:textView];
+        if (!HKWTextView.enableSimpleRefactor) {
+            [self.controlFlowPlugin textViewDidChange:textView];
+        }
     }
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
@@ -534,7 +564,7 @@ static BOOL enableMentionSelectFix = NO;
             // Do nothing
         }
         else {
-            [self.controlFlowPlugin textViewDidChangeSelection:textView];
+            [self.controlFlowPlugin textViewDidChangeSelection:self];
         }
     }
     // Forward to external delegate
@@ -585,7 +615,9 @@ static BOOL enableMentionSelectFix = NO;
         return YES;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:interaction:)]) {
-        return [self.controlFlowPlugin textView:textView shouldInteractWithTextAttachment:textAttachment inRange:characterRange interaction:interaction];
+        if (!HKWTextView.enableSimpleRefactor) {
+            return [self.controlFlowPlugin textView:textView shouldInteractWithTextAttachment:textAttachment inRange:characterRange interaction:interaction];
+        }
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
         return [self.abstractionControlFlowPlugin textView:textView
@@ -606,7 +638,9 @@ static BOOL enableMentionSelectFix = NO;
         return YES;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
-        return [self.controlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange interaction:interaction];
+        if (!HKWTextView.enableSimpleRefactor) {
+            return [self.controlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange interaction:interaction];
+        }
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
         return [self.abstractionControlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange];

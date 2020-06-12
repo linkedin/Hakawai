@@ -296,8 +296,10 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
 }
 
 - (void)mentionCreationEnded:(BOOL)canImmediatelyRestart {
-    NSAssert(self.inMentionCreationState,
-             @"mentionCreationEnded was called, but the state machine was not in the mention creation state.");
+    if (!HKWTextView.enableSimpleRefactor) {
+        NSAssert(self.inMentionCreationState,
+                 @"mentionCreationEnded was called, but the state machine was not in the mention creation state.");
+    }
     // User must type at least one space/newline to start a new mention.
     self.state = canImmediatelyRestart ? HKWMentionsStartDetectionStateQuiescentReady : HKWMentionsStartDetectionStateQuiescentStalled;
 }
