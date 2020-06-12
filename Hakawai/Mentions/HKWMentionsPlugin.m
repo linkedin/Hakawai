@@ -1501,6 +1501,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 #pragma mark - Plug-in protocol
 
+- (void)dataReturnedWithEmptyResults:(BOOL)isEmptyResults
+         keystringEndsWithWhiteSpace:(BOOL)keystringEndsWithWhiteSpace {
+    [self.creationStateMachine dataReturnedWithEmptyResults:isEmptyResults keystringEndsWithWhiteSpace:keystringEndsWithWhiteSpace];
+}
+
 -(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView {
     if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
         [self.creationStateMachine cancelMentionCreation];
@@ -1890,6 +1895,8 @@ shouldChangeTextInRange:(NSRange)range
                                searchType:(HKWMentionsSearchType)type
                          controlCharacter:(unichar)character
                                completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
+    // set up the chooser view prior to data request in order to support fully customized view
+    [self.creationStateMachine setupChooserViewIfNeeded];
     [self.delegate asyncRetrieveEntitiesForKeyString:keyString
                                           searchType:type
                                     controlCharacter:character

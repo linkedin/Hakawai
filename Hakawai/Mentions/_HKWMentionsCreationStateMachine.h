@@ -120,6 +120,11 @@
  */
 + (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate;
 
+/**
+ Informs the state machine typeahead results are returned, so it can update its internal state accordingly.
+ */
+- (void)dataReturnedWithEmptyResults:(BOOL)isEmptyResults
+         keystringEndsWithWhiteSpace:(BOOL)keystringEndsWithWhiteSpace;
 /*!
  Inform the state machine that a single character was typed by the user into the text view.
  */
@@ -160,6 +165,11 @@
  Inform the state machine that mention creation must stop immediately.
  */
 - (void)cancelMentionCreation;
+
+/**
+ Setup chooser view if needed.
+ */
+- (void)setupChooserViewIfNeeded;
 
 /*!
  Completely reset the chooser view. This is useful if the parent plug-in is detached from its editor text view.

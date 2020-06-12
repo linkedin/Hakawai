@@ -124,6 +124,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 @property (nonatomic, readonly) BOOL chooserViewInsideTextView;
 
+@property (nonatomic, readwrite) BOOL chooserViewDidSetup;
+
 @end
 
 @implementation HKWMentionsCreationStateMachine
@@ -525,6 +527,21 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 #pragma mark - Private (chooser view related)
 
+- (void)setupChooserViewIfNeeded {
+    if (self.chooserViewDidSetup) {
+        return;
+    }
+    HKWAccessoryViewMode mode = (self.chooserViewInsideTextView
+                                 ? HKWAccessoryViewModeSibling
+                                 : HKWAccessoryViewModeFreeFloating);
+    [self.delegate attachViewToParentEditor:self.entityChooserView
+                                     origin:self.entityChooserView.frame.origin
+                                       mode:mode];
+    // hide chooser view initially
+    self.entityChooserView.hidden = YES;
+    self.chooserViewDidSetup = YES;
+}
+
 - (void)showChooserView {
     __strong __auto_type delegate = self.delegate;
     [delegate accessoryViewStateWillChange:YES];
@@ -534,14 +551,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     if ([self.entityChooserView respondsToSelector:@selector(setInsertionPointMarkerEnabled:)]) {
         self.entityChooserView.insertionPointMarkerEnabled = YES;
     }
-    HKWAccessoryViewMode mode = (self.chooserViewInsideTextView
-                                 ? HKWAccessoryViewModeSibling
-                                 : HKWAccessoryViewModeFreeFloating);
-    [delegate attachViewToParentEditor:self.entityChooserView
-                                origin:self.entityChooserView.frame.origin
-                                  mode:mode];
     [delegate accessoryViewActivated:YES];
-
     // Force entityChooserView to be laid out before calculating the right cursor position.
     [self.entityChooserView layoutIfNeeded];
 
@@ -717,7 +727,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     if ([results count] == 0) {
         // No responses
         self.entityArray = nil;
-        [self handleFinalizedQueryWithNoResults:action];
+        [self handleFinalizedQueryWithNoResultsWithWhiteSpace:action == HKWMentionsCreationActionWhitespaceCharacterInserted];
         return;
     }
 
@@ -749,6 +759,37 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
     self.entityArray = [validResults copy];
 
+    // If mentions creation is still active or if its for initial search, and we haven't shown the chooser view, show it now.
+    if ((self.state != HKWMentionsCreationStateQuiescent || self.searchType == HKWMentionsSearchTypeInitial)
+        && self.chooserState == HKWMentionsCreationChooserStateHidden) {
+        [self showChooserView];
+    }
+}
+
+/*!
+ Handle updated data received from the data source.
+ */
+- (void)dataReturnedWithEmptyResults:(BOOL)isEmptyResults
+         keystringEndsWithWhiteSpace:(BOOL)keystringEndsWithWhiteSpace {
+    if (self.state == HKWMentionsCreationStateQuiescent && self.searchType != HKWMentionsSearchTypeInitial) {
+        NSAssert(self.chooserState == HKWMentionsCreationChooserStateHidden,
+                 @"Logic error: entity chooser view is active even though state machine is quiescent.");
+        self.entityArray = nil;
+        return;
+    }
+    // At this point, we are handling the *first* response for a given query.
+    self.firstResultReturnedForCurrentQuery = YES;
+    self.currentQueryIsComplete = YES;
+    if (isEmptyResults) {
+        // No responses
+        self.entityArray = nil;
+        [self handleFinalizedQueryWithNoResultsWithWhiteSpace:keystringEndsWithWhiteSpace];
+        return;
+    }
+    // We have at least one response
+    self.resultsState = HKWMentionsCreationResultsStateCreatingMentionWithResults;
+    // set entityArray to nil as the callsite is not sending results
+    self.entityArray = nil;
     // If mentions creation is still active or if its for initial search, and we haven't shown the chooser view, show it now.
     if ((self.state != HKWMentionsCreationStateQuiescent || self.searchType == HKWMentionsSearchTypeInitial)
         && self.chooserState == HKWMentionsCreationChooserStateHidden) {
@@ -799,7 +840,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
         [self.entityChooserView reloadData];
         if ([self.entityArray count] == 0 && self.currentQueryIsComplete) {
             // We have absolutely no results, and we've finalized the results for this query.
-            [self handleFinalizedQueryWithNoResults:previousAction];
+            [self handleFinalizedQueryWithNoResultsWithWhiteSpace:previousAction == HKWMentionsCreationActionWhitespaceCharacterInserted];
         }
         return;
     }
@@ -829,7 +870,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
  Perform all necessary state transitions when the results callback block is called, the query results are finalized, and
  there are no results at all. This may either result in terminating mentions creation, or going into a quiescent mode.
  */
-- (void)handleFinalizedQueryWithNoResults:(HKWMentionsCreationAction)previousAction {
+- (void)handleFinalizedQueryWithNoResultsWithWhiteSpace:(BOOL)endsWithWhiteSpace {
     // There are no more results, so mentions creation should stall
     self.chooserState = HKWMentionsCreationChooserStateHidden;
 
@@ -840,8 +881,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     __strong __auto_type delegate = self.delegate;
     BOOL noResultsAndShouldStop = (!delegate.shouldContinueSearchingAfterEmptyResults
                                    && self.resultsState == HKWMentionsCreationResultsStateAwaitingFirstResult);
-    BOOL shouldStop = (noResultsAndShouldStop
-                       || previousAction == HKWMentionsCreationActionWhitespaceCharacterInserted);
+    BOOL shouldStop = (noResultsAndShouldStop || endsWithWhiteSpace);
     if (shouldStop) {
         [delegate cancelMentionFromStartingLocation:self.startingLocation];
         self.state = HKWMentionsCreationStateQuiescent;
