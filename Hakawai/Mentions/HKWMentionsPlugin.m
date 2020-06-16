@@ -1737,25 +1737,29 @@ shouldChangeTextInRange:(NSRange)range
     return returnValue;
 }
 
+- (NSUInteger)controlCharacterLocation:(NSString *)text beforeLocation:(NSUInteger)location {
+    NSString *substringUntilLocation = [text substringToIndex:location];
+    // Search back MAX_MENTION_QUERY_LENGTH for a control character
+    NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
+    NSString *substringToSearchForControlChar = [substringUntilLocation substringFromIndex:maximumSearchIndex];
+    // TODO: use self.controlCharacterSet and find most recent of any control char
+    // JIRA: POST-13613
+    NSRange rangeOfControlChar = [substringToSearchForControlChar rangeOfString:@"@" options:NSBackwardsSearch];
+    return rangeOfControlChar.location;
+}
+
 - (NSString *)mentionsQuery:(NSString *)text location:(NSUInteger)location {
     if (text.length <= 0) {
         return nil;
     }
-
-    // Query until end of word in which cursor is present (or until cursor if it is
-    // at end of word)
-    NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:text];
-    NSString *substringUntilEndOfWord = [text substringToIndex:location+wordAfterCurrentLocation.length];
-    // Search back MAX_MENTION_QUERY_LENGTH for a control character
-    NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
-    NSString *substringToSearchForControlChar = [substringUntilEndOfWord substringFromIndex:maximumSearchIndex];
-    // Search starting from the end of the string, and return first control character
-    // TODO: use self.controlCharacterSet and find most recent of any control char
-    // JIRA: POST-13613
-    NSRange rangeOfControlChar = [substringToSearchForControlChar rangeOfString:@"@" options:NSBackwardsSearch];
-    if (rangeOfControlChar.location != NSNotFound) {
-        // If there is a control character, return the rest of the string after the char as the query
-        NSString *query = [substringToSearchForControlChar substringFromIndex:rangeOfControlChar.location + 1];
+    // Search starting from the given location, and return first control character
+    NSUInteger controlCharacterLocation = [self controlCharacterLocation:text beforeLocation:location];
+    if (controlCharacterLocation != NSNotFound) {
+        // Query until end of word in which cursor is present (or until cursor if it is at end of word)
+        NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:text];
+        NSString *substringUntilEndOfWord = [text substringToIndex:location+wordAfterCurrentLocation.length];
+        // Return the rest of the string after the control char as the query
+        NSString *query = [substringUntilEndOfWord substringFromIndex:controlCharacterLocation + 1];
         return query;
     }
     return nil;
