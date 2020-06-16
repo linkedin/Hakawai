@@ -146,29 +146,50 @@ describe(@"control flow plugin API", ^{
         };
 
         // Test APIs
-        [p1 resetBlocks];
-        rightBlockWasCalled = NO;
-        p1.shouldBeginEditingBlock = blockToCall;
-        [textView textViewShouldBeginEditing:textView];
-        expect(rightBlockWasCalled).to.equal(YES);
+        if (!HKWTextView.enableSimpleRefactor) {
+            // These don't get called in the simple refactor
+            [p1 resetBlocks];
+            rightBlockWasCalled = NO;
+            p1.shouldBeginEditingBlock = blockToCall;
+            [textView textViewShouldBeginEditing:textView];
+            expect(rightBlockWasCalled).to.equal(YES);
 
-        [p1 resetBlocks];
-        rightBlockWasCalled = NO;
-        p1.didBeginEditingBlock = blockToCall;
-        [textView textViewDidBeginEditing:textView];
-        expect(rightBlockWasCalled).to.equal(YES);
+            [p1 resetBlocks];
+            rightBlockWasCalled = NO;
+            p1.didBeginEditingBlock = blockToCall;
+            [textView textViewDidBeginEditing:textView];
+            expect(rightBlockWasCalled).to.equal(YES);
 
-        [p1 resetBlocks];
-        rightBlockWasCalled = NO;
-        p1.shouldEndEditingBlock = blockToCall;
-        [textView textViewShouldEndEditing:textView];
-        expect(rightBlockWasCalled).to.equal(YES);
+            [p1 resetBlocks];
+            rightBlockWasCalled = NO;
+            p1.shouldEndEditingBlock = blockToCall;
+            [textView textViewShouldEndEditing:textView];
+            expect(rightBlockWasCalled).to.equal(YES);
 
-        [p1 resetBlocks];
-        rightBlockWasCalled = NO;
-        p1.didEndEditingBlock = blockToCall;
-        [textView textViewDidEndEditing:textView];
-        expect(rightBlockWasCalled).to.equal(YES);
+            [p1 resetBlocks];
+            rightBlockWasCalled = NO;
+            p1.didEndEditingBlock = blockToCall;
+            [textView textViewDidEndEditing:textView];
+            expect(rightBlockWasCalled).to.equal(YES);
+
+            [p1 resetBlocks];
+            rightBlockWasCalled = NO;
+            p1.shouldInteractWithURLBlock = blockToCall;
+            [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10) interaction:UITextItemInteractionInvokeDefaultAction];
+            expect(rightBlockWasCalled).to.equal(YES);
+
+            [p1 resetBlocks];
+            rightBlockWasCalled = NO;
+            p1.didChangeBlock = blockToCall;
+            [textView textViewDidChange:textView];
+            expect(rightBlockWasCalled).to.equal(YES);
+
+            [p1 resetBlocks];
+            rightBlockWasCalled = NO;
+            p1.shouldInteractWithTextAttachmentBlock = blockToCall;
+            [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
+            expect(rightBlockWasCalled).to.equal(YES);
+        }
 
         [p1 resetBlocks];
         rightBlockWasCalled = NO;
@@ -178,26 +199,8 @@ describe(@"control flow plugin API", ^{
 
         [p1 resetBlocks];
         rightBlockWasCalled = NO;
-        p1.didChangeBlock = blockToCall;
-        [textView textViewDidChange:textView];
-        expect(rightBlockWasCalled).to.equal(YES);
-
-        [p1 resetBlocks];
-        rightBlockWasCalled = NO;
         p1.didChangeSelectionBlock = blockToCall;
         [textView textViewDidChangeSelection:textView];
-        expect(rightBlockWasCalled).to.equal(YES);
-
-        [p1 resetBlocks];
-        rightBlockWasCalled = NO;
-        p1.shouldInteractWithTextAttachmentBlock = blockToCall;
-        [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
-        expect(rightBlockWasCalled).to.equal(YES);
-
-        [p1 resetBlocks];
-        rightBlockWasCalled = NO;
-        p1.shouldInteractWithURLBlock = blockToCall;
-        [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10) interaction:UITextItemInteractionInvokeDefaultAction];
         expect(rightBlockWasCalled).to.equal(YES);
 
         // Test unregistration

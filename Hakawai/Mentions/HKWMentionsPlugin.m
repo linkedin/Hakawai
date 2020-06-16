@@ -833,6 +833,61 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
+#pragma mark - Mention Query Utils
+
+- (NSString *)mentionsQuery:(NSString *)text location:(NSUInteger)location {
+    if (text.length <= 0) {
+        return nil;
+    }
+    // Search starting from the given location, and return first control character
+    NSUInteger mostRecentValidControlCharacterLocation = [self mostRecentValidControlCharacterLocation:text beforeLocation:location];
+    if (mostRecentValidControlCharacterLocation != NSNotFound) {
+        // Query until end of word in which cursor is present (or until cursor if it is at end of word)
+        NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:text];
+        NSString *substringUntilEndOfWord = [text substringToIndex:location+wordAfterCurrentLocation.length];
+        // Return the rest of the string after the control char as the query
+        NSString *query = [substringUntilEndOfWord substringFromIndex:mostRecentValidControlCharacterLocation + 1];
+        return query;
+    }
+    return nil;
+}
+
+- (NSUInteger)mostRecentValidControlCharacterLocation:(NSString *)text beforeLocation:(NSUInteger)location {
+    NSString *substringUntilLocation = [text substringToIndex:location];
+    // Search back MAX_MENTION_QUERY_LENGTH for a control character
+    NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
+    NSString *substringToSearchForControlChar = [substringUntilLocation substringFromIndex:maximumSearchIndex];
+    // TODO: use self.controlCharacterSet and find most recent of any control char
+    // JIRA: POST-13613
+    NSRange rangeOfControlChar = [substringToSearchForControlChar rangeOfString:@"@" options:NSBackwardsSearch];
+    NSUInteger controlCharLocation = rangeOfControlChar.location;
+
+    // If there's a non-mentions alphanumeric before the control char, then it's invalid
+    unichar charPrecidingControlChar = [self.parentTextView characterPrecedingLocation:(NSInteger)controlCharLocation];
+    if (charPrecidingControlChar
+        && [[NSCharacterSet alphanumericCharacterSet] characterIsMember:charPrecidingControlChar]
+        && ![self isMentionAttributeAtLocation:controlCharLocation-1]) {
+        return NSNotFound;
+    }
+
+    // If there's an entity in between the current location and the previous control character, then it's invalid
+    NSRange mentionRange;
+    HKWMentionsAttribute __unused *mention = [self mentionAttributePrecedingLocation:location
+                                                                               range:&mentionRange];
+    if (mentionRange.location > controlCharLocation) {
+        return NSNotFound;
+    }
+
+    return controlCharLocation;
+}
+
+- (BOOL)isMentionAttributeAtLocation:(NSUInteger)location {
+    NSAttributedString *parentText = self.parentTextView.attributedText;
+    id value = [parentText attribute:HKWMentionAttributeName
+                             atIndex:location
+                      effectiveRange:nil];
+    return [value isKindOfClass:[HKWMentionsAttribute class]];
+}
 
 #pragma mark - State machine
 
@@ -1735,30 +1790,6 @@ shouldChangeTextInRange:(NSRange)range
     [self stripCustomAttributesFromTypingAttributes];
     self.suppressSelectionChangeNotifications = NO;
     return returnValue;
-}
-
-- (NSString *)mentionsQuery:(NSString *)text location:(NSUInteger)location {
-    if (text.length <= 0) {
-        return nil;
-    }
-
-    // Query until end of word in which cursor is present (or until cursor if it is
-    // at end of word)
-    NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:text];
-    NSString *substringUntilEndOfWord = [text substringToIndex:location+wordAfterCurrentLocation.length];
-    // Search back MAX_MENTION_QUERY_LENGTH for a control character
-    NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
-    NSString *substringToSearchForControlChar = [substringUntilEndOfWord substringFromIndex:maximumSearchIndex];
-    // Search starting from the end of the string, and return first control character
-    // TODO: use self.controlCharacterSet and find most recent of any control char
-    // JIRA: POST-13613
-    NSRange rangeOfControlChar = [substringToSearchForControlChar rangeOfString:@"@" options:NSBackwardsSearch];
-    if (rangeOfControlChar.location != NSNotFound) {
-        // If there is a control character, return the rest of the string after the char as the query
-        NSString *query = [substringToSearchForControlChar substringFromIndex:rangeOfControlChar.location + 1];
-        return query;
-    }
-    return nil;
 }
 
 - (void)textViewDidChangeSelectionV2:(UITextView *)textView {
