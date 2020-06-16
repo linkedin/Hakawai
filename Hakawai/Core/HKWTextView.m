@@ -345,7 +345,6 @@ static BOOL enableSimpleRefactor = YES;
         return;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
-        
         [self.controlFlowPlugin textViewDidProgrammaticallyUpdate:self];
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
@@ -564,7 +563,7 @@ static BOOL enableSimpleRefactor = YES;
             // Do nothing
         }
         else {
-            [self.controlFlowPlugin textViewDidChangeSelection:self];
+            [self.controlFlowPlugin textViewDidChangeSelection:textView];
         }
     }
     // Forward to external delegate
