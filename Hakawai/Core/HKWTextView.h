@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class HKWTextView;
 
+// TODO: Make sure to still forward all textview delegate calls
+// JIRA: POST-13614
 @protocol HKWTextViewDelegate <UITextViewDelegate>
 // Note: this protocol should NEVER contain any required methods; doing so will cause clients to break.
 @optional
