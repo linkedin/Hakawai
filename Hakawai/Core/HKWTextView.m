@@ -27,6 +27,8 @@
 
 @property (nonatomic, strong, readwrite) NSString *textStateBeforeDeletion;
 
+@property (nonatomic, readwrite) BOOL wasPaste;
+
 @end
 
 static BOOL enableExperimentalDeadLockFix = NO;
@@ -226,6 +228,7 @@ static BOOL enableMentionSelectFix = NO;
 
 - (void)paste:(id)sender {
     [super paste:sender];
+    self.wasPaste = YES;
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textViewDidHaveTextPastedIn:)]) {
         [externalDelegate textViewDidHaveTextPastedIn:self];
@@ -357,23 +360,13 @@ static BOOL enableMentionSelectFix = NO;
                        textView:(UITextView *)textView {
     // Note that the abstraction layer overrides all other behavior
     if (self.abstractionLayerEnabled) {
-        return [self.abstractionLayer textViewShouldChangeTextInRange:range replacementText:replacementText];
+        return [self.abstractionLayer textViewShouldChangeTextInRange:range replacementText:replacementText wasPaste:self.wasPaste];
     }
 
-    if (!isDictationText && self.shouldRejectAutocorrectInsertions && [replacementText length] > 1) {
-        NSString *const pasteboardString = [[UIPasteboard generalPasteboard] string];
-        if (!pasteboardString) {
-            return NO;
-        }
-        if (![replacementText isEqualToString:pasteboardString]) {
-            // PROVISIONAL FIX
-            // We need some way to distinguish autocorrect insertions from pasting in text. Since currently the only way
-            //  that multiple characters can be inserted at a time is through pasting text from the pasteboard, we can check
-            //  the text in the pasteboard against the string to be inserted to determine whether or not the request is
-            //  coming from the autocorrect module
-            return NO;
-        }
+    if (!isDictationText && self.shouldRejectAutocorrectInsertions && [replacementText length] > 1 && !self.wasPaste) {
+        return NO;
     }
+    self.wasPaste = NO;
     if (self.firstResponderIsCycling) {
         return NO;
     }
