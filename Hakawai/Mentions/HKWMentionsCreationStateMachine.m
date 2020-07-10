@@ -389,7 +389,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                 location:(NSUInteger)location {
     // Because we are supporting insertion of strings (including valid mention-strings) via non-english keyboards,
     // we should be able to start a new mention even without being in a quiescent state
-    if (!HKWTextView.enableKoreanMentionsFix && self.networkState != HKWMentionsCreationNetworkStateQuiescent) {
+    if (self.networkState != HKWMentionsCreationNetworkStateQuiescent) {
         return;
     }
     self.state = HKWMentionsCreationStateCreatingMention;

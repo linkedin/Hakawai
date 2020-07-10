@@ -42,10 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HKWTextView : UITextView
 
 + (BOOL) enableExperimentalDeadLockFix;
-+ (BOOL) enableKoreanMentionsFix;
 + (BOOL) enableMentionSelectFix;
 + (void) setEnableExperimentalDeadLockFix:(BOOL)enabled;
-+ (void) setEnableKoreanMentionsFix:(BOOL)enabled;
 + (void) setEnableMentionSelectFix:(BOOL)enabled;
 
 #pragma mark - Initialization
