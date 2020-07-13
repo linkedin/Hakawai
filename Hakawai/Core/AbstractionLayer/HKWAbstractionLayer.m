@@ -214,7 +214,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
     }
 }
 
-- (BOOL)textViewShouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+- (BOOL)textViewShouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text wasPaste:(BOOL)wasPaste {
 //    NSLog(@"textViewShouldChangeTextInRange:... called. Replacement: '%@', location: %ld, length: %ld; marked text: %@; text view text: '%@'",
 //          text, range.location, range.length, self.parentTextView.markedTextRange, self.parentTextView.text);
 //    NSLog(@"  > The current input mode is %@", [HKWAbstractionLayer nameForMode:self.inputMode]);
@@ -250,12 +250,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                 self.changeType = HKWAbstractionLayerChangeTypeDeletion;
                 self.changeRange = range;
                 self.changeString = [parentTextView.text substringWithRange:range];
-                NSString *const pasteboardString = [[UIPasteboard generalPasteboard] string];
-                if (pasteboardString) {
-                    self.changeIsPaste = [text isEqualToString:pasteboardString];
-                } else {
-                    self.changeIsPaste = NO;
-                }
+                self.changeIsPaste = wasPaste;
             }
             else if ([text length] > 0 && range.length == 0) {
                 // User inserted text
@@ -270,12 +265,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
                 self.changeType = HKWAbstractionLayerChangeTypeReplacement;
                 self.changeRange = range;
                 self.changeString = text;
-                NSString *const pasteboardString = [[UIPasteboard generalPasteboard] string];
-                if (pasteboardString) {
-                    self.changeIsPaste = [text isEqualToString:pasteboardString];
-                } else {
-                    self.changeIsPaste = NO;
-                }
+                self.changeIsPaste = wasPaste;
             }
             else {
                 // No change (e.g. user tapped backspace when there was no text)

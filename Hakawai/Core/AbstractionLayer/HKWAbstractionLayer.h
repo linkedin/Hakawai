@@ -123,7 +123,7 @@
 @property (nonatomic) BOOL shouldIgnoreNextCharacterDeletion;
 
 - (void)textViewDidProgrammaticallyUpdate;
-- (BOOL)textViewShouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text;
+- (BOOL)textViewShouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text wasPaste:(BOOL)wasPaste;
 - (void)textViewDidChangeSelection;
 - (void)textViewDidChange;
 
