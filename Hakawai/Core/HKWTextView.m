@@ -25,8 +25,6 @@
 
 @property (nonatomic) NSMutableDictionary *simplePluginsDictionary;
 
-@property (nonatomic, strong, readwrite) NSString *textStateBeforeDeletion;
-
 @property (nonatomic, readwrite) BOOL wasPaste;
 
 @end

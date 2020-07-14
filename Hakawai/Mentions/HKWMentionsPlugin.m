@@ -498,7 +498,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     for (NSUInteger i=0; i<[string length]; i++) {
         unichar c = [string characterAtIndex:i];
         if ([invalidChars characterIsMember:c]) { return NO; }
-        // We should allow insertion of control characters as a valid mention string
         if (self.controlCharacterSet && [self.controlCharacterSet characterIsMember:c]) {
             return NO;
         }
@@ -1196,20 +1195,15 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         case HKWMentionsStartDetectionStateCreatingMention: {
             // If one or more characters are inserted automatically (e.g. pasting in text, certain types of keyboards),
             // insert the text, but only if it's valid.
-            // Begin a mention if the control character was replaced by another.
-            // Otherwise, treat it as if the cursor moved and the mention  creation process was cancelled.
-            BOOL didBeginMentionsCreation = NO;
-            if (!didBeginMentionsCreation) {
-                if ([self stringValidForMentionsCreation:text]) {
-                    self.characterForAdvanceStateForCharacterInsertion = [text characterAtIndex:[text length] - 1];
-                    [self.creationStateMachine validStringInserted:text];
-                    self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-                    break;
-                }
-                else {
-                    [self.creationStateMachine cursorMoved];
-                    self.state = HKWMentionsStateQuiescent;
-                }
+            if ([self stringValidForMentionsCreation:text]) {
+                self.characterForAdvanceStateForCharacterInsertion = [text characterAtIndex:[text length] - 1];
+                [self.creationStateMachine validStringInserted:text];
+                self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
+                break;
+            }
+            else {
+                [self.creationStateMachine cursorMoved];
+                self.state = HKWMentionsStateQuiescent;
             }
             break;
         }
