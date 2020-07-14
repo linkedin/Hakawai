@@ -161,7 +161,7 @@ typedef NS_ENUM(NSInteger, HKWAbstractionLayerInputMode) {
 
     // State-related
     self.state = HKWAbstractionLayerStateQuiescent;
-    self.changeType = HKWAbstractionLayerMarkStateNone;
+    self.changeType = HKWAbstractionLayerChangeTypeNone;
     self.markState = HKWAbstractionLayerMarkStateNone;
     self.selectedRangeWhenTextWasLastSelected = (textView.selectedRange.length > 0
                                                  ? textView.selectedRange
