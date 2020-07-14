@@ -42,10 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HKWTextView : UITextView
 
 + (BOOL) enableExperimentalDeadLockFix;
-+ (BOOL) enableKoreanMentionsFix;
 + (BOOL) enableMentionSelectFix;
 + (void) setEnableExperimentalDeadLockFix:(BOOL)enabled;
-+ (void) setEnableKoreanMentionsFix:(BOOL)enabled;
 + (void) setEnableMentionSelectFix:(BOOL)enabled;
 
 #pragma mark - Initialization
@@ -125,12 +123,6 @@ NS_ASSUME_NONNULL_BEGIN
  Return whether or not the text view is in 'single line viewport' mode.
  */
 @property (nonatomic, readonly) BOOL inSingleLineViewportMode;
-
-/*!
- String that saves the state of the text in the text view so that it can be accessed in the NSTextStorageDelegate, which will
- already have deleted the character by the time it's trying to process said deletion
- */
-@property (nonatomic, strong, readonly) NSString *textStateBeforeDeletion;
 
 @end
 
