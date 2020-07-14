@@ -21,18 +21,15 @@
 
 #import "_HKWPrivateConstants.h"
 
-@interface HKWTextView () <UITextViewDelegate, HKWAbstractionLayerDelegate, NSTextStorageDelegate>
+@interface HKWTextView () <UITextViewDelegate, HKWAbstractionLayerDelegate>
 
 @property (nonatomic) NSMutableDictionary *simplePluginsDictionary;
-
-@property (nonatomic, strong, readwrite) NSString *textStateBeforeDeletion;
 
 @property (nonatomic, readwrite) BOOL wasPaste;
 
 @end
 
 static BOOL enableExperimentalDeadLockFix = NO;
-static BOOL enableKoreanMentionsFix = NO;
 static BOOL enableMentionSelectFix = NO;
 static BOOL enableSimpleRefactor = YES;
 
@@ -43,13 +40,6 @@ static BOOL enableSimpleRefactor = YES;
 }
 + (void)setEnableExperimentalDeadLockFix:(BOOL)enabled {
     enableExperimentalDeadLockFix = enabled;
-}
-
-+ (BOOL)enableKoreanMentionsFix {
-    return enableKoreanMentionsFix;
-}
-+ (void)setEnableKoreanMentionsFix:(BOOL)enabled {
-    enableKoreanMentionsFix = enabled;
 }
 
 + (BOOL)enableMentionSelectFix {
@@ -143,65 +133,11 @@ static BOOL enableSimpleRefactor = YES;
     return replacement;
 }
 
-- (void)textStorage:(__unused NSTextStorage *)textStorage
-  didProcessEditing:(__unused NSTextStorageEditActions)editedMask
-              range:(NSRange)editedRange
-     changeInLength:(NSInteger)delta {
-    if (HKWTextView.enableSimpleRefactor) {
-        return;
-    }
-    if (!enableKoreanMentionsFix) {
-        // If this mentions fix is not enabled, don't do anything in text storage
-        return;
-    }
-
-    if (delta > 0) {
-        // If the delta is greater than 0, this is an insertion
-        NSString *change = [self.text substringWithRange:editedRange];
-        if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldChangeTextInRange:changeText:isInsertion:previousLength:)]) {
-            [self.controlFlowPlugin textView:self
-                     shouldChangeTextInRange:editedRange
-                                  changeText:change
-                                 isInsertion:true
-                              previousLength:self.textStateBeforeDeletion.length];
-        }
-        // Update the saved text state so that it can be accessed in the case of deletion
-        if (self.textStateBeforeDeletion == nil) {
-            self.textStateBeforeDeletion = change;
-        } else {
-            // This line is needed because text storage works by replacing a certiain number of characters in a given range.
-            // In order to have the correct number of characters to replace in our text state string, we pad it at the correct location
-            // with the given delta.
-            [self padTextStorageForRangeInsertionAtLocation:editedRange.location withLength:delta];
-            self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:editedRange withString:change];
-        }
-    }
-    else if (delta < 0) {
-        // If the delta is less than 0, this is a deletion
-        NSUInteger absoluteDelta = (NSUInteger)labs((long)delta);
-        // Retrieve the string to delete
-        NSRange range = NSMakeRange(editedRange.location, absoluteDelta);
-        NSString *toDelete = [self.textStateBeforeDeletion substringWithRange:range];
-        if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldChangeTextInRange:changeText:isInsertion:previousLength:)]) {
-            [self.controlFlowPlugin textView:self
-                     shouldChangeTextInRange:range
-                                  changeText:toDelete
-                                 isInsertion:false
-                              previousLength:self.textStateBeforeDeletion.length];
-        }
-        // Update the text state for the deletion
-        self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:range withString:@""];
-    }
-}
-
 - (void)setup {
     self.delegate = self;
     self.firstResponderIsCycling = NO;
     self.translatesAutoresizingMaskIntoConstraints = NO;
 
-    if (enableKoreanMentionsFix) {
-        self.textStorage.delegate = self;
-    }
     self.abstractionLayer = [HKWAbstractionLayer instanceWithTextView:self changeRejection:YES];
 }
 
@@ -366,8 +302,6 @@ static BOOL enableSimpleRefactor = YES;
     if ([self shouldChangeTextInRange:self.selectedRange replacementText:dictationString isDictationText:YES textView:self]) {
         [self insertText:dictationString];
     }
-
-    // TODO: Handle dictation string with korean mentions fix
 }
 
 - (BOOL)shouldChangeTextInRange:(NSRange)range
@@ -801,17 +735,6 @@ static BOOL enableSimpleRefactor = YES;
         [_touchCaptureOverlayView addGestureRecognizer:tapGesture];
     }
     return _touchCaptureOverlayView;
-}
-
-/**
- Adds padding of a given @c length at a given @c location, to make string replacement in the text storage delegate work correctly
- */
-- (void)padTextStorageForRangeInsertionAtLocation:(NSUInteger)location withLength:(NSInteger)length {
-    NSString *string = @"";
-    for (int i = 0; i < length; i++) {
-        string = [string stringByAppendingString:@" "];
-    }
-    self.textStateBeforeDeletion = [self.textStateBeforeDeletion stringByReplacingCharactersInRange:NSMakeRange(location, 0) withString:string];
 }
 
 @end
