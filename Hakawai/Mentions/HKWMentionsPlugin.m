@@ -717,6 +717,24 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return delegateImplementsCustomTrimming || (whitespaceRange.length > 0);
 }
 
+- (HKWMentionsAttribute *)mentionAttributeAtLocation:(NSUInteger)location
+                                               range:(NSRangePointer)range {
+    __strong __auto_type parentTextView = self.parentTextView;
+    if (location < 1 || location > [parentTextView.attributedText length]) {
+        // No mention can precede the beginning of the text view.
+        return nil;
+    }
+    NSAttributedString *parentText = parentTextView.attributedText;
+    id value = [parentText attribute:HKWMentionAttributeName
+                             atIndex:location
+                           effectiveRange:range];
+    if ([value isKindOfClass:[HKWMentionsAttribute class]]) {
+        // Typechecking
+        return (HKWMentionsAttribute *)value;
+    }
+    return nil;
+}
+
 - (HKWMentionsAttribute *)mentionAttributePrecedingLocation:(NSUInteger)location
                                                       range:(NSRangePointer)range {
     __strong __auto_type parentTextView = self.parentTextView;
@@ -725,12 +743,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         return nil;
     }
     NSAttributedString *parentText = parentTextView.attributedText;
-    NSUInteger searchIndexForMention;
-    if (HKWTextView.enableSimpleRefactor) {
-        searchIndexForMention = location;
-    } else {
-        searchIndexForMention = location - 1;
-    }
     id value = [parentText attribute:HKWMentionAttributeName
                              atIndex:location - 1
                longestEffectiveRange:range
@@ -997,8 +1009,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;
     if (location > 0) {
         NSRange mentionRange;
-        HKWMentionsAttribute *precedingMention = [self mentionAttributePrecedingLocation:location
-                                                                                   range:&mentionRange];
+        HKWMentionsAttribute *precedingMention = [self mentionAttributeAtLocation:location
+                                                                            range:&mentionRange];
         // If there is a mention preceding the deletion
         if (precedingMention) {
             // Trim or delete the currently selected mention

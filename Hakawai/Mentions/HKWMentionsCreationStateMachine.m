@@ -387,7 +387,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                    usingControlCharacter:(BOOL)usingControlCharacter
                         controlCharacter:(unichar)character
                                 location:(NSUInteger)location {
-    if (self.networkState != HKWMentionsCreationNetworkStateQuiescent) {
+    // For the simple refactor, we don't determine our mention creation behavior based on network state, we do it based on cursor movement.
+    if (!HKWTextView.enableSimpleRefactor && self.networkState != HKWMentionsCreationNetworkStateQuiescent) {
         return;
     }
     self.state = HKWMentionsCreationStateCreatingMention;
