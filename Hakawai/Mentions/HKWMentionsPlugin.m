@@ -877,7 +877,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     unichar charPrecidingControlChar = [self.parentTextView characterPrecedingLocation:(NSInteger)controlCharLocation];
     if (charPrecidingControlChar
         && [[NSCharacterSet alphanumericCharacterSet] characterIsMember:charPrecidingControlChar]
-        && ![self isMentionAttributeAtLocation:controlCharLocation-1]) {
+        && ![self mentionAttributeAtLocation:controlCharLocation-1
+                                       range:nil]) {
         return NSNotFound;
     }
 
@@ -890,14 +891,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 
     return controlCharLocation;
-}
-
-- (BOOL)isMentionAttributeAtLocation:(NSUInteger)location {
-    NSAttributedString *parentText = self.parentTextView.attributedText;
-    id value = [parentText attribute:HKWMentionAttributeName
-                             atIndex:location
-                      effectiveRange:nil];
-    return [value isKindOfClass:[HKWMentionsAttribute class]];
 }
 
 #pragma mark - State machine
@@ -1009,19 +1002,19 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;
     if (location > 0) {
         NSRange mentionRange;
-        HKWMentionsAttribute *precedingMention = [self mentionAttributeAtLocation:location
-                                                                            range:&mentionRange];
-        // If there is a mention preceding the deletion
-        if (precedingMention) {
-            // Trim or delete the currently selected mention
+        HKWMentionsAttribute *mentionAtDeleteLocation = [self mentionAttributeAtLocation:location
+                                                                                   range:&mentionRange];
+        // If the deleted character was part of a mention
+        if (mentionAtDeleteLocation) {
+            // Trim or delete the mention
             [self assertMentionsDataExists];
             NSString *trimmedString = nil;
-            BOOL canTrim = [self mentionCanBeTrimmed:precedingMention trimmedString:&trimmedString];
+            BOOL canTrim = [self mentionCanBeTrimmed:mentionAtDeleteLocation trimmedString:&trimmedString];
             if (canTrim) {
                 // Trim mention to first word only
                 NSAssert([trimmedString length] > 0,
                          @"Cannot trim a mention to zero length");
-                precedingMention.mentionText = trimmedString;
+                mentionAtDeleteLocation.mentionText = trimmedString;
                 [parentTextView transformTextAtRange:mentionRange
                                      withTransformer:^NSAttributedString *(NSAttributedString *input) {
                     return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
@@ -1591,6 +1584,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 - (BOOL)textViewShouldChangeTextInRangeV2:(NSRange)range
                           replacementText:(NSString *)text {
+    // In simple refactor, we only focus on deletions in order to allow for personalization/deletions of mentions
     if ([text length] == 0 && range.length == 1) {
         return [self advanceStateForCharacterDeletionV2:range.location];
     }
@@ -1989,7 +1983,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:currentLocation text:parentTextView.text];
     NSRange rangeToTransform;
     if (HKWTextView.enableSimpleRefactor) {
-        // Find where previous control character was
+        // Find where previous control character was, and replace mention at that point
         NSRange rangeOfControlChar = [parentTextView.text rangeOfString:@"@" options:NSBackwardsSearch];
         NSUInteger lengthOfMention = currentLocation + wordAfterCurrentLocation.length - rangeOfControlChar.location;
         rangeToTransform = NSMakeRange(rangeOfControlChar.location, lengthOfMention);
@@ -2061,6 +2055,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }];
     // Move the cursor
     if (HKWTextView.enableSimpleRefactor) {
+        // Since cursor is already updated in simple refactor, we move it back one character
         parentTextView.selectedRange = NSMakeRange(location + [mentionText length]  - 1, 0);
     } else {
         parentTextView.selectedRange = NSMakeRange(location + [mentionText length], 0);
