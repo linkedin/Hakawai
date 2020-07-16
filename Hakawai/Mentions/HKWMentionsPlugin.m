@@ -720,8 +720,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 - (HKWMentionsAttribute *)mentionAttributeAtLocation:(NSUInteger)location
                                                range:(NSRangePointer)range {
     __strong __auto_type parentTextView = self.parentTextView;
-    if (location < 1 || location > [parentTextView.attributedText length]) {
-        // No mention can precede the beginning of the text view.
+    if (location > [parentTextView.attributedText length]) {
+        NSAssert(NO, @"Can't have a location beyond bounds of parent view");
         return nil;
     }
     NSAttributedString *parentText = parentTextView.attributedText;
@@ -844,8 +844,17 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
+// TODO: Make all utils static
+// JIRA: POST-13757
 #pragma mark - Mention Query Utils
 
+/**
+ Find the mentionas query connected to the given location
+
+ @param text the text to search within
+ @param location the cursor location from which to search for a mention
+ @return The mention query connected to the cursor at @c location
+ */
 - (NSString *)mentionsQuery:(NSString *)text location:(NSUInteger)location {
     if (text.length <= 0) {
         return nil;
@@ -863,6 +872,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return nil;
 }
 
+/**
+ Returns the location for the most recently valid control character before the cursor. Valid includes: not having an alphanumeric before it, not having an existing entity between the character and the cursor, etc.
+
+ @param text the text to search for the control character within
+ @param location the location to start your backwards search for a control character
+ @returns The location, if any, for the control character
+ */
 - (NSUInteger)mostRecentValidControlCharacterLocation:(NSString *)text beforeLocation:(NSUInteger)location {
     NSString *substringUntilLocation = [text substringToIndex:location];
     // Search back MAX_MENTION_QUERY_LENGTH for a control character
@@ -990,13 +1006,12 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 /**
- Customize deletion if we are about to delete a mention
+ Handle deletion of a mention, either personalizing or removing it
 
  @param location current location of cursor
  @return whether or not to allow the text view to process the deletion
  */
 - (BOOL)advanceStateForCharacterDeletionV2:(NSUInteger)location {
-
     BOOL returnValue = YES;
     __strong __auto_type parentTextView = self.parentTextView;
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;

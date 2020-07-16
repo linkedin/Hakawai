@@ -387,9 +387,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                    usingControlCharacter:(BOOL)usingControlCharacter
                         controlCharacter:(unichar)character
                                 location:(NSUInteger)location {
-    // For the simple refactor, we don't determine our mention creation behavior based on network state, we do it based on cursor movement.
-    if (!HKWTextView.enableSimpleRefactor && self.networkState != HKWMentionsCreationNetworkStateQuiescent) {
-        return;
+    if (HKWTextView.enableSimpleRefactor) {
+        // With the simple refactor, we use the "creation" function to make all our mentions calls, because we don't iterate our calls
+        // via a buffer, we send the whole prefix every time. This means we only guard based on cooldown, not quiescent/ready
+        // TODO: Clear this up along with the rest of the refactor lixes by creating a v2 plugin
+        // JIRA: POST-13756
+        if (self.networkState == HKWMentionsCreationNetworkStateTimerCooldown ||
+            self.networkState == HKWMentionsCreationNetworkStatePendingRequestAfterCooldown) {
+            return;
+        }
+    } else {
+        if (self.networkState != HKWMentionsCreationNetworkStateQuiescent) {
+            return;
+        }
     }
     self.state = HKWMentionsCreationStateCreatingMention;
     self.searchType = usingControlCharacter ? HKWMentionsSearchTypeExplicit : HKWMentionsSearchTypeImplicit;
