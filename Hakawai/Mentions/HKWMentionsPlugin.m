@@ -1565,6 +1565,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 -(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        return;
+    }
     if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
         [self.creationStateMachine cancelMentionCreation];
     } else {
@@ -1715,6 +1718,11 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (BOOL)textViewShouldBeginEditing:(__unused UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        // TODO: Figure out initial fetch for simple refactor
+        // JIRA: POST-13736
+        return YES;
+    }
     if (!self.initialSetupPerformed) {
         [self initialSetup];
     }
@@ -1722,6 +1730,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (void)textViewDidBeginEditing:(__unused UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        return;
+    }
     // Bring the text view back to a known good state
     __strong __auto_type parentTextView = self.parentTextView;
     NSUInteger currentLength = [parentTextView.text length];
@@ -1778,6 +1789,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (void)textViewDidEndEditing:(__unused UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        return;
+    }
     // Text view is about to lose focus
     // Perform cleanup
     HKWMentionsState previousState = self.state;

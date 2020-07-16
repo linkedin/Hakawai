@@ -280,9 +280,6 @@ static BOOL enableSimpleRefactor = YES;
 
 -(void) textViewDidProgrammaticallyUpdate {
 
-    if (HKWTextView.enableSimpleRefactor) {
-        return;
-    }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
         [self.controlFlowPlugin textViewDidProgrammaticallyUpdate:self];
     }
@@ -293,18 +290,13 @@ static BOOL enableSimpleRefactor = YES;
 
 - (void)handleDictationString:(NSString *)dictationString {
     if ([self.controlFlowPlugin respondsToSelector:@selector(setDictationString:)]) {
-        if (!HKWTextView.enableSimpleRefactor) {
-            [self.controlFlowPlugin setDictationString:dictationString];
-        }
+        [self.controlFlowPlugin setDictationString:dictationString];
     }
 
     // Used selected range to get the cursor position. So that text will be replaced after the cursor.
     if ([self shouldChangeTextInRange:self.selectedRange replacementText:dictationString isDictationText:YES textView:self]) {
         [self insertText:dictationString];
     }
-
-    // TODO: Handle dictation string with korean mentions fix
-    // JIRA: POST-13717
 }
 
 - (BOOL)shouldChangeTextInRange:(NSRange)range
@@ -364,24 +356,18 @@ static BOOL enableSimpleRefactor = YES;
     BOOL shouldBeginEditing = YES;
     __strong __auto_type externalDelegate = self.externalDelegate;
 
-    if (!HKWTextView.enableSimpleRefactor) {
-        if (self.firstResponderIsCycling) {
-            shouldBeginEditing = YES;
-        }
-        else if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
-            shouldBeginEditing = [self.controlFlowPlugin textViewShouldBeginEditing:textView];
-        }
-        else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
-            shouldBeginEditing = [self.abstractionControlFlowPlugin textViewShouldBeginEditing:textView];
-        }
-        // Forward to external delegate
-        else if ([externalDelegate respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
-            shouldBeginEditing = [externalDelegate textViewShouldBeginEditing:textView];
-        }
-    } else {
-        if ([externalDelegate respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
-            shouldBeginEditing = [externalDelegate textViewShouldBeginEditing:textView];
-        }
+    if (self.firstResponderIsCycling) {
+        shouldBeginEditing = YES;
+    }
+    else if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
+        shouldBeginEditing = [self.controlFlowPlugin textViewShouldBeginEditing:textView];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
+        shouldBeginEditing = [self.abstractionControlFlowPlugin textViewShouldBeginEditing:textView];
+    }
+    // Forward to external delegate
+    else if ([externalDelegate respondsToSelector:@selector(textViewShouldBeginEditing:)]) {
+        shouldBeginEditing = [externalDelegate textViewShouldBeginEditing:textView];
     }
 
     // Let external-delegate know about begin editing.
@@ -392,17 +378,16 @@ static BOOL enableSimpleRefactor = YES;
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    if (!HKWTextView.enableSimpleRefactor) {
-        if (self.firstResponderIsCycling) {
-            return;
-        }
-        if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
-            [self.controlFlowPlugin textViewDidBeginEditing:textView];
-        }
-        else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
-            [self.abstractionControlFlowPlugin textViewDidBeginEditing:textView];
-        }
+    if (self.firstResponderIsCycling) {
+        return;
     }
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
+        [self.controlFlowPlugin textViewDidBeginEditing:textView];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
+        [self.abstractionControlFlowPlugin textViewDidBeginEditing:textView];
+    }
+
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textViewDidBeginEditing:)]) {
@@ -413,24 +398,18 @@ static BOOL enableSimpleRefactor = YES;
 - (BOOL)textViewShouldEndEditing:(UITextView *)textView {
     BOOL shouldEndEditing = YES;
     __strong __auto_type externalDelegate = self.externalDelegate;
-    if (!HKWTextView.enableSimpleRefactor) {
-        if (self.firstResponderIsCycling) {
-            shouldEndEditing = YES;
-        }
-        else if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
-            shouldEndEditing = [self.controlFlowPlugin textViewShouldEndEditing:textView];
-        }
-        else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
-            shouldEndEditing = [self.abstractionControlFlowPlugin textViewShouldEndEditing:textView];
-        }
-        // Forward to external delegate
-        else if ([externalDelegate respondsToSelector:@selector(textViewShouldEndEditing:)]) {
-            shouldEndEditing = [externalDelegate textViewShouldEndEditing:textView];
-        }
-    } else {
-        if ([externalDelegate respondsToSelector:@selector(textViewShouldEndEditing:)]) {
-            shouldEndEditing = [externalDelegate textViewShouldEndEditing:textView];
-        }
+    if (self.firstResponderIsCycling) {
+        shouldEndEditing = YES;
+    }
+    else if ([self.controlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
+        shouldEndEditing = [self.controlFlowPlugin textViewShouldEndEditing:textView];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewShouldEndEditing:)]) {
+        shouldEndEditing = [self.abstractionControlFlowPlugin textViewShouldEndEditing:textView];
+    }
+    // Forward to external delegate
+    else if ([externalDelegate respondsToSelector:@selector(textViewShouldEndEditing:)]) {
+        shouldEndEditing = [externalDelegate textViewShouldEndEditing:textView];
     }
 
     // Let external-delegate know about end editing.
@@ -441,17 +420,16 @@ static BOOL enableSimpleRefactor = YES;
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView {
-    if (!HKWTextView.enableSimpleRefactor) {
-        if (self.firstResponderIsCycling) {
-            return;
-        }
-        if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
-            [self.controlFlowPlugin textViewDidEndEditing:textView];
-        }
-        else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
-            [self.abstractionControlFlowPlugin textViewDidEndEditing:textView];
-        }
+    if (self.firstResponderIsCycling) {
+        return;
     }
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
+        [self.controlFlowPlugin textViewDidEndEditing:textView];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
+        [self.abstractionControlFlowPlugin textViewDidEndEditing:textView];
+    }
+
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textViewDidEndEditing:)]) {
@@ -464,19 +442,18 @@ static BOOL enableSimpleRefactor = YES;
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    if (!HKWTextView.enableSimpleRefactor) {
-        if (self.abstractionLayerEnabled) {
-            [self.abstractionLayer textViewDidChange];
-            return;
-        }
-
-        if (self.firstResponderIsCycling) {
-            return;
-        }
-        if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidChange:)]) {
-            [self.controlFlowPlugin textViewDidChange:textView];
-        }
+    if (self.abstractionLayerEnabled) {
+        [self.abstractionLayer textViewDidChange];
+        return;
     }
+    
+    if (self.firstResponderIsCycling) {
+        return;
+    }
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidChange:)]) {
+        [self.controlFlowPlugin textViewDidChange:textView];
+    }
+
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
@@ -545,20 +522,19 @@ static BOOL enableSimpleRefactor = YES;
 }
 
 - (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
-    if (!HKWTextView.enableSimpleRefactor) {
-        if (self.firstResponderIsCycling) {
-            return YES;
-        }
-        if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:interaction:)]) {
-            return [self.controlFlowPlugin textView:textView shouldInteractWithTextAttachment:textAttachment inRange:characterRange interaction:interaction];
-
-        }
-        else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
-            return [self.abstractionControlFlowPlugin textView:textView
-                              shouldInteractWithTextAttachment:textAttachment
-                                                       inRange:characterRange];
-        }
+    if (self.firstResponderIsCycling) {
+        return YES;
     }
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:interaction:)]) {
+        return [self.controlFlowPlugin textView:textView shouldInteractWithTextAttachment:textAttachment inRange:characterRange interaction:interaction];
+
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
+        return [self.abstractionControlFlowPlugin textView:textView
+                          shouldInteractWithTextAttachment:textAttachment
+                                                   inRange:characterRange];
+    }
+
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:interaction:)]) {
@@ -568,17 +544,16 @@ static BOOL enableSimpleRefactor = YES;
 }
 
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction {
-    if (!HKWTextView.enableSimpleRefactor) {
-        if (self.firstResponderIsCycling) {
-            return YES;
-        }
-        if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
-            return [self.controlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange interaction:interaction];
-        }
-        else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
-            return [self.abstractionControlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange];
-        }
+    if (self.firstResponderIsCycling) {
+        return YES;
     }
+    if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
+        return [self.controlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange interaction:interaction];
+    }
+    else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
+        return [self.abstractionControlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange];
+    }
+
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
