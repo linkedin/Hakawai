@@ -387,7 +387,6 @@ static BOOL enableSimpleRefactor = YES;
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidBeginEditing:)]) {
         [self.abstractionControlFlowPlugin textViewDidBeginEditing:textView];
     }
-
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textViewDidBeginEditing:)]) {
@@ -411,7 +410,6 @@ static BOOL enableSimpleRefactor = YES;
     else if ([externalDelegate respondsToSelector:@selector(textViewShouldEndEditing:)]) {
         shouldEndEditing = [externalDelegate textViewShouldEndEditing:textView];
     }
-
     // Let external-delegate know about end editing.
     if ([externalDelegate respondsToSelector:@selector(textView:willEndEditing:)]) {
         [externalDelegate textView:self willEndEditing:shouldEndEditing];
@@ -429,7 +427,6 @@ static BOOL enableSimpleRefactor = YES;
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textViewDidEndEditing:)]) {
         [self.abstractionControlFlowPlugin textViewDidEndEditing:textView];
     }
-
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textViewDidEndEditing:)]) {
@@ -453,7 +450,6 @@ static BOOL enableSimpleRefactor = YES;
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidChange:)]) {
         [self.controlFlowPlugin textViewDidChange:textView];
     }
-
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
@@ -466,7 +462,6 @@ static BOOL enableSimpleRefactor = YES;
         [self.abstractionLayer textViewDidChangeSelection];
         return;
     }
-
     if (self.firstResponderIsCycling) {
         return;
     }
@@ -527,7 +522,6 @@ static BOOL enableSimpleRefactor = YES;
     }
     if ([self.controlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:interaction:)]) {
         return [self.controlFlowPlugin textView:textView shouldInteractWithTextAttachment:textAttachment inRange:characterRange interaction:interaction];
-
     }
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithTextAttachment:inRange:)]) {
         return [self.abstractionControlFlowPlugin textView:textView
@@ -553,7 +547,6 @@ static BOOL enableSimpleRefactor = YES;
     else if ([self.abstractionControlFlowPlugin respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
         return [self.abstractionControlFlowPlugin textView:textView shouldInteractWithURL:URL inRange:characterRange];
     }
-
     // Forward to external delegate
     __strong __auto_type externalDelegate = self.externalDelegate;
     if ([externalDelegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:interaction:)]) {
