@@ -31,7 +31,7 @@
 
 static BOOL enableExperimentalDeadLockFix = NO;
 static BOOL enableMentionSelectFix = NO;
-static BOOL enableSimpleRefactor = YES;
+static BOOL enableSimpleRefactor = NO;
 
 @implementation HKWTextView
 
@@ -355,7 +355,6 @@ static BOOL enableSimpleRefactor = YES;
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
     BOOL shouldBeginEditing = YES;
     __strong __auto_type externalDelegate = self.externalDelegate;
-
     if (self.firstResponderIsCycling) {
         shouldBeginEditing = YES;
     }
@@ -410,6 +409,7 @@ static BOOL enableSimpleRefactor = YES;
     else if ([externalDelegate respondsToSelector:@selector(textViewShouldEndEditing:)]) {
         shouldEndEditing = [externalDelegate textViewShouldEndEditing:textView];
     }
+
     // Let external-delegate know about end editing.
     if ([externalDelegate respondsToSelector:@selector(textView:willEndEditing:)]) {
         [externalDelegate textView:self willEndEditing:shouldEndEditing];
@@ -443,7 +443,6 @@ static BOOL enableSimpleRefactor = YES;
         [self.abstractionLayer textViewDidChange];
         return;
     }
-    
     if (self.firstResponderIsCycling) {
         return;
     }
@@ -462,6 +461,7 @@ static BOOL enableSimpleRefactor = YES;
         [self.abstractionLayer textViewDidChangeSelection];
         return;
     }
+
     if (self.firstResponderIsCycling) {
         return;
     }
