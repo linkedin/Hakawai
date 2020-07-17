@@ -28,7 +28,7 @@
 
 @end
 
-@interface HKWMentionsPlugin () <HKWMentionsDelegate>
+@interface HKWMentionsPlugin () <HKWMentionsDefaultChooserViewDelegate>
 
 @property (nonatomic, strong) HKWMentionsCreationStateMachine *creationStateMachine;
 

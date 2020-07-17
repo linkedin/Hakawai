@@ -19,7 +19,7 @@
 
 @class HKWMentionsAttribute;
 
-@protocol HKWMentionsCreationStateMachineProtocol <HKWMentionsDelegate>
+@protocol HKWMentionsCreationStateMachineProtocol <HKWMentionsDefaultChooserViewDelegate>
 
 /*!
  Get whether or not the host app supports displaying a loading cell.
