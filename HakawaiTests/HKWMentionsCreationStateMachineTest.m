@@ -90,6 +90,10 @@ describe(@"Showing mentions list for explicit search only", ^{
     });
 
     it(@"should trigger initial fetch mentions request when text begins editing", ^{
+        if (HKWTextView.enableSimpleRefactor) {
+            // With simple refactor, we trigger based on cursor movement, not based on "begin editing"
+            return;
+        }
         [textView.delegate textViewShouldBeginEditing:textView];
         expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(1);
     });

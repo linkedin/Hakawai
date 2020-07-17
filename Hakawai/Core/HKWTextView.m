@@ -31,6 +31,7 @@
 
 static BOOL enableExperimentalDeadLockFix = NO;
 static BOOL enableMentionSelectFix = NO;
+static BOOL enableSimpleRefactor = NO;
 
 @implementation HKWTextView
 
@@ -46,6 +47,13 @@ static BOOL enableMentionSelectFix = NO;
 }
 + (void)setEnableMentionSelectFix:(BOOL)enabled {
     enableMentionSelectFix = enabled;
+}
+
++ (BOOL)enableSimpleRefactor {
+    return enableSimpleRefactor;
+}
++ (void)setEnableSimpleRefactor:(BOOL)enabled {
+    enableSimpleRefactor = enabled;
 }
 
 #pragma mark - Lifecycle
@@ -402,7 +410,6 @@ static BOOL enableMentionSelectFix = NO;
         shouldEndEditing = [externalDelegate textViewShouldEndEditing:textView];
     }
 
-
     // Let external-delegate know about end editing.
     if ([externalDelegate respondsToSelector:@selector(textView:willEndEditing:)]) {
         [externalDelegate textView:self willEndEditing:shouldEndEditing];
@@ -436,7 +443,6 @@ static BOOL enableMentionSelectFix = NO;
         [self.abstractionLayer textViewDidChange];
         return;
     }
-
     if (self.firstResponderIsCycling) {
         return;
     }

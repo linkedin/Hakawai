@@ -151,6 +151,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 @implementation HKWMentionsPlugin
 
+static int MAX_MENTION_QUERY_LENGTH = 100;
+
 @synthesize parentTextView = _parentTextView;
 
 @synthesize dictationString;
@@ -715,6 +717,24 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     return delegateImplementsCustomTrimming || (whitespaceRange.length > 0);
 }
 
+- (HKWMentionsAttribute *)mentionAttributeAtLocation:(NSUInteger)location
+                                               range:(NSRangePointer)range {
+    __strong __auto_type parentTextView = self.parentTextView;
+    if (location > [parentTextView.attributedText length]) {
+        NSAssert(NO, @"Can't have a location beyond bounds of parent view");
+        return nil;
+    }
+    NSAttributedString *parentText = parentTextView.attributedText;
+    id value = [parentText attribute:HKWMentionAttributeName
+                             atIndex:location
+                           effectiveRange:range];
+    if ([value isKindOfClass:[HKWMentionsAttribute class]]) {
+        // Typechecking
+        return (HKWMentionsAttribute *)value;
+    }
+    return nil;
+}
+
 - (HKWMentionsAttribute *)mentionAttributePrecedingLocation:(NSUInteger)location
                                                       range:(NSRangePointer)range {
     __strong __auto_type parentTextView = self.parentTextView;
@@ -824,6 +844,70 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     }
 }
 
+// TODO: Make all utils static
+// JIRA: POST-13757
+#pragma mark - Mention Query Utils
+
+/**
+ Find the mentionas query connected to the given location
+
+ @param text the text to search within
+ @param location the cursor location from which to search for a mention
+ @return The mention query connected to the cursor at @c location
+ */
+- (NSString *)mentionsQuery:(NSString *)text location:(NSUInteger)location {
+    if (text.length <= 0) {
+        return nil;
+    }
+    // Search starting from the given location, and return first control character
+    NSUInteger mostRecentValidControlCharacterLocation = [self mostRecentValidControlCharacterLocation:text beforeLocation:location];
+    if (mostRecentValidControlCharacterLocation != NSNotFound) {
+        // Query until end of word in which cursor is present (or until cursor if it is at end of word)
+        NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:text];
+        NSString *substringUntilEndOfWord = [text substringToIndex:location+wordAfterCurrentLocation.length];
+        // Return the rest of the string after the control char as the query
+        NSString *query = [substringUntilEndOfWord substringFromIndex:mostRecentValidControlCharacterLocation + 1];
+        return query;
+    }
+    return nil;
+}
+
+/**
+ Returns the location for the most recently valid control character before the cursor. Valid includes: not having an alphanumeric before it, not having an existing entity between the character and the cursor, etc.
+
+ @param text the text to search for the control character within
+ @param location the location to start your backwards search for a control character
+ @returns The location, if any, for the control character
+ */
+- (NSUInteger)mostRecentValidControlCharacterLocation:(NSString *)text beforeLocation:(NSUInteger)location {
+    NSString *substringUntilLocation = [text substringToIndex:location];
+    // Search back MAX_MENTION_QUERY_LENGTH for a control character
+    NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
+    NSString *substringToSearchForControlChar = [substringUntilLocation substringFromIndex:maximumSearchIndex];
+    // TODO: use self.controlCharacterSet and find most recent of any control char
+    // JIRA: POST-13613
+    NSRange rangeOfControlChar = [substringToSearchForControlChar rangeOfString:@"@" options:NSBackwardsSearch];
+    NSUInteger controlCharLocation = rangeOfControlChar.location;
+
+    // If there's a non-mentions alphanumeric before the control char, then it's invalid
+    unichar charPrecidingControlChar = [self.parentTextView characterPrecedingLocation:(NSInteger)controlCharLocation];
+    if (charPrecidingControlChar
+        && [[NSCharacterSet alphanumericCharacterSet] characterIsMember:charPrecidingControlChar]
+        && ![self mentionAttributeAtLocation:controlCharLocation-1
+                                       range:nil]) {
+        return NSNotFound;
+    }
+
+    // If there's an entity in between the current location and the previous control character, then it's invalid
+    NSRange mentionRange;
+    HKWMentionsAttribute __unused *mention = [self mentionAttributePrecedingLocation:location
+                                                                               range:&mentionRange];
+    if (mentionRange.location > controlCharLocation) {
+        return NSNotFound;
+    }
+
+    return controlCharLocation;
+}
 
 #pragma mark - State machine
 
@@ -918,6 +1002,66 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         searchRange = NSMakeRange(location, 0);
     }
     [self toggleAutocorrectAsRequiredForRange:searchRange];
+    return returnValue;
+}
+
+/**
+ Handle deletion of a mention, either personalizing or removing it
+
+ @param location current location of cursor
+ @return whether or not to allow the text view to process the deletion
+ */
+- (BOOL)advanceStateForCharacterDeletionV2:(NSUInteger)location {
+    BOOL returnValue = YES;
+    __strong __auto_type parentTextView = self.parentTextView;
+    __strong __auto_type externalDelegate = parentTextView.externalDelegate;
+    if (location > 0) {
+        NSRange mentionRange;
+        HKWMentionsAttribute *mentionAtDeleteLocation = [self mentionAttributeAtLocation:location
+                                                                                   range:&mentionRange];
+        // If the deleted character was part of a mention
+        if (mentionAtDeleteLocation) {
+            // Trim or delete the mention
+            [self assertMentionsDataExists];
+            NSString *trimmedString = nil;
+            BOOL canTrim = [self mentionCanBeTrimmed:mentionAtDeleteLocation trimmedString:&trimmedString];
+            if (canTrim) {
+                // Trim mention to first word only
+                NSAssert([trimmedString length] > 0,
+                         @"Cannot trim a mention to zero length");
+                mentionAtDeleteLocation.mentionText = trimmedString;
+                [parentTextView transformTextAtRange:mentionRange
+                                     withTransformer:^NSAttributedString *(NSAttributedString *input) {
+                    return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
+                }];
+                // Move the cursor into position.
+                parentTextView.selectedRange = NSMakeRange(mentionRange.location + [trimmedString length],
+                                                           0);
+                // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
+                if (self.notifyTextViewDelegateOnMentionTrim
+                    && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [externalDelegate textViewDidChange:parentTextView];
+                }
+            }
+            else {
+                // Delete mention entirely
+                NSUInteger locationAfterDeletion = mentionRange.location;
+                [parentTextView transformTextAtRange:mentionRange
+                                     withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
+                    return (NSAttributedString *)nil;
+                }];
+                [self stripCustomAttributesFromTypingAttributes];
+                parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
+
+                // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
+                if (self.notifyTextViewDelegateOnMentionDeletion
+                    && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                    [externalDelegate textViewDidChange:parentTextView];
+                }
+            }
+            returnValue = NO;
+        }
+    }
     return returnValue;
 }
 
@@ -1436,6 +1580,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 -(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        return;
+    }
     if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
         [self.creationStateMachine cancelMentionCreation];
     } else {
@@ -1453,7 +1600,21 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     return text.length == 1 && [self.controlCharacterSet characterIsMember:[text characterAtIndex:0]];
 }
 
+- (BOOL)textViewShouldChangeTextInRangeV2:(NSRange)range
+                          replacementText:(NSString *)text {
+    // In simple refactor, we only focus on deletions in order to allow for personalization/deletions of mentions
+    if ([text length] == 0 && range.length == 1) {
+        return [self advanceStateForCharacterDeletionV2:range.location];
+    }
+    [self stripCustomAttributesFromTypingAttributes];
+    return YES;
+}
+
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if (HKWTextView.enableSimpleRefactor) {
+        return [self textViewShouldChangeTextInRangeV2:range
+                                       replacementText:text];
+    }
     BOOL returnValue = YES;
     self.suppressSelectionChangeNotifications = YES;
     __strong __auto_type parentTextView = self.parentTextView;
@@ -1511,7 +1672,30 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     return returnValue;
 }
 
+- (void)textViewDidChangeSelectionV2:(UITextView *)textView {
+    NSRange range = textView.selectedRange;
+    if (range.length > 0) {
+        return;
+    }
+    // Find a mentions query from the last control char if there is one
+    NSString *query = [self mentionsQuery:textView.text location:range.location];
+    if (query) {
+        // query it
+        [self beginMentionsCreationWithString:query
+                                   atLocation:range.location
+                        usingControlCharacter:YES
+                             controlCharacter:[@"@" characterAtIndex:0]];
+    } else {
+        // if there isn't a query, cancel entity creation
+        [self.creationStateMachine cancelMentionCreation];
+    }
+}
+
 - (void)textViewDidChangeSelection:(UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        [self textViewDidChangeSelectionV2:textView];
+        return;
+    }
     if (self.suppressSelectionChangeNotifications) {
         // Don't run the 'selection change' code as a result of the user entering, deleting, or modifying the text.
         return;
@@ -1549,6 +1733,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 - (BOOL)textViewShouldBeginEditing:(__unused UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        // TODO: Figure out initial fetch for simple refactor
+        // JIRA: POST-13736
+        return YES;
+    }
     if (!self.initialSetupPerformed) {
         [self initialSetup];
     }
@@ -1556,6 +1745,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 - (void)textViewDidBeginEditing:(__unused UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        return;
+    }
     // Bring the text view back to a known good state
     __strong __auto_type parentTextView = self.parentTextView;
     NSUInteger currentLength = [parentTextView.text length];
@@ -1612,6 +1804,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 }
 
 - (void)textViewDidEndEditing:(__unused UITextView *)textView {
+    if (HKWTextView.enableSimpleRefactor) {
+        return;
+    }
     // Text view is about to lose focus
     // Perform cleanup
     HKWMentionsState previousState = self.state;
@@ -1815,7 +2010,15 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
     // we want to replace word after control character with mention text.
     // e.g "hey @|john" will be replaced as "hey John Doe". '|' indicates cursor.
     NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:currentLocation text:parentTextView.text];
-    NSRange rangeToTransform = NSMakeRange(location, currentLocation + wordAfterCurrentLocation.length - location);
+    NSRange rangeToTransform;
+    if (HKWTextView.enableSimpleRefactor) {
+        // Find where previous control character was, and replace mention at that point
+        NSRange rangeOfControlChar = [parentTextView.text rangeOfString:@"@" options:NSBackwardsSearch];
+        NSUInteger lengthOfMention = currentLocation + wordAfterCurrentLocation.length - rangeOfControlChar.location;
+        rangeToTransform = NSMakeRange(rangeOfControlChar.location, lengthOfMention);
+    } else {
+        rangeToTransform = NSMakeRange(location, currentLocation + wordAfterCurrentLocation.length - location);
+    }
 
     /*
      When the textview text that matches the mention text is not the first part of the mention text,
@@ -1880,7 +2083,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
         return [self typingAttributesByStrippingMentionAttributes:currentAttributes];
     }];
     // Move the cursor
-    parentTextView.selectedRange = NSMakeRange(location + [mentionText length], 0);
+    if (HKWTextView.enableSimpleRefactor) {
+        // Since cursor is already updated in simple refactor, we move it back one character
+        parentTextView.selectedRange = NSMakeRange(location + [mentionText length]  - 1, 0);
+    } else {
+        parentTextView.selectedRange = NSMakeRange(location + [mentionText length], 0);
+    }
     // Since the cursor is right after the mention, set the state to 'about to select'
     self.currentlySelectedMention = mention;
     self.currentlySelectedMentionRange = NSMakeRange(location, [mentionText length]);
