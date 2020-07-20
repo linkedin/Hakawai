@@ -849,6 +849,29 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 #pragma mark - Mention Query Utils
 
 /**
+ Find the location for the end of the next word, starting at the given location. If there is an invalid character (such as a mention), return @c NSNotFound
+
+ @param location location to begin search from
+ @param text text to search
+ @return location of end of next word, start at @c location
+ */
+- (NSUInteger)endOfValidWordAfterLocation:(NSUInteger)location text:(nonnull NSString *)text {
+    NSUInteger i;
+    for(i = location; i < text.length ; i++) {
+        // If there is a mentions character before there is a whitespace, then this is not a valid word for querying
+        BOOL isMention = [self mentionAttributeAtLocation:i range:nil];
+        if (isMention) {
+            return NSNotFound;
+        }
+        const unichar character = [text characterAtIndex:i];
+        if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:character]) {
+            return i;
+        }
+    }
+    return i;
+}
+
+/**
  Find the mentionas query connected to the given location
 
  @param text the text to search within
@@ -863,13 +886,35 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSUInteger mostRecentValidControlCharacterLocation = [self mostRecentValidControlCharacterLocation:text beforeLocation:location];
     if (mostRecentValidControlCharacterLocation != NSNotFound) {
         // Query until end of word in which cursor is present (or until cursor if it is at end of word)
-        NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:location text:text];
-        NSString *substringUntilEndOfWord = [text substringToIndex:location+wordAfterCurrentLocation.length];
-        // Return the rest of the string after the control char as the query
-        NSString *query = [substringUntilEndOfWord substringFromIndex:mostRecentValidControlCharacterLocation + 1];
-        return query;
+        NSUInteger endOfValidWordAfterLocation = [self endOfValidWordAfterLocation:location text:text];
+        if (endOfValidWordAfterLocation != NSNotFound) {
+            NSString *substringUntilEndOfWord = [text substringToIndex:endOfValidWordAfterLocation];
+            // Return the string, including the control char as the query
+            return [substringUntilEndOfWord substringFromIndex:mostRecentValidControlCharacterLocation];
+        }
     }
     return nil;
+}
+
+/**
+ Search backwards in a string for a character in the control character set
+
+ @param text The text in which to perform a backwards search for a control character
+ @returns Location for most recent control character in a string
+ */
+- (NSUInteger)mostRecentControlCharacterLocation:(NSString *)text {
+    if (text.length == 0) {
+        return NSNotFound;
+    }
+    int endOfTextIndex = (int)text.length - 1;
+    for (int index = endOfTextIndex; index >= 0; index--) {
+        NSUInteger unsignedIndex = (unsigned long)index;
+        unichar character = [text characterAtIndex:unsignedIndex];
+        if ([self.controlCharacterSet characterIsMember:character]) {
+            return unsignedIndex;
+        }
+    }
+    return NSNotFound;
 }
 
 /**
@@ -884,10 +929,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Search back MAX_MENTION_QUERY_LENGTH for a control character
     NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
     NSString *substringToSearchForControlChar = [substringUntilLocation substringFromIndex:maximumSearchIndex];
-    // TODO: use self.controlCharacterSet and find most recent of any control char
-    // JIRA: POST-13613
-    NSRange rangeOfControlChar = [substringToSearchForControlChar rangeOfString:@"@" options:NSBackwardsSearch];
-    NSUInteger controlCharLocation = rangeOfControlChar.location;
+    NSUInteger controlCharLocation = [self mostRecentControlCharacterLocation:substringToSearchForControlChar];
 
     // If there's a non-mentions alphanumeric before the control char, then it's invalid
     unichar charPrecidingControlChar = [self.parentTextView characterPrecedingLocation:(NSInteger)controlCharLocation];
@@ -1680,11 +1722,11 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Find a mentions query from the last control char if there is one
     NSString *query = [self mentionsQuery:textView.text location:range.location];
     if (query) {
-        // query it
-        [self beginMentionsCreationWithString:query
+        // first character is control character,rest of string is query
+        [self beginMentionsCreationWithString:[query substringFromIndex:1]
                                    atLocation:range.location
                         usingControlCharacter:YES
-                             controlCharacter:[@"@" characterAtIndex:0]];
+                             controlCharacter:[query characterAtIndex:0]];
     } else {
         // if there isn't a query, cancel entity creation
         [self.creationStateMachine cancelMentionCreation];
@@ -2013,9 +2055,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSRange rangeToTransform;
     if (HKWTextView.enableSimpleRefactor) {
         // Find where previous control character was, and replace mention at that point
-        NSRange rangeOfControlChar = [parentTextView.text rangeOfString:@"@" options:NSBackwardsSearch];
-        NSUInteger lengthOfMention = currentLocation + wordAfterCurrentLocation.length - rangeOfControlChar.location;
-        rangeToTransform = NSMakeRange(rangeOfControlChar.location, lengthOfMention);
+        NSUInteger controlCharLocation = [self mostRecentControlCharacterLocation:parentTextView.text];
+        NSUInteger lengthOfMention = currentLocation + wordAfterCurrentLocation.length - controlCharLocation;
+        rangeToTransform = NSMakeRange(controlCharLocation, lengthOfMention);
     } else {
         rangeToTransform = NSMakeRange(location, currentLocation + wordAfterCurrentLocation.length - location);
     }
