@@ -13,7 +13,7 @@
 #import "HKWMentionsPlugin.h"
 #import "HKWTDummyMentionEntity.h"
 
-@interface HKWTDummyMentionsManager: NSObject<HKWMentionsDelegate>
+@interface HKWTDummyMentionsManager: NSObject<HKWMentionsDefaultChooserViewDelegate>
 
 - (void)asyncRetrieveEntitiesForKeyString:(NSString *)keyString
                                searchType:(HKWMentionsSearchType)type
