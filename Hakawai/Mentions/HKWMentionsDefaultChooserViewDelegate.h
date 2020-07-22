@@ -51,10 +51,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsSearchType) {
 
 /*!
  Return a table view cell to be displayed for a given mention entity in the chooser view.
-
- \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
- defined in the \c HKWCustomChooserViewDelegate protocol, you can just return nil. In that case the mentions plug-in
- defers responsibility for preparing the UI entirely to your custom chooser view.
  */
 - (UITableViewCell *_Null_unspecified)cellForMentionsEntity:(_Null_unspecified id<HKWMentionsEntityProtocol>)entity
                                             withMatchString:(NSString *_Null_unspecified)matchString
@@ -63,10 +59,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsSearchType) {
 
 /*!
  Return the height of the table view cell for a given mention entity in the chooser view.
-
- \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
- defined in the \c HKWCustomChooserViewDelegate protocol, you can just return 0. In that case the mentions plug-in
- defers responsibility for preparing the UI entirely to your custom chooser view.
  */
 - (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
                                 tableView:(UITableView *_Null_unspecified)tableView;
@@ -90,17 +82,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsSearchType) {
 
 /*!
  Return a loading cell to be displayed if results still haven't been returned yet.
-
- \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
- defined in the \c HKWCustomChooserViewDelegate protocol, this method does nothing.
  */
 - (UITableViewCell *_Null_unspecified)loadingCellForTableView:(UITableView *_Null_unspecified)tableView;
 
 /*!
  Return the height of the loading cell; this must be implemented for the loading cell functionality to be enabled.
-
- \note If you are using the mentions plug-in in conjunction with a custom chooser view that implements the methods
- defined in the \c HKWCustomChooserViewDelegate protocol, this method does nothing.
  */
 - (CGFloat)heightForLoadingCellInTableView:(UITableView *_Null_unspecified)tableView;
 

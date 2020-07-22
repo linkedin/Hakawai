@@ -19,41 +19,6 @@ typedef NS_ENUM(NSInteger, HKWChooserBorderMode) {
 };
 
 /*!
- A protocol defining the interface provided to you by a Hakawai consumer of a custom chooser view. Your custom chooser
- view can call these methods on its delegate.
-
- \note If your custom chooser view is backed by a table view, you can simply use the delegate object as your table view
- delegate and data source. If you do so, the consumer will automatically take care of providing your chooser view with
- table view cells, and cell heights; in that case you should not call any of the methods shown below.
- */
-@protocol HKWCustomChooserViewDelegate <UITableViewDataSource, UITableViewDelegate>
-
-/*!
- Return whether or not the view should display a loading indicator. Note that the chooser view does not have to display
- a loading indicator if it doesn't want to.
- */
-- (BOOL)shouldDisplayLoadingIndicator;
-
-/*!
- Return the number of model objects to display. Returns 0 if loading is occuring.
- */
-- (NSUInteger)numberOfModelObjects;
-
-/*!
- Given an index value between 0 and (numberOfModelObjects - 1), return the appropriate model object. Depending on what
- application you are using the custom view for (e.g. Mentions), you may have to downcast the model in order to use it.
- */
-- (id)modelObjectForIndex:(NSUInteger)index;
-
-/*!
- Inform the Hakawai consumer that the user selected a model index at a value between 0 and (numberOfObjects - 1). If the
- index is out of range the consumer will do nothing.
- */
-- (void)modelObjectSelectedAtIndex:(NSUInteger)index;
-
-@end
-
-/*!
  A protocol describing a \c UIView subclass that can act as a chooser view for the Hakawai text view (for example, when
  displaying mentions).
  */
@@ -87,7 +52,7 @@ typedef NS_ENUM(NSInteger, HKWChooserBorderMode) {
  implemented.
  */
 + (id)chooserViewWithFrame:(CGRect)frame
-                  delegate:(id<HKWCustomChooserViewDelegate>)delegate;
+                  delegate:(id<UITableViewDelegate>)delegate;
 
 /*!
  Return an instance of the chooser view with a given frame, properly setting the delegate and data source. This method
