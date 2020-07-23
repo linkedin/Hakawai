@@ -274,8 +274,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  the first time.
 
  \note Per the definition of \c HKWChooserViewProtocol your custom chooser view class (if any) can either choose to
- consume the plug-in's \c UITableViewDelegate and \c UITableViewDataSource methods, or its
- \c HKWCustomChooserViewDelegate methods.
+ consume the plug-in's \c UITableViewDelegate and \c UITableViewDataSource methods.
 
  Use the former if you want to use the API in \c HKWMentionsDefaultChooserViewDelegate to provide table view cells and cell heights, the
  latter if you want your chooser view to be completely responsible for preparing the UI.

@@ -19,8 +19,6 @@
 		E1562BC919E72C2600D68787 /* MentionsDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1562BC819E72C2600D68787 /* MentionsDemoViewController.m */; };
 		E1562BD319E737BB00D68787 /* SampleAbstractionLayerPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E1562BD219E737BB00D68787 /* SampleAbstractionLayerPlugin.m */; };
 		E1562BD519E73C4600D68787 /* libHakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1562BD419E73C4600D68787 /* libHakawai.a */; };
-		E18678121A93F2C70005B9C2 /* SimpleChooserView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E18678111A93F2C70005B9C2 /* SimpleChooserView.xib */; };
-		E192339A1A940C6300A6159D /* SimpleChooserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19233991A940C6300A6159D /* SimpleChooserView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,8 +65,6 @@
 		E1562BD219E737BB00D68787 /* SampleAbstractionLayerPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleAbstractionLayerPlugin.m; sourceTree = "<group>"; };
 		E1562BD419E73C4600D68787 /* libHakawai.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHakawai.a; path = "../../../Library/Developer/Xcode/DerivedData/Hakawai-cjeestplxjjygthexnwbgdlvmstc/Build/Products/Debug-iphoneos/libHakawai.a"; sourceTree = "<group>"; };
 		E16EBF151A01765E008D6A89 /* Hakawai.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Hakawai.xcodeproj; path = ../Hakawai.xcodeproj; sourceTree = "<group>"; };
-		E18678111A93F2C70005B9C2 /* SimpleChooserView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SimpleChooserView.xib; sourceTree = "<group>"; };
-		E19233991A940C6300A6159D /* SimpleChooserView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleChooserView.swift; sourceTree = "<group>"; };
 		E192339B1A940C8700A6159D /* HakawaiDemo-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HakawaiDemo-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -170,8 +166,6 @@
 				E11DF8C219E7741D0072F4AD /* MentionsManager.m */,
 				E11DF8C419E774CD0072F4AD /* MentionEntity.h */,
 				E11DF8C519E774CD0072F4AD /* MentionEntity.m */,
-				E19233991A940C6300A6159D /* SimpleChooserView.swift */,
-				E18678111A93F2C70005B9C2 /* SimpleChooserView.xib */,
 			);
 			name = Mentions;
 			sourceTree = "<group>";
@@ -269,7 +263,6 @@
 			files = (
 				E1562BAD19E72A6F00D68787 /* Main.storyboard in Resources */,
 				E1562BB219E72A6F00D68787 /* LaunchScreen.xib in Resources */,
-				E18678121A93F2C70005B9C2 /* SimpleChooserView.xib in Resources */,
 				E1562BAF19E72A6F00D68787 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -283,7 +276,6 @@
 			files = (
 				E1562BAA19E72A6F00D68787 /* AbstractionLayerDemoViewController.m in Sources */,
 				E11DF8C619E774CD0072F4AD /* MentionEntity.m in Sources */,
-				E192339A1A940C6300A6159D /* SimpleChooserView.swift in Sources */,
 				E1562BC919E72C2600D68787 /* MentionsDemoViewController.m in Sources */,
 				E1562BA419E72A6F00D68787 /* AppDelegate.m in Sources */,
 				E1562BA719E72A6F00D68787 /* BasicDemoViewController.m in Sources */,
