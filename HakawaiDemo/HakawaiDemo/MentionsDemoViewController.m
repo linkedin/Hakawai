@@ -53,10 +53,6 @@ BOOL HKW_systemVersionIsAtLeast(NSString *version);
                                                                            controlCharacters:controlCharacters
                                                                                 searchLength:3];
 
-        // NOTE: If you want to see an example of a custom chooser, uncomment the following line.
-//        mentionsPlugin.chooserViewClass = [SimpleChooserView class];
-
-
         // If the text view loses focus while the mention chooser is up, and then regains focus, it will automatically put
         //  the mentions chooser back up
         mentionsPlugin.resumeMentionsCreationEnabled = YES;

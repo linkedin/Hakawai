@@ -189,15 +189,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 #pragma mark - API
 
 /*!
- Informs the plugin typeahead results are returned, so it can update its internal state accordingly.
- It's meant to be an experimental feature. This function will be updated.
-*/
-- (void)dataReturnedWithEmptyResults:(BOOL)isEmptyResults
-         keystringEndsWithWhiteSpace:(BOOL)keystringEndsWithWhiteSpace;
-/*!
  Inform the plugin that the textview was programatically updated (e.g. setText: or setAttributedText:)
  */
--(void) textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
+-(void)textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
 
 /*!
  Extract mentions attributes from an attributed string. The array of mentions attribute objects returned by this method
@@ -263,6 +257,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  */
 @property (nonatomic) BOOL shouldContinueSearchingAfterEmptyResults;
 
+#pragma mark - API for HKWMentionsCustomChooserViewDelegate
+
+/*!
+ Informs the plugin typeahead results are returned, so it can update its internal state accordingly.
+ It's meant to be an experimental feature. This function will be updated.
+*/
+- (void)dataReturnedWithEmptyResults:(BOOL)isEmptyResults
+         keystringEndsWithWhiteSpace:(BOOL)keystringEndsWithWhiteSpace;
+
+/*!
+Handles the selection from the user. This is only needed for consumers who use custom chooser view.
+*/
+- (void)handleSelectionForEntity:(nonnull id<HKWMentionsEntityProtocol>)entity;
 
 #pragma mark - Chooser UI Configuration
 
@@ -275,7 +282,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
  \note Per the definition of \c HKWChooserViewProtocol your custom chooser view class (if any) can either choose to
  consume the plug-in's \c UITableViewDelegate and \c UITableViewDataSource methods.
-
  Use the former if you want to use the API in \c HKWMentionsDefaultChooserViewDelegate to provide table view cells and cell heights, the
  latter if you want your chooser view to be completely responsible for preparing the UI.
  */
@@ -328,13 +334,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  */
 - (CGRect)calculatedChooserFrameForMode:(HKWMentionsChooserPositionMode)mode
                              edgeInsets:(UIEdgeInsets)edgeInsets;
-
-
-/*!
-Handles the selection from the user.
-Needs to be public for integration between Hakawai and HotPot.
-*/
-- (void)handleSelectionForEntity:(nonnull id<HKWMentionsEntityProtocol>)entity indexPath:(nonnull NSIndexPath *)indexPath;
 
 /*!
  Gets the input made by the user for both @ mentions or # hashtag.
