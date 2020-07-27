@@ -80,7 +80,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     HKWMentionsCreationActionCharacterDeleted
 };
 
-@interface HKWMentionsCreationStateMachine () <HKWCustomChooserViewDelegate>
+@interface HKWMentionsCreationStateMachine () <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, weak) id<HKWMentionsCreationStateMachineProtocol> delegate;
 
@@ -592,7 +592,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     // Instantiate the chooser view
     UIView<HKWChooserViewProtocol> *chooserView = nil;
     if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:)]) {
-        chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame delegate:self];
+        chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
+                                                         delegate:self];
     }
     else if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:dataSource:)]) {
         chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
@@ -907,31 +908,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
              nameForResultsState(self.resultsState));
     self.resultsState = HKWMentionsCreationResultsStateNoResultsWithoutWhitespace;
 }
-
-
-#pragma mark - Custom chooser view
-
-- (BOOL)shouldDisplayLoadingIndicator {
-    return !self.currentQueryIsComplete;
-}
-
-- (NSUInteger)numberOfModelObjects {
-    return [self.entityArray count];
-}
-
-- (id)modelObjectForIndex:(NSUInteger)index {
-    return self.entityArray[index];
-}
-
-- (void)modelObjectSelectedAtIndex:(NSUInteger)index {
-    id<HKWMentionsEntityProtocol> entity = self.entityArray[index];
-    HKWMentionsAttribute *mention = [HKWMentionsAttribute mentionWithText:[entity entityName]
-                                                               identifier:[entity entityId]];
-    mention.metadata = [entity entityMetadata];
-    self.state = HKWMentionsCreationStateQuiescent;
-    [self.delegate createMention:mention startingLocation:self.startingLocation];
-}
-
 
 #pragma mark - Table view
 // Note: the table view data source and delegate here service the table view embedded within the state machine's

@@ -88,6 +88,8 @@
 		B149A6412106294C00AFEAFB /* HKWTDummyMentionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWTDummyMentionsManager.h; path = "Supporting Classes/HKWTDummyMentionsManager.h"; sourceTree = "<group>"; };
 		B149A6422106294C00AFEAFB /* HKWTDummyMentionEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWTDummyMentionEntity.m; path = "Supporting Classes/HKWTDummyMentionEntity.m"; sourceTree = "<group>"; };
 		C7279F7F7F1F30EF0603FB9B /* Pods-Hakawai.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hakawai.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hakawai/Pods-Hakawai.debug.xcconfig"; sourceTree = "<group>"; };
+		DBA02B9024C23EA1000C7F79 /* HKWMentionsCustomChooserViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsCustomChooserViewDelegate.h; path = Mentions/HKWMentionsCustomChooserViewDelegate.h; sourceTree = "<group>"; };
+		DBA02B9124C23EB2000C7F79 /* HKWMentionsDefaultChooserViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HKWMentionsDefaultChooserViewDelegate.h; path = Mentions/HKWMentionsDefaultChooserViewDelegate.h; sourceTree = "<group>"; };
 		E11DF8CF19EC8DA30072F4AD /* HKWTextView+TextTransformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HKWTextView+TextTransformation.h"; sourceTree = "<group>"; };
 		E11DF8D019EC8DA30072F4AD /* HKWTextView+TextTransformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HKWTextView+TextTransformation.m"; sourceTree = "<group>"; };
 		E1233BFB19A303620052217A /* HKWTextViewPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWTextViewPluginTests.m; sourceTree = "<group>"; };
@@ -250,6 +252,8 @@
 				E1B308A919A2CC0F0096DE0E /* _HKWMentionsPrivateConstants.h */,
 				E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */,
 				E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */,
+				DBA02B9124C23EB2000C7F79 /* HKWMentionsDefaultChooserViewDelegate.h */,
+				DBA02B9024C23EA1000C7F79 /* HKWMentionsCustomChooserViewDelegate.h */,
 				E1B3088919A2C1890096DE0E /* _HKWMentionsPlugin.h */,
 				E1B3089019A2C1890096DE0E /* HKWMentionsPlugin.m */,
 				E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */,
