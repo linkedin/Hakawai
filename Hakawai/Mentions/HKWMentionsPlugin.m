@@ -902,7 +902,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  @param text The text in which to perform a backwards search for a control character
  @returns Location for most recent control character in a string
  */
-- (NSUInteger)mostRecentControlCharacterLocation:(NSString *)text {
++ (NSUInteger)mostRecentControlCharacterLocation:(NSString *)text controlCharacterSet:(NSCharacterSet *)controlCharacterSet {
     if (text.length == 0) {
         return NSNotFound;
     }
@@ -910,7 +910,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     for (int index = endOfTextIndex; index >= 0; index--) {
         NSUInteger unsignedIndex = (unsigned long)index;
         unichar character = [text characterAtIndex:unsignedIndex];
-        if ([self.controlCharacterSet characterIsMember:character]) {
+        if ([controlCharacterSet characterIsMember:character]) {
             return unsignedIndex;
         }
     }
@@ -929,7 +929,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Search back MAX_MENTION_QUERY_LENGTH for a control character
     NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
     NSString *substringToSearchForControlChar = [substringUntilLocation substringFromIndex:maximumSearchIndex];
-    NSUInteger controlCharLocation = [self mostRecentControlCharacterLocation:substringToSearchForControlChar];
+    NSUInteger controlCharLocation = [HKWMentionsPlugin mostRecentControlCharacterLocation:substringToSearchForControlChar controlCharacterSet:self.controlCharacterSet];
 
     // If there's a non-mentions alphanumeric before the control char, then it's invalid
     unichar charPrecidingControlChar = [self.parentTextView characterPrecedingLocation:(NSInteger)controlCharLocation];
@@ -2055,7 +2055,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSRange rangeToTransform;
     if (HKWTextView.enableSimpleRefactor) {
         // Find where previous control character was, and replace mention at that point
-        NSUInteger controlCharLocation = [self mostRecentControlCharacterLocation:parentTextView.text];
+        NSUInteger controlCharLocation = [HKWMentionsPlugin mostRecentControlCharacterLocation:parentTextView.text controlCharacterSet:self.controlCharacterSet];
         NSUInteger lengthOfMention = currentLocation + wordAfterCurrentLocation.length - controlCharLocation;
         rangeToTransform = NSMakeRange(controlCharLocation, lengthOfMention);
     } else {
