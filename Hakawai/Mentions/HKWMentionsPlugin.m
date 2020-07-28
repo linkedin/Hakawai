@@ -23,6 +23,8 @@
 #import "HKWMentionsAttribute.h"
 
 #import "_HKWMentionsStartDetectionStateMachine.h"
+#import "_HKWMentionsCreationStateMachineV2.h"
+#import "_HKWMentionsCreationStateMachineV1.h"
 #import "_HKWMentionsCreationStateMachine.h"
 
 #import "_HKWMentionsPrivateConstants.h"
@@ -88,7 +90,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 @property (nonatomic) BOOL nextInsertionShouldBeIgnored;
 
 @property (nonatomic, strong) HKWMentionsStartDetectionStateMachine *startDetectionStateMachine;
-@property (nonatomic, strong) HKWMentionsCreationStateMachine *creationStateMachine;
+@property (nonatomic, strong) id<HKWMentionsCreationStateMachine> creationStateMachine;
 
 /*!
  The point at which the last character typed was inserted.
@@ -2325,11 +2327,19 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return _startDetectionStateMachine;
 }
 
-- (HKWMentionsCreationStateMachine *)creationStateMachine {
-    if (!_creationStateMachine) {
-        _creationStateMachine = [HKWMentionsCreationStateMachine stateMachineWithDelegate:self];
+- (id<HKWMentionsCreationStateMachine>)creationStateMachine {
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        if (!_creationStateMachine) {
+            _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self];
+        }
+        return _creationStateMachine;
+    } else {
+        //TODO: init V1 version
+        if (!_creationStateMachine) {
+            _creationStateMachine = [HKWMentionsCreationStateMachineV1 stateMachineWithDelegate:self];
+        }
+        return _creationStateMachine;
     }
-    return _creationStateMachine;
 }
 
 - (NSString *)pluginName {
@@ -2389,11 +2399,11 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 /*!
- Handles the selection from the user.
- Needs to be public for integration between Hakawai and HotPot.
+ Handles the selection from the user. This is only needed for consumers who use custom chooser view. 
  */
-- (void)handleSelectionForEntity:(id<HKWMentionsEntityProtocol>)entity indexPath:(NSIndexPath *)indexPath {
-    [self.creationStateMachine handleSelectionForEntity:entity indexPath:indexPath];
+- (void)handleSelectionForEntity:(id<HKWMentionsEntityProtocol>)entity {
+    [self.creationStateMachine handleSelectionForEntity:entity
+                                              indexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
 }
 
 /*!
