@@ -1,3 +1,5 @@
+#import "HKWMentionsEntityProtocol.h"
+
 typedef NS_ENUM(NSInteger, HKWMentionsSearchType) {
     HKWMentionsSearchTypeImplicit,
     HKWMentionsSearchTypeExplicit,

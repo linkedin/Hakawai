@@ -5,3 +5,4 @@
 #import "HKWChooserViewProtocol.h"
 #import "HKWMentionsEntityProtocol.h"
 #import "HKWMentionsAttribute.h"
+#import "HKWMentionsDefaultChooserViewDelegate.h"

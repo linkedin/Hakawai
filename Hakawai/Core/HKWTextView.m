@@ -32,6 +32,7 @@
 static BOOL enableExperimentalDeadLockFix = NO;
 static BOOL enableMentionSelectFix = NO;
 static BOOL enableSimpleRefactor = NO;
+static BOOL enableMentionsCreationStateMachineV2 = NO;
 
 @implementation HKWTextView
 
@@ -54,6 +55,13 @@ static BOOL enableSimpleRefactor = NO;
 }
 + (void)setEnableSimpleRefactor:(BOOL)enabled {
     enableSimpleRefactor = enabled;
+}
+
++ (BOOL)enableMentionsCreationStateMachineV2 {
+    return enableMentionsCreationStateMachineV2;
+}
++ (void)setEnableMentionsCreationStateMachineV2:(BOOL)enabled {
+    enableMentionsCreationStateMachineV2 = enabled;
 }
 
 #pragma mark - Lifecycle

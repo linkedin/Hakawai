@@ -20,6 +20,7 @@
                                completion:(void(^)(NSArray *results, BOOL dedupe, BOOL isComplete))completionBlock {
     if (type == HKWMentionsSearchTypeInitial) {
         completionBlock([[NSArray alloc] initWithObjects:[HKWTDummyMentionEntity entityWithName:@"Alan Perlis" entityID:@"1"], nil], YES, YES);
+        return;
     }
     NSArray *fakeData = @[[HKWTDummyMentionEntity entityWithName:@"Alan Perlis" entityID:@"1"],
                           [HKWTDummyMentionEntity entityWithName:@"Maurice Wilkes" entityID:@"2"],

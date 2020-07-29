@@ -1,23 +1,8 @@
-//
-//  HKWMentionsCreationStateMachine.h
-//  Hakawai
-//
-//  Copyright (c) 2014 LinkedIn Corp. All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
-//  the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
-//  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//
-
-#import <Foundation/Foundation.h>
-
 #import "HKWChooserViewProtocol.h"
 #import "HKWTextView.h"
 #import "HKWTextView+Plugins.h"
+#import "HKWMentionsDefaultChooserViewDelegate.h"
 #import "HKWMentionsPlugin.h"
-
-@class HKWMentionsAttribute;
 
 @protocol HKWMentionsCreationStateMachineProtocol <HKWMentionsDefaultChooserViewDelegate>
 
@@ -89,15 +74,11 @@
 
 @end
 
-/*!
- This class represents a state machine that manages the creation of mentions. In this case, 'mentions creation' is
- defined as either an active state in which the editor text view's viewport is locked and a list of potential mentions
- is displayed, or a passive state where mentions creation is stalled but the user is still eligible to resume mentions
- creation. The state machine also manages making requests to the data source and displaying the chooser list. The state
- machine should inform the host when mentions creation is canceled or completed.
+/**
+ This is a temprorary protocol that V1 and V2 version of HKWMentionsCreationStateMachine will conform to so we can toggle between two versions easily.
+ Once V2 is fully ramped and tested, we will remove V1 version and this protocol.
  */
-@class HKWDefaultChooserView;
-@interface HKWMentionsCreationStateMachine : NSObject
+@protocol HKWMentionsCreationStateMachine
 
 /// The background color of the chooser view.
 @property (nonatomic, strong) UIColor *chooserViewBackgroundColor;
@@ -211,7 +192,15 @@
 /*!
  Handles the selection from the user.
  Needs to be public for integration between Hakawai and HotPot.
+ // TODO: remove indexPath as it's no longer needed for tracking
  */
 - (void)handleSelectionForEntity:(id<HKWMentionsEntityProtocol>)entity indexPath:(NSIndexPath *)indexPath;
+
+@optional
+/*!
+ reload the results chooser view.
+ This needs to be called when the results data is updated.
+ */
+- (void)reloadChooserView;
 
 @end

@@ -1,5 +1,5 @@
 //
-//  HKWMentionsCreationStateMachine.m
+//  HKWMentionsCreationStateMachineV1.m
 //  Hakawai
 //
 //  Copyright (c) 2014 LinkedIn Corp. All rights reserved.
@@ -10,7 +10,7 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
-#import "_HKWMentionsCreationStateMachine.h"
+#import "_HKWMentionsCreationStateMachineV1.h"
 
 #import "HKWChooserViewProtocol.h"
 #import "_HKWDefaultChooserView.h"
@@ -80,7 +80,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     HKWMentionsCreationActionCharacterDeleted
 };
 
-@interface HKWMentionsCreationStateMachine () <UITableViewDataSource, UITableViewDelegate>
+@interface HKWMentionsCreationStateMachineV1 () <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, weak) id<HKWMentionsCreationStateMachineProtocol> delegate;
 
@@ -128,16 +128,19 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 @end
 
-@implementation HKWMentionsCreationStateMachine
+@implementation HKWMentionsCreationStateMachineV1
 
 // NOTE: Do not remove these
 @synthesize chooserViewBackgroundColor = _chooserViewBackgroundColor;
+@synthesize chooserViewClass = _chooserViewClass;
+@synthesize chooserViewEdgeInsets = _chooserViewEdgeInsets;
+@synthesize explicitSearchControlCharacter = _explicitSearchControlCharacter;
 
 #pragma mark - API
 
 + (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate {
     NSAssert(delegate != nil, @"Cannot create state machine with nil delegate.");
-    HKWMentionsCreationStateMachine *sm = [[self class] new];
+    HKWMentionsCreationStateMachineV1 *sm = [[self class] new];
     sm.chooserViewClass = [HKWDefaultChooserView class];
     sm.sequenceNumber = 0;
     sm.delegate = delegate;
@@ -583,7 +586,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     HKWMentionsChooserPositionMode mode = [self.delegate chooserPositionMode];
     CGRect chooserFrame = [self frameForMode:mode];
     // Handle the case where the chooser frame is completely custom
-    if ([HKWMentionsCreationStateMachine modeRequiresCustomFrame:mode]) {
+    if ([HKWMentionsCreationStateMachineV1 modeRequiresCustomFrame:mode]) {
         // Placeholder frame; used until the constraints are properly applied
         chooserFrame = CGRectZero;
     }
@@ -606,10 +609,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
 
     if ([chooserView respondsToSelector:@selector(setBorderMode:)]) {
-        if ([HKWMentionsCreationStateMachine modeConfiguresArrowPointingUp:mode]) {
+        if ([HKWMentionsCreationStateMachineV1 modeConfiguresArrowPointingUp:mode]) {
             chooserView.borderMode = HKWChooserBorderModeTop;
         }
-        else if ([HKWMentionsCreationStateMachine modeConfiguresArrowPointingDown:mode]) {
+        else if ([HKWMentionsCreationStateMachineV1 modeConfiguresArrowPointingDown:mode]) {
             chooserView.borderMode = HKWChooserBorderModeBottom;
         }
         else {
@@ -905,7 +908,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
              || self.resultsState == HKWMentionsCreationResultsStateNoResultsWithoutWhitespace
              || self.searchType == HKWMentionsSearchTypeInitial,
              @"Logic error in dataReturnedForResults:...; resultsState is inconsistent. Got %@, which is invalid.",
-             nameForResultsState(self.resultsState));
+             nameForResultsStateV1(self.resultsState));
     self.resultsState = HKWMentionsCreationResultsStateNoResultsWithoutWhitespace;
 }
 
@@ -987,7 +990,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
 }
 
-
 #pragma mark - Properties
 
 - (UIColor *)chooserViewBackgroundColor {
@@ -1057,7 +1059,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
         return;
     }
     HKW_STATE_LOG(@"  Creation SM Network State Transition: %@ --> %@",
-                  nameForNetworkState(_networkState), nameForNetworkState(networkState));
+                  nameForNetworkStateV1(_networkState), nameForNetworkStateV1(networkState));
     _networkState = networkState;
     if (_networkState == HKWMentionsCreationNetworkStateQuiescent) {
         // Reset the cooldown timer
@@ -1070,7 +1072,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
         return;
     }
     HKW_STATE_LOG(@"  Creation SM Results State Transition: %@ --> %@",
-                  nameForResultsState(_resultsState), nameForResultsState(resultsState));
+                  nameForResultsStateV1(_resultsState), nameForResultsStateV1(resultsState));
     _resultsState = resultsState;
 }
 
@@ -1131,38 +1133,38 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 #pragma mark - Development
 
-NSString *nameForMentionsCreationState(HKWMentionsCreationState s) {
+NSString *nameForMentionsCreationStateV1(HKWMentionsCreationState s) {
     switch (s) {
         case HKWMentionsCreationStateQuiescent:
-            return @"Quiescent";
+            return @"QuiescentV1";
         case HKWMentionsCreationStateCreatingMention:
-            return @"CreatingMention";
+            return @"CreatingMentionV1";
     }
 }
 
-NSString *nameForResultsState(HKWMentionsCreationResultsState s) {
+NSString *nameForResultsStateV1(HKWMentionsCreationResultsState s) {
     switch (s) {
         case HKWMentionsCreationResultsStateQuiescent:
-            return @"Quiescent";
+            return @"QuiescentV1";
         case HKWMentionsCreationResultsStateAwaitingFirstResult:
-            return @"AwaitingFirstResult";
+            return @"AwaitingFirstResultV1";
         case HKWMentionsCreationResultsStateCreatingMentionWithResults:
-            return @"CreatingMentionWithResults";
+            return @"CreatingMentionWithResultsV1";
         case HKWMentionsCreationResultsStateNoResultsWithoutWhitespace:
-            return @"NoResultsWithoutWhitespace";
+            return @"NoResultsWithoutWhitespaceV1";
     }
 }
 
-NSString *nameForNetworkState(HKWMentionsCreationNetworkState s) {
+NSString *nameForNetworkStateV1(HKWMentionsCreationNetworkState s) {
     switch (s) {
         case HKWMentionsCreationNetworkStateQuiescent:
-            return @"Quiescent";
+            return @"QuiescentV1";
         case HKWMentionsCreationNetworkStateReady:
-            return @"Ready";
+            return @"ReadyV1";
         case HKWMentionsCreationNetworkStateTimerCooldown:
-            return @"TimerCooldown";
+            return @"TimerCooldownV1";
         case HKWMentionsCreationNetworkStatePendingRequestAfterCooldown:
-            return @"PendingRequestAfterCooldown";
+            return @"PendingRequestAfterCooldownV1";
     }
 }
 

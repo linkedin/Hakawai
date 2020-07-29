@@ -20,9 +20,24 @@
 #import "HKWMentionsAttribute.h"
 #import "HKWRoundedRectBackgroundAttributeValue.h"
 #import "_HKWMentionsCreationStateMachine.h"
+#import "_HKWMentionsCreationStateMachineV1.h"
+#import "_HKWMentionsCreationStateMachineV2.h"
+#import "HKWMentionDataProvider.h"
 #import "HKWTDummyMentionsManager.h"
 
-@interface HKWMentionsCreationStateMachine ()
+@interface HKWMentionsCreationStateMachineV1 ()
+
+@property (nonatomic) NSArray *entityArray;
+
+@end
+
+@interface HKWMentionsCreationStateMachineV2 ()
+
+@property (nonatomic) HKWMentionDataProvider *dataProvider;
+
+@end
+
+@interface HKWMentionDataProvider ()
 
 @property (nonatomic) NSArray *entityArray;
 
@@ -30,7 +45,7 @@
 
 @interface HKWMentionsPlugin () <HKWMentionsDefaultChooserViewDelegate>
 
-@property (nonatomic, strong) HKWMentionsCreationStateMachine *creationStateMachine;
+@property (nonatomic, strong) id<HKWMentionsCreationStateMachine> creationStateMachine;
 
 @end
 
@@ -54,48 +69,115 @@ describe(@"Showing mentions list for explicit search only", ^{
     it(@"should not show mention list for email", ^{
         [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"A"];
         [textView setText:@"A"];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(0);
+    NSArray *entityArray;
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(0);
 
-        [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) replacementText:@"B"];
-        [textView setText:@"AB"];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(0);
+    [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) replacementText:@"B"];
+    [textView setText:@"AB"];
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(0);
 
-        [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) replacementText:@"@"];
-        [textView setText:@"AB@"];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(0);
+    [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) replacementText:@"@"];
+    [textView setText:@"AB@"];
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(0);
 
-        [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(3, 0) replacementText:@"C"];
-        [textView setText:@"AB@C"];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(0);
+    [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(3, 0) replacementText:@"C"];
+    [textView setText:@"AB@C"];
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(0);
     });
 
     it(@"should show mention list for non email", ^{
         [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"A"];
         [textView setText:@"A"];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(0);
+    NSArray *entityArray;
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(0);
 
-        [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) replacementText:@" "];
-        [textView setText:@"A "];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(0);
+    [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) replacementText:@" "];
+    [textView setText:@"A "];
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(0);
 
-        [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) replacementText:@"@"];
-        [textView setText:@"A @"];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(5);
+    [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) replacementText:@"@"];
+    [textView setText:@"A @"];
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(5);
     });
 
     it(@"should show mentions list for explicit search(when typed control character `@`)", ^{
+    NSArray *entityArray;
         [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"@"];
         [textView setText:@"@"];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(5);
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(5);
     });
 
     it(@"should trigger initial fetch mentions request when text begins editing", ^{
+    NSArray *entityArray;
         if (HKWTextView.enableSimpleRefactor) {
             // With simple refactor, we trigger based on cursor movement, not based on "begin editing"
             return;
         }
         [textView.delegate textViewShouldBeginEditing:textView];
-        expect(mentionsPlugin.creationStateMachine.entityArray.count).to.equal(1);
+    if (HKWTextView.enableMentionsCreationStateMachineV2) {
+        HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm2.dataProvider.entityArray;
+    } else {
+        HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
+        entityArray = sm1.entityArray;
+    }
+    expect(entityArray.count).to.equal(1);
     });
 });
 
