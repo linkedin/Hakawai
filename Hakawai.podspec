@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Hakawai"
-  s.version      = "7.2.2"
+  s.version      = "7.2.4"
   s.summary      = "Hakawai aims to be a more powerful UITextView."
   s.description  = <<-DESC
                    Hakawai is a subclass of UITextView that exposes a number of convenience APIs, and supports further extension via 'plug-ins'. Hakawai ships with an easy-to-use, powerful, and customizable plug-in allowing users to create social media 'mentions'-style annotations.
