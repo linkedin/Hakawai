@@ -114,6 +114,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
  */
 @property (nonatomic) NSRange currentlySelectedMentionRange;
 
+/**
+ The range of the mention attribute whose value is stored in the @c currentlySelectedMention property.
+ This value is synced with highlighted mention.
+ */
+@property (nonatomic) NSRange currentlySelectedMentionRangeV2;
+
 @property (nonatomic, strong) NSDictionary *mentionSelectedAttributes;
 @property (nonatomic, strong) NSDictionary *mentionUnselectedAttributes;
 
@@ -248,6 +254,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     self.previousSelectionRange = NSMakeRange(NSNotFound, 0);
     self.previousTextLength = 0;
     self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
+    self.currentlySelectedMentionRangeV2 = NSMakeRange(NSNotFound, 0);
 
     self.shouldResumeMentionsCreation = NO;
     self.notifyTextViewDelegateOnMentionCreation = NO;
@@ -842,6 +849,71 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     else {
         [parentTextView restoreOriginalAutocorrection:YES];
     }
+}
+
+- (void)highlightMentionIfNeededForCursorLocation:(NSUInteger)cursorLocation {
+    // When cursor is placed within mention, highlight that mention.
+    __strong __auto_type parentTextView = self.parentTextView;
+    const NSRange textFullRange = HKW_FULL_RANGE(parentTextView.attributedText);
+
+    // When whitespace is inserted at end of text, it is not included in text range.
+    // So check if cursor location is inside text range.
+    if (NSLocationInRange(cursorLocation, textFullRange)) {
+        const NSRange currentMentionRange = [HKWMentionsPlugin mentionRangeAtLocation:cursorLocation
+                                                                       attributedText:parentTextView.attributedText];
+
+        // Handles mention unhighlight.
+        if (self.currentlySelectedMentionRangeV2.location != NSNotFound) {
+            const NSRange previousSelectedMentionRange = [HKWMentionsPlugin mentionRangeAtLocation:self.currentlySelectedMentionRangeV2.location
+                                                                                    attributedText:parentTextView.attributedText];
+            // Previous selected mention range is valid if mention is not edited.
+            const BOOL isPreviousSelectedMentionRangeValid = NSEqualRanges(previousSelectedMentionRange, self.currentlySelectedMentionRangeV2);
+            if (previousSelectedMentionRange.location != NSNotFound && isPreviousSelectedMentionRangeValid) {
+                // If previous selected mention range is valid and exists then unhighlight it.
+                [self toggleMentionsFormattingAtRange:self.currentlySelectedMentionRangeV2 selected:NO];
+            } else {
+                // Previous selected mention if edited, then it should have been bleached/unhighlighted by now.
+                // If previous selected mention range dosen't exists or invalid due to edited mention,
+                // then reset range hold by `currentlySelectedMentionRangeV2`.
+                self.currentlySelectedMentionRangeV2 = NSMakeRange(NSNotFound, 0);
+            }
+        }
+
+        // Handles mention highlight.
+        if (currentMentionRange.location != NSNotFound && currentMentionRange.location != cursorLocation) {
+            // Highlight current selected mention.
+            [self toggleMentionsFormattingAtRange:currentMentionRange selected:YES];
+            self.currentlySelectedMentionRangeV2 = currentMentionRange;
+        }
+    } else if (self.currentlySelectedMentionRangeV2.location != NSNotFound) {
+        // If cursor is beyond range due to whitespace and selected mention exists then unhighlight it.
+        [self toggleMentionsFormattingAtRange:self.currentlySelectedMentionRangeV2 selected:NO];
+    }
+}
+
+/**
+ Returns valid range for mention if location is inside mention.
+ */
++ (NSRange)mentionRangeAtLocation:(NSUInteger)location attributedText:(NSAttributedString *)attributedText  {
+    __block NSRange mentionRangeForLocation = NSMakeRange(NSNotFound, 0);
+    [attributedText enumerateAttributesInRange:HKW_FULL_RANGE(attributedText)
+                                       options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+                                    usingBlock:^(NSDictionary *attrs, NSRange range, BOOL *stop) {
+        for (NSString *attributeName in attrs) {
+            if (attributeName != HKWMentionAttributeName) {
+                continue;
+            }
+            id object = attrs[attributeName];
+            if (![object isKindOfClass:[HKWMentionsAttribute class]]) {
+                continue;
+            }
+            if (NSLocationInRange(location, range)) {
+                mentionRangeForLocation = range;
+                *stop = YES;
+            }
+        }
+    }];
+    return mentionRangeForLocation;
 }
 
 // TODO: Make all utils static
@@ -1677,6 +1749,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     if (range.length > 0) {
         return;
     }
+
+    [self highlightMentionIfNeededForCursorLocation:range.location];
+
     // Find a mentions query from the last control char if there is one
     NSString *query = [self mentionsQuery:textView.text location:range.location];
     if (query) {
