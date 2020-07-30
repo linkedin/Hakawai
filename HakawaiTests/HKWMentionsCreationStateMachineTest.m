@@ -62,7 +62,7 @@ describe(@"Showing mentions list for explicit search only", ^{
                                                         controlCharacters:[NSCharacterSet characterSetWithCharactersInString:@"@"]
                                                              searchLength:0];
         mentionsManager = [[HKWTDummyMentionsManager alloc] init];
-        mentionsPlugin.delegate = mentionsManager;
+        mentionsPlugin.defaultChooserViewDelegate = mentionsManager;
         [textView setControlFlowPlugin:mentionsPlugin];
     });
 
