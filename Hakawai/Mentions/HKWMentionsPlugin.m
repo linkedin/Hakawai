@@ -1602,9 +1602,19 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 - (BOOL)textViewShouldChangeTextInRangeV2:(NSRange)range
                           replacementText:(NSString *)text {
-    // In simple refactor, we only focus on deletions in order to allow for personalization/deletions of mentions
-    if ([text length] == 0 && range.length == 1) {
+    // In simple refactor, we only focus on insertions and deletions in order to allow for personalization/deletions/bleaching of mentions.
+    if (text.length == 0 && range.length == 1) {
         return [self advanceStateForCharacterDeletionV2:range.location];
+    }
+    if (text.length > 0 && range.length == 0 && self.currentlySelectedMentionRangeV2.location != NSNotFound) {
+        //  If character is inserted within a mention then bleach the mention.
+        const NSRange selectedMentionInternalTextRange = NSMakeRange(self.currentlySelectedMentionRangeV2.location + 1,
+                                                                     self.currentlySelectedMentionRangeV2.length - 1);
+        if (NSLocationInRange(range.location, selectedMentionInternalTextRange)) {
+            [self bleachExistingMentionAtRange:self.currentlySelectedMentionRangeV2];
+        } else {
+            self.currentlySelectedMentionRangeV2 = NSMakeRange(NSNotFound, 0);
+        }
     }
     [self stripCustomAttributesFromTypingAttributes];
     return YES;
