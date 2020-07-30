@@ -16,6 +16,7 @@
 #import "HKWMentionsEntityProtocol.h"
 #import "HKWChooserViewProtocol.h"
 #import "HKWMentionsDefaultChooserViewDelegate.h"
+#import "HKWMentionsCustomChooserViewDelegate.h"
 
 /*!
  An attribute for \c NSAttributedString objects representing a mention. This attribute by itself confers no special
@@ -144,7 +145,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
 @interface HKWMentionsPlugin : NSObject <HKWDirectControlFlowPluginProtocol>
 
-@property (nonatomic, weak, nullable) id<HKWMentionsDefaultChooserViewDelegate> delegate;
+/*!
+ There should be only one chooser view delegate.
+ If you are using default chooser view provided by Hakawai, set `defaultChooserViewDelegate`. Otherwsie set `customChooserViewDelegate`
+ */
+@property (nonatomic, weak, nullable) id<HKWMentionsDefaultChooserViewDelegate> defaultChooserViewDelegate;
+@property (nonatomic, weak, nullable) id<HKWMentionsCustomChooserViewDelegate> customChooserViewDelegate;
+
 @property (nonatomic, weak, nullable) id<HKWMentionsStateChangeDelegate> stateChangeDelegate;
 
 /*!
