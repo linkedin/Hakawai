@@ -22,7 +22,6 @@
 
 #import "HKWMentionsAttribute.h"
 
-#import "_HKWMentionsStartDetectionStateMachine.h"
 #import "_HKWMentionsCreationStateMachineV2.h"
 #import "_HKWMentionsCreationStateMachineV1.h"
 #import "_HKWMentionsCreationStateMachine.h"
@@ -31,66 +30,7 @@
 
 @interface HKWMentionsPluginV2 () <HKWMentionsCreationStateMachineProtocol>
 
-// State properties
-@property (nonatomic) HKWMentionsState state;
-
-/// Whether or not initial setup has been performed. If the text view is the first responder already when the plug-in is
-/// set, initial setup should be performed immediately. However, if it's not, setup should be deferred until editing is
-/// going to begin, so that the text view doesn't snatch first-responder status from a different control.
-@property (nonatomic) BOOL initialSetupPerformed;
-
-/*!
- Indicates that all calls to \c textViewDidChangeSelection: should be ignored. This is used when custom transformations
- on the text view's text are desired, which would result in the text view's selection range temporarily changing, but
- should not actually indicate the cursor being manually moved or text being selected.
- */
-@property (nonatomic) BOOL suppressSelectionChangeNotifications;
-
-/*!
- Indicates that the next call to \c textViewDidChangeSelection: should be ignored. This property is a fix for an issue
- where the delegate method is called twice whenever a single character is deleted, each time with a different range,
- screwing up the state machine.
-
- \warning Do not use this to suppress notifications unless absolutely necessary. Instead, in many cases where text is
- programmatically replaced, it is more correct to update the \c previousSelectionRange and \c previousTextLength
- properties, preventing the spurious selection change detection machinery from getting into a bad state.
- */
-@property (nonatomic) BOOL nextSelectionChangeShouldBeIgnored;
-
-/*!
- Indicates that the next call to \c textView:shouldChangeTextInRange:replacementText: should be ignored. This property
- is a fix for an issue where, when a suggestion-based keyboard suggestion is deleted (e.g. for the Chinese keyboard),
- the delegate method is fired requesting the suggestion be deleted, and then immediately again with a spurious
- insertion.
- */
-@property (nonatomic) BOOL nextInsertionShouldBeIgnored;
-
-@property (nonatomic, strong) HKWMentionsStartDetectionStateMachine *startDetectionStateMachine;
 @property (nonatomic, strong) id<HKWMentionsCreationStateMachine> creationStateMachine;
-
-/*!
- The point at which the last character typed was inserted.
- */
-@property (nonatomic) NSUInteger previousInsertionLocation;
-
-/*!
- The previous distinct value of the parent text view's \c selectedRange value for which the text view was in insertion
- mode.
- */
-@property (nonatomic) NSRange previousSelectionRange;
-@property (nonatomic) NSUInteger previousTextLength;
-
-/*!
- The mention currently highlighted as the 'selected' mention (due to the cursor being in the right place), or the
- mention which may be selected if the state machine is in the 'about to select mention' state.
- */
-@property (nonatomic, strong) HKWMentionsAttribute *currentlySelectedMention;
-
-/*!
- The range of the mention attribute whose value is stored in the \c currentlySelectedMention property. This value is not
- automatically updated; it must be kept in sync by the plug-in if the text is modified.
- */
-@property (nonatomic) NSRange currentlySelectedMentionRange;
 
 @property (nonatomic, strong) NSDictionary *mentionSelectedAttributes;
 @property (nonatomic, strong) NSDictionary *mentionUnselectedAttributes;
@@ -100,28 +40,6 @@
 @property (nonatomic, readonly) BOOL viewportLocksToTopUponMentionCreation;
 @property (nonatomic, readonly) BOOL viewportLocksToBottomUponMentionCreation;
 @property (nonatomic, readonly) BOOL viewportLocksUponMentionCreation;
-
-/*!
- If the state machine is currently executing the \c advanceStateForCharacterInsertion method, this property contains the
- character being inserted. Otherwise, it contains the NULL character, 0.
-
- This property is intended to allow the data-retrieved callback code to determine whether the callback was called
- synchronously or asynchronously, and therefore determine which character to use to determine whether mentions creation,
- if cancelled, should be allowed to immediately restart.
-
- (If the callback was made asynchronously, then the text in the text view should be used to determine the last character
- typed. If the callback was made synchronously, then the character in this property should be used to determine whether
- or not to allow immediate restart. However, sometimes the callback will be deferred until the next runloop anyways, so
- this should not be used to determine whether or not the callback is synchronous.)
- */
-@property (nonatomic) unichar characterForAdvanceStateForCharacterInsertion;
-
-// Properties for resuming mentions creation
-@property (nonatomic) BOOL shouldResumeMentionsCreation;
-@property (nonatomic) unichar resumeMentionsControlCharacter;   // 0 if implicit mention
-@property (nonatomic) NSUInteger resumeMentionsPriorTextLength;
-@property (nonatomic) NSUInteger resumeMentionsPriorPosition;
-@property (nonatomic) NSString *resumeMentionsPriorString;
 
 @property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
 
@@ -221,13 +139,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     self = [super init];
     if (!self) { return nil; }
 
-    self.state = HKWMentionsStateQuiescent;
-    self.initialSetupPerformed = NO;
-    self.previousSelectionRange = NSMakeRange(NSNotFound, 0);
-    self.previousTextLength = 0;
-    self.characterForAdvanceStateForCharacterInsertion = (unichar)0;
-
-    self.shouldResumeMentionsCreation = NO;
     self.notifyTextViewDelegateOnMentionCreation = NO;
     self.notifyTextViewDelegateOnMentionTrim = NO;
     self.notifyTextViewDelegateOnMentionDeletion = NO;
@@ -275,23 +186,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         // Mention range is invalid
         return;
     }
-    // Setup
-    switch (self.state) {
-        case HKWMentionsStateQuiescent:
-            break;
-        case HKWMentionsStartDetectionStateCreatingMention:
-            // If creating a mention, gracefully terminate mentions creation so we're in a known state
-            [self.creationStateMachine cancelMentionCreation];
-            NSAssert(self.state == HKWMentionsStateQuiescent,
-                     @"Logic error: cancelMentionCreation must always set the state back to quiescent.");
-            break;
-        case HKWMentionsStateAboutToSelectMention:
-        case HKWMentionsStateSelectedMention:
-            break;
-        case HKWMentionsStateLosingFocus:
-            NSAssert(NO, @"Logic error: addMention cannot possibly be invoked while the state is LosingFocus.");
-            return;
-    }
+    [self.creationStateMachine cancelMentionCreation];
 
     NSUInteger location = parentTextView.selectedRange.location;
     NSRange originalRange = NSMakeRange(location, 0);
@@ -340,7 +235,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 /// Perform initial setup and put the mentions plug-in into a known good state. This setup takes place the first time
 /// the text view becomes the first responder, or immediately if the text view already is the first responder.
 - (void)initialSetup {
-    self.initialSetupPerformed = YES;
     __strong __auto_type parentTextView = self.parentTextView;
 
     // Disable 'undo'; it doesn't work right with mentions yet
@@ -357,9 +251,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 // Delegate method called when the plug-in is unregistered from a text view. Cleans up the state of the text view.
 - (void)performFinalCleanup {
     // Cancel mentions creation, if it's happening
-    if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
-        [self.creationStateMachine cancelMentionCreation];
-    }
+    [self.creationStateMachine cancelMentionCreation];
 
     // Remove the accessory view from the parent text view's view hierarchy
     __strong __auto_type parentTextView = self.parentTextView;
@@ -372,10 +264,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
     // Restore the parent text view's spell checking
     [parentTextView restoreOriginalSpellChecking:NO];
-
-    self.initialSetupPerformed = NO;
 }
-
 
 #pragma mark - Utility
 
@@ -408,6 +297,20 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return [buffer copy];
 }
 
++ (nullable NSString *)wordAfterLocation:(NSUInteger)location text:(nonnull NSString *)text {
+    NSMutableString *const word = [[NSMutableString alloc] init];
+    for(NSUInteger i = location; i < text.length ; i++) {
+        const unichar character = [text characterAtIndex:i];
+        if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:character]) {
+            break;
+        }
+        [word appendString:[NSString stringWithCharacters:&character length:1]];
+    }
+    if (word.length == 0) {
+        return nil;
+    }
+    return [word copy];
+}
 
 #pragma mark - UI
 
@@ -416,12 +319,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (void)singleLineViewportTapped {
-    if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
-        // If user taps on the text view, cancel mentions creation.
-        [self.creationStateMachine cancelMentionCreation];
-        NSAssert(self.state == HKWMentionsStateQuiescent,
-                 @"Logic error: cancelMentionCreation must always set the state back to quiescent.");
-    }
+    // If user taps on the text view, cancel mentions creation.
+    [self.creationStateMachine cancelMentionCreation];
 }
 
 - (void)setChooserTopLevelView:(UIView *)topLevelView attachmentBlock:(void(^)(UIView *))block {
@@ -765,53 +664,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return NO;
 }
 
-- (void)assertMentionsDataExists {
-    NSAssert(self.currentlySelectedMention != nil, @"Currently selected mention was nil. This is unexpected.");
-    NSAssert(self.currentlySelectedMentionRange.location != NSNotFound
-             && self.currentlySelectedMentionRange.length != 0,
-             @"Currently selected mention range was nil. This is unexpected.");
-}
-
-/*!
- Manually perform a character insertion. This is useful in order to avoid certain built-in \c UITextView side effects.
- */
-- (void)manuallyInsertCharacter:(unichar)character
-                     atLocation:(NSUInteger)location
-                     inTextView:(HKWTextView *)textView {
-    unichar stackC = character;
-    [textView insertPlainText:[NSString stringWithCharacters:&stackC length:1] location:location];
-    textView.selectedRange = NSMakeRange(location + 1, 0);
-}
-
-- (void)resetCurrentMentionsData {
-    self.currentlySelectedMention = nil;
-    self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
-}
-
-- (void)resetAuxiliaryState {
-    self.suppressSelectionChangeNotifications = NO;
-    self.nextSelectionChangeShouldBeIgnored = NO;
-    self.previousInsertionLocation = NSNotFound;
-    self.previousSelectionRange = NSMakeRange(NSNotFound, 0);
-    self.previousTextLength = 0;
-    [self resetCurrentMentionsData];
-}
-
-- (void)toggleAutocorrectAsRequiredForRange:(NSRange)range {
-    // PROVISIONAL FIX: Determine whether or not a mention exists, and disable or enable autocorrect
-    if (self.state == HKWMentionsPluginStateCreatingMention) {
-        return;
-    }
-    __strong __auto_type parentTextView = self.parentTextView;
-    BOOL shouldDisable = [self rangeTouchesMentions:range] || [self rangeTouchesMentions:parentTextView.selectedRange];
-    if (shouldDisable) {
-        [parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
-    }
-    else {
-        [parentTextView restoreOriginalAutocorrection:YES];
-    }
-}
-
 // TODO: Make all utils static
 // JIRA: POST-13757
 #pragma mark - Mention Query Utils
@@ -994,15 +846,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     [self.creationStateMachine dataReturnedWithEmptyResults:isEmptyResults keystringEndsWithWhiteSpace:keystringEndsWithWhiteSpace];
 }
 
-/*!
- Returns whether a string is a single control character
- */
-- (BOOL)isStringControlCharacter:(NSString *)text {
-    return text.length == 1 && [self.controlCharacterSet characterIsMember:[text characterAtIndex:0]];
-}
-
 // TODO: Remove text view from call
-// JIRA: XXXX
+// JIRA: POST-14031
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     // In simple refactor, we only focus on deletions in order to allow for personalization/deletions of mentions
     if ([text length] == 0 && range.length == 1) {
@@ -1043,19 +888,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                     atLocation:(NSUInteger)location
          usingControlCharacter:(BOOL)usingControlCharacter
               controlCharacter:(unichar)character {
-    // Begin mentions creation
-    self.state = HKWMentionsStartDetectionStateCreatingMention;
-
     NSAssert(self.parentTextView.selectedRange.length == 0,
              @"Cannot start a mention unless the cursor is in insertion mode.");
-    self.resumeMentionsPriorPosition = location;
-    self.resumeMentionsControlCharacter = usingControlCharacter ? character : (unichar)0;
     [self.creationStateMachine mentionCreationStartedWithPrefix:prefix
                                           usingControlCharacter:usingControlCharacter
                                                controlCharacter:character
                                                        location:location];
 }
-
 
 #pragma mark - Mentions creation state machine protocol
 
@@ -1109,32 +948,19 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  Perform shared cleanup once a mention is created or mentions creation is cancelled (as signaled by the mentions
  creation state machine).
  */
-- (void)performMentionCreationEndCleanup:(BOOL)canImmediatelyRestart {
+- (void)performMentionCreationEndCleanup {
     if (self.viewportLocksUponMentionCreation) {
         [self.parentTextView exitSingleLineViewportMode];
     }
-    self.state = HKWMentionsStateQuiescent;
-    [self.startDetectionStateMachine mentionCreationEnded:canImmediatelyRestart];
 }
 
 - (void)cancelMentionFromStartingLocation:(__unused NSUInteger)location {
-    NSAssert(self.state == HKWMentionsStartDetectionStateCreatingMention || self.state == HKWMentionsStateLosingFocus,
-             @"cancelMentionFromStartingLocation was invoked, but the state machine was not creating a mention or \
-             performing cleanup.");
     // Note that if the mention was cancelled because the user typed a whitespace and caused no search results to return
     //  as a result, the desired behavior is to allow the start detection state machine to immediately begin searching
     //  (without waiting for a second space).
     __strong __auto_type parentTextView = self.parentTextView;
     parentTextView.shouldRejectAutocorrectInsertions = NO;
-    NSUInteger currentLocation = parentTextView.selectedRange.location;
-    NSCharacterSet *whitespaces = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    BOOL canRestart = ([whitespaces characterIsMember:[parentTextView characterPrecedingLocation:(NSInteger)currentLocation]]
-                       || (self.characterForAdvanceStateForCharacterInsertion != 0
-                           && [whitespaces characterIsMember:self.characterForAdvanceStateForCharacterInsertion])
-                       || [[NSCharacterSet punctuationCharacterSet]
-                           characterIsMember:[parentTextView characterPrecedingLocation:(NSInteger)currentLocation]]);
-    [self performMentionCreationEndCleanup:canRestart];
-    [parentTextView restoreOriginalAutocorrection:(self.state != HKWMentionsStateLosingFocus)];
+    [parentTextView restoreOriginalAutocorrection:YES];
 }
 
 - (void)selected:(id<HKWMentionsEntityProtocol>)entity atIndexPath:(NSIndexPath *)indexPath {
@@ -1146,11 +972,10 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)location {
-    if (self.state != HKWMentionsStartDetectionStateCreatingMention || !mention) {
+    if (!mention) {
         return;
     }
-    // If you create a mention, you MUST do something before the next mention can be created.
-    [self performMentionCreationEndCleanup:NO];
+    [self performMentionCreationEndCleanup];
 
     // Actually create the mention
     NSString *mentionText = mention.mentionText;
@@ -1166,7 +991,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSRange rangeToTransform;
     // Find where previous control character was, and replace mention at that point
     NSUInteger controlCharLocation = [HKWMentionsPluginV2 mostRecentControlCharacterLocationInText:parentTextView.text controlCharacterSet:self.controlCharacterSet];
-    NSString *const wordAfterControlChar = [HKWMentionsStartDetectionStateMachine wordAfterLocation:controlCharLocation text:parentTextView.text];
+    NSString *const wordAfterControlChar = [HKWMentionsPluginV2 wordAfterLocation:controlCharLocation text:parentTextView.text];
     rangeToTransform = NSMakeRange(controlCharLocation, wordAfterControlChar.length);
 
     /*
@@ -1234,14 +1059,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Move the cursor
     // Since cursor is already updated in simple refactor, we move it back one character
     parentTextView.selectedRange = NSMakeRange(location + [mentionText length]  - 1, 0);
-
-    // Since the cursor is right after the mention, set the state to 'about to select'
-    self.currentlySelectedMention = mention;
-    self.currentlySelectedMentionRange = NSMakeRange(location, [mentionText length]);
-    self.state = HKWMentionsStateAboutToSelectMention;
-    // Toggle autocorrect. This is because we don't want the user to be able to alter the mention text using autocorrect
-    //  (since the cursor will be located immediately after the location of the mention once it's created)
-    [self toggleAutocorrectAsRequiredForRange:NSMakeRange(location, 0)];
     parentTextView.shouldRejectAutocorrectInsertions = NO;
 
     // Inform the delegate (if appropriate)
@@ -1425,34 +1242,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 #pragma mark - Properties
 
-- (void)setState:(HKWMentionsState)state {
-    if (state == _state) {
-        return;
-    }
-    HKW_STATE_LOG(@"STATE TRANSITION: %@ --> %@", nameForMentionsState(_state), nameForMentionsState(state));
-
-    // Inform the delegate, if one exists
-    __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
-    if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPlugin:stateChangedTo:from:)]) {
-        if (state == HKWMentionsStartDetectionStateCreatingMention && _state != HKWMentionsStartDetectionStateCreatingMention) {
-            [strongStateChangeDelegate mentionsPlugin:self
-                                       stateChangedTo:HKWMentionsPluginStateCreatingMention
-                                                 from:HKWMentionsPluginStateQuiescent];
-        }
-        else if (state != HKWMentionsStartDetectionStateCreatingMention && _state == HKWMentionsStartDetectionStateCreatingMention) {
-            [strongStateChangeDelegate mentionsPlugin:self
-                                       stateChangedTo:HKWMentionsPluginStateQuiescent
-                                                 from:HKWMentionsPluginStateCreatingMention];
-        }
-    }
-
-    _state = state;
-}
-
-- (void)setCurrentlySelectedMentionRange:(NSRange)currentlySelectedMentionRange {
-    _currentlySelectedMentionRange = currentlySelectedMentionRange;
-}
-
 - (BOOL)loadingCellSupported {
     __strong __auto_type strongDelegate = self.delegate;
     return ([strongDelegate respondsToSelector:@selector(loadingCellForTableView:)]
@@ -1461,13 +1250,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 - (UIView<HKWChooserViewProtocol> *)chooserView {
     return [self.creationStateMachine getEntityChooserView];
-}
-
-- (HKWMentionsStartDetectionStateMachine *)startDetectionStateMachine {
-    if (!_startDetectionStateMachine) {
-        _startDetectionStateMachine = [HKWMentionsStartDetectionStateMachine stateMachineWithDelegate:nil];
-    }
-    return _startDetectionStateMachine;
 }
 
 - (id<HKWMentionsCreationStateMachine>)creationStateMachine {
@@ -1558,7 +1340,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 // TODO: Remove this call
-// JIRA: XXXX
+// JIRA: POST-14031
 - (void)textViewDidProgrammaticallyUpdate:(UITextView * _Null_unspecified)textView {
     return;
 }

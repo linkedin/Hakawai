@@ -19,28 +19,6 @@
 
 static NSString* _Nonnull const HKWMentionAttributeName = @"HKWMentionAttributeName";
 
-// Don't confuse this with the public 'HKWMentionsPluginState', which exposes fewer implementation details.
-typedef NS_ENUM(NSInteger, HKWMentionsState) {
-    // The user is not creating a mention and not in any of the following states.
-    HKWMentionsStateQuiescent = 0,
-
-    // The user is currently creating a mention.
-    HKWMentionsStartDetectionStateCreatingMention,
-
-    // The user's cursor is currently positioned at the right edge of a mention. Pressing 'delete' again will select the
-    //  mention.
-    HKWMentionsStateAboutToSelectMention,
-
-    // The user has selected a mention. Deleting text should trim or remove the mention. Inserting text should bleach
-    //  the mention.
-    HKWMentionsStateSelectedMention,
-
-    // The mentions plugin's text view has lost focus and cleanup is happening. This is a transient state that is
-    //  intended to last only as long as textViewDidEndEditing: is running, and allow cleanup code to properly engage
-    //  special-case behavior needed for cleanup.
-    HKWMentionsStateLosingFocus
-};
-
 /*!
  An attribute for \c NSAttributedString objects representing a mention. This attribute by itself confers no special
  formatting on its text; the plug-in is responsible for coloring and highlighting text according to the current state.
@@ -171,6 +149,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  */
 @protocol HKWMentionsPlugin <HKWDirectControlFlowPluginProtocol>
 
+// TODO: Move these properties back to hidden _.h file after V2 cleanup
+// JIRA: POST-14031
 @property (nonatomic, nonnull, strong) NSCharacterSet *controlCharacterSet;
 @property (nonatomic) NSInteger implicitSearchLength;
 @property (nonatomic, readonly) BOOL implicitMentionsEnabled;
@@ -372,20 +352,5 @@ Handles the selection from the user. This is only needed for consumers who use c
  Needs to be public for integration between Hakawai and HotPot.
  */
 - (unichar)getExplicitSearchControlCharacter;
-
-NSString * _Nonnull nameForMentionsState(HKWMentionsState s) {
-    switch (s) {
-        case HKWMentionsStateQuiescent:
-            return @"Quiescent";
-        case HKWMentionsStartDetectionStateCreatingMention:
-            return @"CreatingMention";
-        case HKWMentionsStateAboutToSelectMention:
-            return @"AboutToSelectMention";
-        case HKWMentionsStateSelectedMention:
-            return @"SelectedMention";
-        case HKWMentionsStateLosingFocus:
-            return @"LosingFocus";
-    }
-}
 
 @end

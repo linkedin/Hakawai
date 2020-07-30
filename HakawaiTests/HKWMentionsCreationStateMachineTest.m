@@ -297,7 +297,7 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
 
     it(@"should trigger initial fetch mentions request when text begins editing", ^{
     // TODO: Enable this test for V2
-    // JIRA: XXXX
+    // JIRA: POST-13796
     });
 });
 

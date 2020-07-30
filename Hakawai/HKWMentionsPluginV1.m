@@ -129,8 +129,6 @@
 
 @implementation HKWMentionsPluginV1
 
-static int MAX_MENTION_QUERY_LENGTH = 100;
-
 @synthesize parentTextView = _parentTextView;
 
 @synthesize dictationString;
@@ -2203,6 +2201,21 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 #pragma mark - Developer
+
+NSString * _Nonnull nameForMentionsState(HKWMentionsState s) {
+    switch (s) {
+        case HKWMentionsStateQuiescent:
+            return @"Quiescent";
+        case HKWMentionsStartDetectionStateCreatingMention:
+            return @"CreatingMention";
+        case HKWMentionsStateAboutToSelectMention:
+            return @"AboutToSelectMention";
+        case HKWMentionsStateSelectedMention:
+            return @"SelectedMention";
+        case HKWMentionsStateLosingFocus:
+            return @"LosingFocus";
+    }
+}
 
 @synthesize controlCharacterSet;
 
