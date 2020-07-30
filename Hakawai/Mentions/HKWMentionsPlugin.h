@@ -17,11 +17,34 @@
 #import "HKWChooserViewProtocol.h"
 #import "HKWMentionsDefaultChooserViewDelegate.h"
 
+static NSString* _Nonnull const HKWMentionAttributeName = @"HKWMentionAttributeName";
+
+// Don't confuse this with the public 'HKWMentionsPluginState', which exposes fewer implementation details.
+typedef NS_ENUM(NSInteger, HKWMentionsState) {
+    // The user is not creating a mention and not in any of the following states.
+    HKWMentionsStateQuiescent = 0,
+
+    // The user is currently creating a mention.
+    HKWMentionsStartDetectionStateCreatingMention,
+
+    // The user's cursor is currently positioned at the right edge of a mention. Pressing 'delete' again will select the
+    //  mention.
+    HKWMentionsStateAboutToSelectMention,
+
+    // The user has selected a mention. Deleting text should trim or remove the mention. Inserting text should bleach
+    //  the mention.
+    HKWMentionsStateSelectedMention,
+
+    // The mentions plugin's text view has lost focus and cleanup is happening. This is a transient state that is
+    //  intended to last only as long as textViewDidEndEditing: is running, and allow cleanup code to properly engage
+    //  special-case behavior needed for cleanup.
+    HKWMentionsStateLosingFocus
+};
+
 /*!
  An attribute for \c NSAttributedString objects representing a mention. This attribute by itself confers no special
  formatting on its text; the plug-in is responsible for coloring and highlighting text according to the current state.
  */
-OBJC_EXTERN NSString* _Nonnull const HKWMentionAttributeName;
 
 /*!
  An enum representing supported modes for positioning the chooser view.
@@ -83,7 +106,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
     HKWMentionsPluginStateCreatingMention
 };
 
-@class HKWMentionsPlugin;
+@protocol HKWMentionsPlugin;
 /*!
  A protocol providing a way for listeners to be informed when the state of the mentions plug-in changes. This allows
  a host application to know when the plug-in is creating a mention, and when it is quiescent.
@@ -93,18 +116,18 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 @optional
 
 /// Inform the delegate that the specified mentions plug-in changed its internal state.
-- (void)mentionsPlugin:(HKWMentionsPlugin *_Null_unspecified)plugin
+- (void)mentionsPlugin:(id<HKWMentionsPlugin> _Null_unspecified)plugin
         stateChangedTo:(HKWMentionsPluginState)newState
                   from:(HKWMentionsPluginState)oldState;
 
 /// Inform the delegate that the specified mentions plug-in is about to activate and display its chooser view.
-- (void)mentionsPluginWillActivateChooserView:(HKWMentionsPlugin *_Null_unspecified)plugin;
+- (void)mentionsPluginWillActivateChooserView:(id<HKWMentionsPlugin> _Null_unspecified)plugin;
 
 /// Inform the delegate that the specified mentions plug-in activated and displayed its chooser view.
-- (void)mentionsPluginActivatedChooserView:(HKWMentionsPlugin *_Null_unspecified)plugin;
+- (void)mentionsPluginActivatedChooserView:(id<HKWMentionsPlugin> _Null_unspecified)plugin;
 
 /// Inform the delegate that the specified mentions plug-in deactivated and hid its chooser view.
-- (void)mentionsPluginDeactivatedChooserView:(HKWMentionsPlugin *_Null_unspecified)plugin;
+- (void)mentionsPluginDeactivatedChooserView:(id<HKWMentionsPlugin> _Null_unspecified)plugin;
 
 /*! 
  Inform the delegate that the specified mentions plug-in created a mention at the given location as a result of user
@@ -112,7 +135,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
  \note Mentions created by calling the \c addMention: or \c addMentions: methods will not trigger this method.
  */
-- (void)mentionsPlugin:(HKWMentionsPlugin *_Null_unspecified)plugin
+- (void)mentionsPlugin:(id<HKWMentionsPlugin> _Null_unspecified)plugin
         createdMention:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
             atLocation:(NSUInteger)location;
 
@@ -120,7 +143,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  Inform the delegate that the specified mentions plug-in trimmed a mention at the given location as a result of user
  input.
  */
-- (void)mentionsPlugin:(HKWMentionsPlugin *_Null_unspecified)plugin
+- (void)mentionsPlugin:(id<HKWMentionsPlugin> _Null_unspecified)plugin
         trimmedMention:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
             atLocation:(NSUInteger)location;
 
@@ -128,7 +151,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  Inform the delegate that the specified mentions plug-in deleted a mention at the given location as a result of user
  input.
  */
-- (void)mentionsPlugin:(HKWMentionsPlugin *_Null_unspecified)plugin
+- (void)mentionsPlugin:(id<HKWMentionsPlugin> _Null_unspecified)plugin
         deletedMention:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity
             atLocation:(NSUInteger)location;
 
@@ -142,8 +165,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
 @class HKWMentionsAttribute;
 
-@interface HKWMentionsPlugin : NSObject <HKWDirectControlFlowPluginProtocol>
+/**
+ This is a temprorary protocol that V1 and V2 version of HKWMentionsPlugin will conform to so we can toggle between two versions easily.
+ Once V2 is fully ramped and tested, we will remove V1 version and this protocol.
+ */
+@protocol HKWMentionsPlugin <HKWDirectControlFlowPluginProtocol>
 
+@property (nonatomic, nonnull, strong) NSCharacterSet *controlCharacterSet;
+@property (nonatomic) NSInteger implicitSearchLength;
+@property (nonatomic, readonly) BOOL implicitMentionsEnabled;
+
+@property (nonatomic) BOOL shouldEnableUndoUponUnregistration;
 @property (nonatomic, weak, nullable) id<HKWMentionsDefaultChooserViewDelegate> delegate;
 @property (nonatomic, weak, nullable) id<HKWMentionsStateChangeDelegate> stateChangeDelegate;
 
@@ -340,5 +372,20 @@ Handles the selection from the user. This is only needed for consumers who use c
  Needs to be public for integration between Hakawai and HotPot.
  */
 - (unichar)getExplicitSearchControlCharacter;
+
+NSString * _Nonnull nameForMentionsState(HKWMentionsState s) {
+    switch (s) {
+        case HKWMentionsStateQuiescent:
+            return @"Quiescent";
+        case HKWMentionsStartDetectionStateCreatingMention:
+            return @"CreatingMention";
+        case HKWMentionsStateAboutToSelectMention:
+            return @"AboutToSelectMention";
+        case HKWMentionsStateSelectedMention:
+            return @"SelectedMention";
+        case HKWMentionsStateLosingFocus:
+            return @"LosingFocus";
+    }
+}
 
 @end

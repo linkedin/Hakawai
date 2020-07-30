@@ -16,13 +16,15 @@
 
 #import "HKWTextView.h"
 #import "HKWMentionsPlugin.h"
+#import "HKWMentionsPluginV1.h"
+#import "HKWMentionsPluginV2.h"
 
 BOOL HKW_systemVersionIsAtLeast(NSString *version);
 
 @interface MentionsDemoViewController ()
 @property (nonatomic, weak) IBOutlet HKWTextView *textView;
 @property (nonatomic, weak) IBOutlet UIButton *listMentionsButton;
-@property (nonatomic, strong) HKWMentionsPlugin *plugin;
+@property (nonatomic, strong) id<HKWMentionsPlugin> plugin;
 @end
 
 @implementation MentionsDemoViewController
@@ -49,9 +51,16 @@ BOOL HKW_systemVersionIsAtLeast(NSString *version);
         // In this demo, the user may explicitly begin a mention with either the '@' or '+' characters
         NSCharacterSet *controlCharacters = [NSCharacterSet characterSetWithCharactersInString:@"@+"];
         // The user may also begin a mention by typing three characters (set searchLength to 0 to disable)
-        HKWMentionsPlugin *mentionsPlugin = [HKWMentionsPlugin mentionsPluginWithChooserMode:mode
-                                                                           controlCharacters:controlCharacters
-                                                                                searchLength:3];
+        id<HKWMentionsPlugin> mentionsPlugin;
+        if (HKWTextView.enableMentionsPluginV2) {
+            mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:mode
+                                                              controlCharacters:controlCharacters
+                                                                   searchLength:3];
+        } else {
+            mentionsPlugin = [HKWMentionsPluginV1 mentionsPluginWithChooserMode:mode
+                                                              controlCharacters:controlCharacters
+                                                                   searchLength:3];
+        }
 
         // If the text view loses focus while the mention chooser is up, and then regains focus, it will automatically put
         //  the mentions chooser back up

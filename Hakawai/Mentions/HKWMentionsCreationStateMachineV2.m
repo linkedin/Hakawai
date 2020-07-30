@@ -294,7 +294,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                    usingControlCharacter:(BOOL)usingControlCharacter
                         controlCharacter:(unichar)character
                                 location:(NSUInteger)location {
-    if (!HKWTextView.enableSimpleRefactor && self.state != HKWMentionsCreationStateQuiescent) {
+    if (!HKWTextView.enableMentionsPluginV2 && self.state != HKWMentionsCreationStateQuiescent) {
         return;
     }
     self.state = HKWMentionsCreationStateCreatingMention;

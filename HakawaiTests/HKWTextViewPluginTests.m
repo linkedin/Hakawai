@@ -133,7 +133,7 @@ describe(@"control flow plugin API", ^{
         expect(p1.parentTextView).to.equal(textView);
     });
 
-    it(@"should properly forward calls to delegate methods", ^{
+    it(@"should properly forward calls to delegate methods - MENTIONS PLUGIN V1", ^{
         HKWTControlFlowDummyPlugin *p1 = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p1"];
         textView.controlFlowPlugin = p1;
         __block BOOL rightBlockWasCalled = NO;
@@ -146,50 +146,97 @@ describe(@"control flow plugin API", ^{
         };
 
         // Test APIs
-        if (!HKWTextView.enableSimpleRefactor) {
-            // These don't get called in the simple refactor
-            [p1 resetBlocks];
-            rightBlockWasCalled = NO;
-            p1.shouldBeginEditingBlock = blockToCall;
-            [textView textViewShouldBeginEditing:textView];
-            expect(rightBlockWasCalled).to.equal(YES);
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.shouldBeginEditingBlock = blockToCall;
+        [textView textViewShouldBeginEditing:textView];
+        expect(rightBlockWasCalled).to.equal(YES);
 
-            [p1 resetBlocks];
-            rightBlockWasCalled = NO;
-            p1.didBeginEditingBlock = blockToCall;
-            [textView textViewDidBeginEditing:textView];
-            expect(rightBlockWasCalled).to.equal(YES);
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.didBeginEditingBlock = blockToCall;
+        [textView textViewDidBeginEditing:textView];
+        expect(rightBlockWasCalled).to.equal(YES);
 
-            [p1 resetBlocks];
-            rightBlockWasCalled = NO;
-            p1.shouldEndEditingBlock = blockToCall;
-            [textView textViewShouldEndEditing:textView];
-            expect(rightBlockWasCalled).to.equal(YES);
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.shouldEndEditingBlock = blockToCall;
+        [textView textViewShouldEndEditing:textView];
+        expect(rightBlockWasCalled).to.equal(YES);
 
-            [p1 resetBlocks];
-            rightBlockWasCalled = NO;
-            p1.didEndEditingBlock = blockToCall;
-            [textView textViewDidEndEditing:textView];
-            expect(rightBlockWasCalled).to.equal(YES);
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.didEndEditingBlock = blockToCall;
+        [textView textViewDidEndEditing:textView];
+        expect(rightBlockWasCalled).to.equal(YES);
 
-            [p1 resetBlocks];
-            rightBlockWasCalled = NO;
-            p1.shouldInteractWithURLBlock = blockToCall;
-            [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10) interaction:UITextItemInteractionInvokeDefaultAction];
-            expect(rightBlockWasCalled).to.equal(YES);
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.shouldInteractWithURLBlock = blockToCall;
+        [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10) interaction:UITextItemInteractionInvokeDefaultAction];
+        expect(rightBlockWasCalled).to.equal(YES);
 
-            [p1 resetBlocks];
-            rightBlockWasCalled = NO;
-            p1.didChangeBlock = blockToCall;
-            [textView textViewDidChange:textView];
-            expect(rightBlockWasCalled).to.equal(YES);
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.didChangeBlock = blockToCall;
+        [textView textViewDidChange:textView];
+        expect(rightBlockWasCalled).to.equal(YES);
 
-            [p1 resetBlocks];
-            rightBlockWasCalled = NO;
-            p1.shouldInteractWithTextAttachmentBlock = blockToCall;
-            [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
-            expect(rightBlockWasCalled).to.equal(YES);
-        }
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.shouldInteractWithTextAttachmentBlock = blockToCall;
+        [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
+        expect(rightBlockWasCalled).to.equal(YES);
+
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.shouldChangeTextInRangeBlock = blockToCall;
+        [textView textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"dummy"];
+        expect(rightBlockWasCalled).to.equal(YES);
+
+        [p1 resetBlocks];
+        rightBlockWasCalled = NO;
+        p1.didChangeSelectionBlock = blockToCall;
+        [textView textViewDidChangeSelection:textView];
+        expect(rightBlockWasCalled).to.equal(YES);
+
+        // Test unregistration
+        textView.controlFlowPlugin = nil;
+        p1.shouldBeginEditingBlock = failBlock;
+        p1.didBeginEditingBlock = failBlock;
+        p1.shouldEndEditingBlock = failBlock;
+        p1.didEndEditingBlock = failBlock;
+        p1.shouldChangeTextInRangeBlock = failBlock;
+        p1.didChangeBlock = failBlock;
+        p1.didChangeSelectionBlock = failBlock;
+        p1.shouldInteractWithTextAttachmentBlock = failBlock;
+        p1.shouldInteractWithURLBlock = failBlock;
+
+        // None of these should trip the fail block
+        [textView textViewShouldBeginEditing:textView];
+        [textView textViewDidBeginEditing:textView];
+        [textView textViewShouldEndEditing:textView];
+        [textView textViewDidEndEditing:textView];
+        [textView textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"dummy"];
+        [textView textViewDidChange:textView];
+        [textView textViewDidChangeSelection:textView];
+        [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
+        [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10) interaction:UITextItemInteractionInvokeDefaultAction];
+    });
+
+    it(@"should properly forward calls to delegate methods - MENTIONS PLUGIN V2", ^{
+        HKWTControlFlowDummyPlugin *p1 = [HKWTControlFlowDummyPlugin dummyPluginWithName:@"p1"];
+        textView.controlFlowPlugin = p1;
+        __block BOOL rightBlockWasCalled = NO;
+        void (^blockToCall)(void) = ^{
+            rightBlockWasCalled = YES;
+        };
+        void (^failBlock)(void) = ^{
+            // Always fail
+            expect(NO).to.beTruthy();
+        };
+
+        // Test APIs
 
         [p1 resetBlocks];
         rightBlockWasCalled = NO;
