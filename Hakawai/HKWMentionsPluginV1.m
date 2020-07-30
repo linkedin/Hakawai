@@ -667,10 +667,13 @@
     // See if the mention is valid
     if (!mention) { return NO; }
     // See if the delegate will allow the mention to be trimmed
-    __strong __auto_type delegate = self.delegate;
+    __strong __auto_type delegate = self.defaultChooserViewDelegate;
+    __strong __auto_type customChooserViewDelegate = self.customChooserViewDelegate;
     BOOL delegateImplementsCustomTrimming = [delegate respondsToSelector:@selector(trimmedNameForEntity:)];
     BOOL delegateAllowsTrimming = NO;
-    if ([delegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
+    if ([customChooserViewDelegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
+        delegateAllowsTrimming = [delegate entityCanBeTrimmed:mention];
+    } else if ([delegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
         delegateAllowsTrimming = [delegate entityCanBeTrimmed:mention];
     }
     if (!delegateAllowsTrimming) { return NO; }
@@ -1716,33 +1719,39 @@
                                completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
     // set up the chooser view prior to data request in order to support fully customized view
     [self.creationStateMachine setupChooserViewIfNeeded];
-    [self.delegate asyncRetrieveEntitiesForKeyString:keyString
-                                          searchType:type
-                                    controlCharacter:character
-                                          completion:completionBlock];
+    __strong __auto_type customChooserViewDelegate = self.customChooserViewDelegate;
+    if (customChooserViewDelegate) {
+        [customChooserViewDelegate didUpdateKeyString:keyString
+                                     controlCharacter:character];
+    } else {
+        [self.defaultChooserViewDelegate asyncRetrieveEntitiesForKeyString:keyString
+                                                                searchType:type
+                                                          controlCharacter:character
+                                                                completion:completionBlock];
+    }
 }
 
 - (UITableViewCell *)cellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
                            withMatchString:(NSString *)matchString
                                  tableView:(UITableView *)tableView
                                atIndexPath:(NSIndexPath *)indexPath {
-    return [self.delegate cellForMentionsEntity:entity withMatchString:matchString tableView:tableView atIndexPath:indexPath];
+    return [self.defaultChooserViewDelegate cellForMentionsEntity:entity withMatchString:matchString tableView:tableView atIndexPath:indexPath];
 }
 
 - (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol>)entity
                                 tableView:(UITableView *)tableView {
-    return [self.delegate heightForCellForMentionsEntity:entity tableView:tableView];
+    return [self.defaultChooserViewDelegate heightForCellForMentionsEntity:entity tableView:tableView];
 }
 
 - (UITableViewCell *)loadingCellForTableView:(UITableView *)tableView {
-    __strong __auto_type delegate = self.delegate;
+    __strong __auto_type delegate = self.defaultChooserViewDelegate;
     NSAssert([delegate respondsToSelector:@selector(loadingCellForTableView:)],
              @"The delegate does not implement the loading cell functionality. This probably means the property wasn't checked properly.");
     return [delegate loadingCellForTableView:tableView];
 }
 
 - (CGFloat)heightForLoadingCellInTableView:(UITableView *)tableView {
-    __strong __auto_type delegate = self.delegate;
+    __strong __auto_type delegate = self.defaultChooserViewDelegate;
     NSAssert([delegate respondsToSelector:@selector(heightForLoadingCellInTableView:)],
              @"The delegate does not implement the loading cell functionality. This probably means the property wasn't checked properly.");
     return [delegate heightForLoadingCellInTableView:tableView];
@@ -2097,7 +2106,7 @@
 }
 
 - (BOOL)loadingCellSupported {
-    __strong __auto_type delegate = self.delegate;
+    __strong __auto_type delegate = self.defaultChooserViewDelegate;
     return ([delegate respondsToSelector:@selector(loadingCellForTableView:)]
             && [delegate respondsToSelector:@selector(heightForLoadingCellInTableView:)]);
 }
@@ -2219,7 +2228,9 @@ NSString * _Nonnull nameForMentionsState(HKWMentionsState s) {
 
 @synthesize controlCharacterSet;
 
-@synthesize delegate;
+@synthesize defaultChooserViewDelegate;
+
+@synthesize customChooserViewDelegate;
 
 @synthesize implicitMentionsEnabled;
 

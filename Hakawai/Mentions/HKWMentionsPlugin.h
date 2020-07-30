@@ -16,6 +16,7 @@
 #import "HKWMentionsEntityProtocol.h"
 #import "HKWChooserViewProtocol.h"
 #import "HKWMentionsDefaultChooserViewDelegate.h"
+#import "HKWMentionsCustomChooserViewDelegate.h"
 
 static NSString* _Nonnull const HKWMentionAttributeName = @"HKWMentionAttributeName";
 
@@ -156,7 +157,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 @property (nonatomic, readonly) BOOL implicitMentionsEnabled;
 
 @property (nonatomic) BOOL shouldEnableUndoUponUnregistration;
-@property (nonatomic, weak, nullable) id<HKWMentionsDefaultChooserViewDelegate> delegate;
+/*!
+ There should be only one chooser view delegate.
+ If you are using default chooser view provided by Hakawai, set `defaultChooserViewDelegate`. Otherwsie set `customChooserViewDelegate`
+ */
+@property (nonatomic, weak, nullable) id<HKWMentionsDefaultChooserViewDelegate> defaultChooserViewDelegate;
+@property (nonatomic, weak, nullable) id<HKWMentionsCustomChooserViewDelegate> customChooserViewDelegate;
+
 @property (nonatomic, weak, nullable) id<HKWMentionsStateChangeDelegate> stateChangeDelegate;
 
 /*!
