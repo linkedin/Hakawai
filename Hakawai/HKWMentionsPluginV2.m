@@ -44,7 +44,12 @@
 @property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
 
 /**
+<<<<<<< HEAD
  The range of the currently highlighted mention, if it exists.
+=======
+ The range of the mention attribute whose value is stored in the @c currentlySelectedMention property.
+ This value is synced with highlighted mention.
+>>>>>>> upstream/master
  */
 @property (nonatomic) NSRange currentlySelectedMentionRange;
 
