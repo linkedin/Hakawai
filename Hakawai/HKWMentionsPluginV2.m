@@ -789,12 +789,14 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 #pragma mark - Deletion
 
 /**
- Handle deletion of a mention, either personalizing or removing it
+ Return whether or not to allow text view to process the deletion.
+
+ If it is a mention, do not allow the text view to process the deletion, and handle the deletion ourselves, either personalizing or removing it
 
  @param location current location of cursor
  @return whether or not to allow the text view to process the deletion
  */
-- (BOOL)handleCharacterDeletionAtLocation:(NSUInteger)location {
+- (BOOL)shouldAllowCharacterDeletionAtLocation:(NSUInteger)location {
     BOOL returnValue = YES;
     __strong __auto_type parentTextView = self.parentTextView;
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;
@@ -890,7 +892,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     if (text.length == 0 && range.length == 1) {
         [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
         self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
-        returnValue = [self handleCharacterDeletionAtLocation:range.location];
+        returnValue = [self shouldAllowCharacterDeletionAtLocation:range.location];
     }
 
     //  If character is inserted within a mention then bleach the mention.
