@@ -1,5 +1,4 @@
 #import "HKWMentionDataProvider.h"
-#import "HKWMentionsPlugin.h"
 
 #import "_HKWMentionsCreationStateMachineV2.h"
 

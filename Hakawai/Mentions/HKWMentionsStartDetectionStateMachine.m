@@ -290,7 +290,7 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
 }
 
 - (void)mentionCreationEnded:(BOOL)canImmediatelyRestart {
-    if (!HKWTextView.enableSimpleRefactor) {
+    if (!HKWTextView.enableMentionsPluginV2) {
         // For the simple refactor, we only focus on cursor movement to determine when to start mention creation, and don't use the state machine to determine
         // the validity of this call
         NSAssert(self.inMentionCreationState,

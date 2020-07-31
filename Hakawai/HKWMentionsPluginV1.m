@@ -1,5 +1,5 @@
 //
-//  HKWMentionsPlugin.m
+//  HKWMentionsPluginV1.m
 //  Hakawai
 //
 //  Copyright (c) 2014 LinkedIn Corp. All rights reserved.
@@ -10,7 +10,7 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
-#import "_HKWMentionsPlugin.h"
+#import "HKWMentionsPluginV1.h"
 
 #import "HKWCustomAttributes.h"
 #import "HKWRoundedRectBackgroundAttributeValue.h"
@@ -29,31 +29,7 @@
 
 #import "_HKWMentionsPrivateConstants.h"
 
-NSString* _Nonnull const HKWMentionAttributeName = @"HKWMentionAttributeName";
-
-// Don't confuse this with the public 'HKWMentionsPluginState', which exposes fewer implementation details.
-typedef NS_ENUM(NSInteger, HKWMentionsState) {
-    // The user is not creating a mention and not in any of the following states.
-    HKWMentionsStateQuiescent = 0,
-
-    // The user is currently creating a mention.
-    HKWMentionsStartDetectionStateCreatingMention,
-
-    // The user's cursor is currently positioned at the right edge of a mention. Pressing 'delete' again will select the
-    //  mention.
-    HKWMentionsStateAboutToSelectMention,
-
-    // The user has selected a mention. Deleting text should trim or remove the mention. Inserting text should bleach
-    //  the mention.
-    HKWMentionsStateSelectedMention,
-
-    // The mentions plugin's text view has lost focus and cleanup is happening. This is a transient state that is
-    //  intended to last only as long as textViewDidEndEditing: is running, and allow cleanup code to properly engage
-    //  special-case behavior needed for cleanup.
-    HKWMentionsStateLosingFocus
-};
-
-@interface HKWMentionsPlugin () <HKWMentionsStartDetectionStateMachineProtocol, HKWMentionsCreationStateMachineProtocol>
+@interface HKWMentionsPluginV1 () <HKWMentionsStartDetectionStateMachineProtocol, HKWMentionsCreationStateMachineProtocol>
 
 // State properties
 @property (nonatomic) HKWMentionsState state;
@@ -151,9 +127,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsState) {
 
 @end
 
-@implementation HKWMentionsPlugin
-
-static int MAX_MENTION_QUERY_LENGTH = 100;
+@implementation HKWMentionsPluginV1
 
 @synthesize parentTextView = _parentTextView;
 
@@ -203,7 +177,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         NSAssert(NO, @"Mentions plug-in is only supported for iOS 7.1 or later.");
     }
 
-    HKWMentionsPlugin *plugin = [[[self class] alloc] init];
+    HKWMentionsPluginV1 *plugin = [[[self class] alloc] init];
     plugin.chooserPositionMode = mode;
     plugin.controlCharacterSet = controlCharacterSet;
     plugin.implicitSearchLength = searchLength;
@@ -849,120 +823,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
-// TODO: Make all utils static
-// JIRA: POST-13757
-#pragma mark - Mention Query Utils
-
-/**
- Find the mentionas query connected to the given location
-
- @param text the text to search within
- @param location the cursor location from which to search for a mention
- @return The mention query connected to the cursor at @c location
- */
-- (NSString *)mentionsQueryInText:(NSString *)text location:(NSUInteger)location {
-    if (text.length <= 0) {
-        return nil;
-    }
-    // Search starting from the given location, and return first control character
-    NSUInteger mostRecentValidControlCharacterLocation = [self mostRecentValidControlCharacterLocation:text beforeLocation:location];
-    if (mostRecentValidControlCharacterLocation != NSNotFound) {
-        // Query until end of word in which cursor is present (or until cursor if it is at end of word)
-        NSUInteger endOfValidWordAfterLocation = [self endOfValidWordInText:text afterLocation:location];
-        if (endOfValidWordAfterLocation != NSNotFound) {
-            NSString *substringUntilEndOfWord = [text substringToIndex:endOfValidWordAfterLocation];
-            // Return the string, including the control char as the query
-            return [substringUntilEndOfWord substringFromIndex:mostRecentValidControlCharacterLocation];
-        }
-    }
-    return nil;
-}
-
-/**
- Find the location for the end of the next word, starting at the given location.
-
- If we ever encounter a mention character, this word is invalid, and we return @c NSNotFound
-
- @param location location to begin search from
- @param text text to search
- @return location of end of next word, start at @c location
- */
-- (NSUInteger)endOfValidWordInText:(nonnull NSString *)text afterLocation:(NSUInteger)location {
-    NSUInteger i;
-    for(i = location; i < text.length ; i++) {
-        // If there is a mentions character before there is a whitespace, then this is not a valid word for querying
-        BOOL isMention = [self mentionAttributeAtLocation:i range:nil];
-        if (isMention) {
-            return NSNotFound;
-        }
-        const unichar character = [text characterAtIndex:i];
-        if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:character]) {
-            return i;
-        }
-    }
-    return i;
-}
-
-/**
- Search backwards in a string for a character in the control character set
-
- @param text The text in which to perform a backwards search for a control character
- @returns Location for most recent control character in a string
- */
-+ (NSUInteger)mostRecentControlCharacterLocationInText:(NSString *)text controlCharacterSet:(NSCharacterSet *)controlCharacterSet {
-    if (text.length == 0) {
-        return NSNotFound;
-    }
-    int endOfTextIndex = (int)text.length - 1;
-    for (int index = endOfTextIndex; index >= 0; index--) {
-        NSUInteger unsignedIndex = (unsigned long)index;
-        unichar character = [text characterAtIndex:unsignedIndex];
-        if ([controlCharacterSet characterIsMember:character]) {
-            return unsignedIndex;
-        }
-    }
-    return NSNotFound;
-}
-
-/**
- Returns the location for the most recently valid control character before the cursor. Valid includes: not having an alphanumeric before it, not having an existing entity between the character and the cursor, etc.
-
- @param text the text to search for the control character within
- @param location the location to start your backwards search for a control character
- @returns The location, if any, for the control character
- */
-- (NSUInteger)mostRecentValidControlCharacterLocation:(NSString *)text beforeLocation:(NSUInteger)location {
-    NSString *substringUntilLocation = [text substringToIndex:location];
-    // Search back MAX_MENTION_QUERY_LENGTH for a control character
-    NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
-    NSString *substringToSearchForControlChar = [substringUntilLocation substringFromIndex:maximumSearchIndex];
-    // Find control character location
-    NSUInteger controlCharLocation = [HKWMentionsPlugin mostRecentControlCharacterLocationInText:substringToSearchForControlChar controlCharacterSet:self.controlCharacterSet];
-    if (controlCharLocation != NSNotFound) {
-        // If it exists, offset it by the search index to get actual location in the parent text view
-        controlCharLocation = controlCharLocation + maximumSearchIndex;
-    }
-
-    // If there's a non-mentions alphanumeric before the control char, then it's invalid
-    unichar charPrecidingControlChar = [self.parentTextView characterPrecedingLocation:(NSInteger)controlCharLocation];
-    if (charPrecidingControlChar
-        && [[NSCharacterSet alphanumericCharacterSet] characterIsMember:charPrecidingControlChar]
-        && ![self mentionAttributeAtLocation:controlCharLocation-1
-                                       range:nil]) {
-        return NSNotFound;
-    }
-
-    // If there's an entity in between the current location and the previous control character, then it's invalid
-    NSRange mentionRange;
-    HKWMentionsAttribute __unused *mention = [self mentionAttributePrecedingLocation:location
-                                                                               range:&mentionRange];
-    if (mentionRange.location > controlCharLocation) {
-        return NSNotFound;
-    }
-
-    return controlCharLocation;
-}
-
 #pragma mark - State machine
 
 /*!
@@ -1056,66 +916,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         searchRange = NSMakeRange(location, 0);
     }
     [self toggleAutocorrectAsRequiredForRange:searchRange];
-    return returnValue;
-}
-
-/**
- Handle deletion of a mention, either personalizing or removing it
-
- @param location current location of cursor
- @return whether or not to allow the text view to process the deletion
- */
-- (BOOL)advanceStateForCharacterDeletionV2:(NSUInteger)location {
-    BOOL returnValue = YES;
-    __strong __auto_type parentTextView = self.parentTextView;
-    __strong __auto_type externalDelegate = parentTextView.externalDelegate;
-    if (location > 0) {
-        NSRange mentionRange;
-        HKWMentionsAttribute *mentionAtDeleteLocation = [self mentionAttributeAtLocation:location
-                                                                                   range:&mentionRange];
-        // If the deleted character was part of a mention
-        if (mentionAtDeleteLocation) {
-            // Trim or delete the mention
-            [self assertMentionsDataExists];
-            NSString *trimmedString = nil;
-            BOOL canTrim = [self mentionCanBeTrimmed:mentionAtDeleteLocation trimmedString:&trimmedString];
-            if (canTrim) {
-                // Trim mention to first word only
-                NSAssert([trimmedString length] > 0,
-                         @"Cannot trim a mention to zero length");
-                mentionAtDeleteLocation.mentionText = trimmedString;
-                [parentTextView transformTextAtRange:mentionRange
-                                     withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                    return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
-                }];
-                // Move the cursor into position.
-                parentTextView.selectedRange = NSMakeRange(mentionRange.location + [trimmedString length],
-                                                           0);
-                // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
-                if (self.notifyTextViewDelegateOnMentionTrim
-                    && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                    [externalDelegate textViewDidChange:parentTextView];
-                }
-            }
-            else {
-                // Delete mention entirely
-                NSUInteger locationAfterDeletion = mentionRange.location;
-                [parentTextView transformTextAtRange:mentionRange
-                                     withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
-                    return (NSAttributedString *)nil;
-                }];
-                [self stripCustomAttributesFromTypingAttributes];
-                parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
-
-                // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
-                if (self.notifyTextViewDelegateOnMentionDeletion
-                    && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                    [externalDelegate textViewDidChange:parentTextView];
-                }
-            }
-            returnValue = NO;
-        }
-    }
     return returnValue;
 }
 
@@ -1634,9 +1434,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 -(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView {
-    if (HKWTextView.enableSimpleRefactor) {
-        return;
-    }
     if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
         [self.creationStateMachine cancelMentionCreation];
     } else {
@@ -1654,21 +1451,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return text.length == 1 && [self.controlCharacterSet characterIsMember:[text characterAtIndex:0]];
 }
 
-- (BOOL)textViewShouldChangeTextInRangeV2:(NSRange)range
-                          replacementText:(NSString *)text {
-    // In simple refactor, we only focus on deletions in order to allow for personalization/deletions of mentions
-    if ([text length] == 0 && range.length == 1) {
-        return [self advanceStateForCharacterDeletionV2:range.location];
-    }
-    [self stripCustomAttributesFromTypingAttributes];
-    return YES;
-}
-
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if (HKWTextView.enableSimpleRefactor) {
-        return [self textViewShouldChangeTextInRangeV2:range
-                                       replacementText:text];
-    }
     BOOL returnValue = YES;
     self.suppressSelectionChangeNotifications = YES;
     __strong __auto_type parentTextView = self.parentTextView;
@@ -1726,30 +1509,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return returnValue;
 }
 
-- (void)textViewDidChangeSelectionV2:(UITextView *)textView {
-    NSRange range = textView.selectedRange;
-    if (range.length > 0) {
-        return;
-    }
-    // Find a mentions query from the last control char if there is one
-    NSString *query = [self mentionsQueryInText:textView.text location:range.location];
-    if (query) {
-        // first character is control character,rest of string is query
-        [self beginMentionsCreationWithString:[query substringFromIndex:1]
-                                   atLocation:range.location
-                        usingControlCharacter:YES
-                             controlCharacter:[query characterAtIndex:0]];
-    } else {
-        // if there isn't a query, cancel entity creation
-        [self.creationStateMachine cancelMentionCreation];
-    }
-}
-
 - (void)textViewDidChangeSelection:(UITextView *)textView {
-    if (HKWTextView.enableSimpleRefactor) {
-        [self textViewDidChangeSelectionV2:textView];
-        return;
-    }
     if (self.suppressSelectionChangeNotifications) {
         // Don't run the 'selection change' code as a result of the user entering, deleting, or modifying the text.
         return;
@@ -1787,11 +1547,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (BOOL)textViewShouldBeginEditing:(__unused UITextView *)textView {
-    if (HKWTextView.enableSimpleRefactor) {
-        // TODO: Figure out initial fetch for simple refactor
-        // JIRA: POST-13736
-        return YES;
-    }
     if (!self.initialSetupPerformed) {
         [self initialSetup];
     }
@@ -1799,9 +1554,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (void)textViewDidBeginEditing:(__unused UITextView *)textView {
-    if (HKWTextView.enableSimpleRefactor) {
-        return;
-    }
     // Bring the text view back to a known good state
     __strong __auto_type parentTextView = self.parentTextView;
     NSUInteger currentLength = [parentTextView.text length];
@@ -1858,9 +1610,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (void)textViewDidEndEditing:(__unused UITextView *)textView {
-    if (HKWTextView.enableSimpleRefactor) {
-        return;
-    }
     // Text view is about to lose focus
     // Perform cleanup
     HKWMentionsState previousState = self.state;
@@ -2067,18 +1816,11 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
 
     NSRange rangeToTransform;
-    if (HKWTextView.enableSimpleRefactor) {
-        // Find where previous control character was, and replace mention at that point
-        NSUInteger controlCharLocation = [HKWMentionsPlugin mostRecentControlCharacterLocationInText:parentTextView.text controlCharacterSet:self.controlCharacterSet];
-        NSString *const wordAfterControlChar = [HKWMentionsStartDetectionStateMachine wordAfterLocation:controlCharLocation text:parentTextView.text];
-        rangeToTransform = NSMakeRange(controlCharLocation, wordAfterControlChar.length);
-    } else {
-        // When control character is inserted before word and user selects mention for that word,
-        // we want to replace word after control character with mention text.
-        // e.g "hey @|john" will be replaced as "hey John Doe". '|' indicates cursor.
-        NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:currentLocation text:parentTextView.text];
-        rangeToTransform = NSMakeRange(location, currentLocation + wordAfterCurrentLocation.length - location);
-    }
+    // When control character is inserted before word and user selects mention for that word,
+    // we want to replace word after control character with mention text.
+    // e.g "hey @|john" will be replaced as "hey John Doe". '|' indicates cursor.
+    NSString *const wordAfterCurrentLocation = [HKWMentionsStartDetectionStateMachine wordAfterLocation:currentLocation text:parentTextView.text];
+    rangeToTransform = NSMakeRange(location, currentLocation + wordAfterCurrentLocation.length - location);
 
     /*
      When the textview text that matches the mention text is not the first part of the mention text,
@@ -2143,12 +1885,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         return [self typingAttributesByStrippingMentionAttributes:currentAttributes];
     }];
     // Move the cursor
-    if (HKWTextView.enableSimpleRefactor) {
-        // Since cursor is already updated in simple refactor, we move it back one character
-        parentTextView.selectedRange = NSMakeRange(location + [mentionText length]  - 1, 0);
-    } else {
-        parentTextView.selectedRange = NSMakeRange(location + [mentionText length], 0);
-    }
+    parentTextView.selectedRange = NSMakeRange(location + [mentionText length], 0);
     // Since the cursor is right after the mention, set the state to 'about to select'
     self.currentlySelectedMention = mention;
     self.currentlySelectedMentionRange = NSMakeRange(location, [mentionText length]);
@@ -2457,7 +2194,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 /*!
- Handles the selection from the user. This is only needed for consumers who use custom chooser view. 
+ Handles the selection from the user. This is only needed for consumers who use custom chooser view.
  */
 - (void)handleSelectionForEntity:(id<HKWMentionsEntityProtocol>)entity {
     [self.creationStateMachine handleSelectionForEntity:entity
@@ -2474,7 +2211,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 #pragma mark - Developer
 
-NSString *nameForMentionsState(HKWMentionsState s) {
+NSString * _Nonnull nameForMentionsState(HKWMentionsState s) {
     switch (s) {
         case HKWMentionsStateQuiescent:
             return @"Quiescent";
@@ -2488,5 +2225,29 @@ NSString *nameForMentionsState(HKWMentionsState s) {
             return @"LosingFocus";
     }
 }
+
+@synthesize controlCharacterSet;
+
+@synthesize defaultChooserViewDelegate;
+
+@synthesize customChooserViewDelegate;
+
+@synthesize implicitMentionsEnabled;
+
+@synthesize implicitSearchLength;
+
+@synthesize notifyTextViewDelegateOnMentionCreation;
+
+@synthesize notifyTextViewDelegateOnMentionDeletion;
+
+@synthesize notifyTextViewDelegateOnMentionTrim;
+
+@synthesize resumeMentionsCreationEnabled;
+
+@synthesize shouldContinueSearchingAfterEmptyResults;
+
+@synthesize shouldEnableUndoUponUnregistration;
+
+@synthesize stateChangeDelegate;
 
 @end

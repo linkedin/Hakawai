@@ -14,8 +14,6 @@
 
 #import "MentionEntity.h"
 
-#import "HKWMentionsPlugin.h"
-
 // This #define determines whether or not custom trimming behavior should be enabled
 //#define USE_CUSTOM_TRIMMING_BEHAVIOR
 
@@ -198,7 +196,7 @@
 // The state-change delegate allows your app to optionally listen in on certain important events that might happen to
 //  the mentions plug-in. For example, implementing the optional method below allows your app to be notified whenever a
 //  new mention is successfully created.
-- (void)mentionsPlugin:(HKWMentionsPlugin *)plugin
+- (void)mentionsPlugin:(id<HKWMentionsPlugin>)plugin
         createdMention:(id<HKWMentionsEntityProtocol>)entity
             atLocation:(NSUInteger)location {
     NSLog(@"Mentions plug-in created mention named \"%@\" at location %ld", [entity entityName], (long) location);
