@@ -824,8 +824,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                 && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
                 [externalDelegate textViewDidChange:parentTextView];
             }
-        }
-        else {
+        } else {
             // Delete mention entirely
             NSUInteger locationAfterDeletion = mentionRange.location;
             [parentTextView transformTextAtRange:mentionRange
@@ -891,7 +890,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
 
     // In simple refactor, we only focus on deletions in order to allow for personalization/deletions of mentions
-    if ([text length] == 0 && range.length == 1) {
+    if (text.length == 0 && range.length == 1) {
         return [self handleCharacterDeletionAtLocation:range.location];
     }
     [self stripCustomAttributesFromTypingAttributes];
