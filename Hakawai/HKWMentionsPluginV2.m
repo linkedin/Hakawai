@@ -44,8 +44,7 @@
 @property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
 
 /**
- The range of the mention attribute whose value is stored in the @c currentlySelectedMention property.
- This value is synced with highlighted mention.
+ The range of the currently highlighted mention, if it exists.
  */
 @property (nonatomic) NSRange currentlySelectedMentionRange;
 
@@ -885,16 +884,31 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 // TODO: Remove text view from call
 // JIRA: POST-14031
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    // Remove any mentions selections, since those will go away upon any insertion/deletion
+    BOOL returnValue = YES;
+
+    // In simple refactor, we only focus on insertions and deletions in order to allow for personalization/deletions/bleaching of mentions.
+    if (text.length == 0 && range.length == 1) {
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
+        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+        returnValue = [self handleCharacterDeletionAtLocation:range.location];
+    }
+
+    //  If character is inserted within a mention then bleach the mention.
+    if (text.length > 0 && range.length == 0 && self.currentlySelectedMentionRange.location != NSNotFound) {
+        const NSRange selectedMentionInternalTextRange = NSMakeRange(self.currentlySelectedMentionRange.location + 1,
+                                                                     self.currentlySelectedMentionRange.length - 1);
+        if (NSLocationInRange(range.location, selectedMentionInternalTextRange)) {
+            [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
+        }
+        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+    }
+
+    // Remove any mention selection that still exists, since it should go away upon any text change
     [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
     self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
 
-    // In simple refactor, we only focus on deletions in order to allow for personalization/deletions of mentions
-    if (text.length == 0 && range.length == 1) {
-        return [self handleCharacterDeletionAtLocation:range.location];
-    }
     [self stripCustomAttributesFromTypingAttributes];
-    return YES;
+    return returnValue;
 }
 
 - (void)textViewDidChangeSelection:(UITextView *)textView {
