@@ -43,6 +43,12 @@
 
 @property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
 
+/**
+ The range of the mention attribute whose value is stored in the @c currentlySelectedMention property.
+ This value is synced with highlighted mention.
+ */
+@property (nonatomic) NSRange currentlySelectedMentionRange;
+
 @end
 
 @implementation HKWMentionsPluginV2
@@ -102,7 +108,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     plugin.controlCharacterSet = controlCharacterSet;
     plugin.implicitSearchLength = searchLength;
 
-
     // Validate attribute dictionaries
     // (unselected mention attributes)
     NSMutableSet *badAttributes = [NSMutableSet set];
@@ -139,6 +144,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     self = [super init];
     if (!self) { return nil; }
 
+    self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
     self.notifyTextViewDelegateOnMentionCreation = NO;
     self.notifyTextViewDelegateOnMentionTrim = NO;
     self.notifyTextViewDelegateOnMentionDeletion = NO;
@@ -408,8 +414,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  Toggle mentions-related formatting for a given portion of text. Mentions can either be 'selected' (annotation
  background, light text color), or 'unselected' (no background, dark text color)
  */
-- (void)toggleMentionsFormattingAtRange:(NSRange)range
-                               selected:(BOOL)selected {
+- (void)toggleMentionsFormattingIfNeededAtRange:(NSRange)range
+                                       selected:(BOOL)selected {
     if (range.location == NSNotFound || range.length == 0) {
         return;
     }
@@ -793,51 +799,48 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     BOOL returnValue = YES;
     __strong __auto_type parentTextView = self.parentTextView;
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;
-    if (location > 0) {
-        NSRange mentionRange;
-        HKWMentionsAttribute *mentionAtDeleteLocation = [self mentionAttributeAtLocation:location
-                                                                                   range:&mentionRange];
-        // If the deleted character was part of a mention
-        if (mentionAtDeleteLocation) {
-            // Trim or delete the mention
-            NSString *trimmedString = nil;
-            BOOL canTrim = [self mentionCanBeTrimmed:mentionAtDeleteLocation trimmedString:&trimmedString];
-            if (canTrim) {
-                // Trim mention to first word only
-                NSAssert([trimmedString length] > 0,
-                         @"Cannot trim a mention to zero length");
-                mentionAtDeleteLocation.mentionText = trimmedString;
-                [parentTextView transformTextAtRange:mentionRange
-                                     withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                    return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
-                }];
-                // Move the cursor into position.
-                parentTextView.selectedRange = NSMakeRange(mentionRange.location + [trimmedString length],
-                                                           0);
-                // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
-                if (self.notifyTextViewDelegateOnMentionTrim
-                    && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                    [externalDelegate textViewDidChange:parentTextView];
-                }
+    NSRange mentionRange;
+    HKWMentionsAttribute *mentionAtDeleteLocation = [self mentionAttributeAtLocation:location
+                                                                               range:&mentionRange];
+    // If the deleted character was part of a mention
+    if (mentionAtDeleteLocation) {
+        // Trim or delete the mention
+        NSString *trimmedString = nil;
+        BOOL canTrim = [self mentionCanBeTrimmed:mentionAtDeleteLocation trimmedString:&trimmedString];
+        if (canTrim) {
+            // Trim mention to first word only
+            NSAssert([trimmedString length] > 0,
+                     @"Cannot trim a mention to zero length");
+            mentionAtDeleteLocation.mentionText = trimmedString;
+            [parentTextView transformTextAtRange:mentionRange
+                                 withTransformer:^NSAttributedString *(NSAttributedString *input) {
+                return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
+            }];
+            // Move the cursor into position.
+            parentTextView.selectedRange = NSMakeRange(mentionRange.location + [trimmedString length],
+                                                       0);
+            // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
+            if (self.notifyTextViewDelegateOnMentionTrim
+                && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                [externalDelegate textViewDidChange:parentTextView];
             }
-            else {
-                // Delete mention entirely
-                NSUInteger locationAfterDeletion = mentionRange.location;
-                [parentTextView transformTextAtRange:mentionRange
-                                     withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
-                    return (NSAttributedString *)nil;
-                }];
-                [self stripCustomAttributesFromTypingAttributes];
-                parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
-
-                // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
-                if (self.notifyTextViewDelegateOnMentionDeletion
-                    && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                    [externalDelegate textViewDidChange:parentTextView];
-                }
+        } else {
+            // Delete mention entirely
+            NSUInteger locationAfterDeletion = mentionRange.location;
+            [parentTextView transformTextAtRange:mentionRange
+                                 withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
+                return (NSAttributedString *)nil;
+            }];
+            [self stripCustomAttributesFromTypingAttributes];
+            parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
+            
+            // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
+            if (self.notifyTextViewDelegateOnMentionDeletion
+                && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+                [externalDelegate textViewDidChange:parentTextView];
             }
-            returnValue = NO;
         }
+        returnValue = NO;
     }
     return returnValue;
 }
@@ -849,11 +852,45 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     [self.creationStateMachine dataReturnedWithEmptyResults:isEmptyResults keystringEndsWithWhiteSpace:keystringEndsWithWhiteSpace];
 }
 
+- (void)highlightMentionIfNeededForCursorLocationV2:(NSUInteger)cursorLocation {
+    __strong __auto_type parentTextView = self.parentTextView;
+    const NSRange textFullRange = HKW_FULL_RANGE(parentTextView.attributedText);
+
+    // If cursor falls out of attributed range, it cannot be in a mention
+    if (!(NSLocationInRange(cursorLocation, textFullRange))) {
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
+        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+        return;
+    }
+
+    NSRange range;
+    id attribute = [parentTextView.attributedText attribute:HKWMentionAttributeName atIndex:cursorLocation effectiveRange:&range];
+
+    // If there is a mention at the given location, select it
+    // - unless the cursor is right at the beginning of the mention. We only want to select if the cursor is within it
+    if ([attribute isKindOfClass:[HKWMentionsAttribute class]] && range.location != cursorLocation) {
+        // We don't need to update if we're already in the currently selected range
+        if (!(NSEqualRanges(range, self.currentlySelectedMentionRange))) {
+            [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
+            [self toggleMentionsFormattingIfNeededAtRange:range selected:YES];
+            self.currentlySelectedMentionRange = range;
+        }
+    } else {
+        // If we are not in a mention, unselect the currently selected mention
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
+        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+    }
+}
+
 // TODO: Remove text view from call
 // JIRA: POST-14031
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    // Remove any mentions selections, since those will go away upon any insertion/deletion
+    [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
+    self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+
     // In simple refactor, we only focus on deletions in order to allow for personalization/deletions of mentions
-    if ([text length] == 0 && range.length == 1) {
+    if (text.length == 0 && range.length == 1) {
         return [self handleCharacterDeletionAtLocation:range.location];
     }
     [self stripCustomAttributesFromTypingAttributes];
@@ -865,6 +902,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     if (range.length > 0) {
         return;
     }
+    // Highlight mention if needed
+    [self highlightMentionIfNeededForCursorLocationV2:range.location];
     // Find a mentions query from the last control char if there is one
     NSString *query = [self mentionsQueryInText:textView.text location:range.location];
     if (query) {
