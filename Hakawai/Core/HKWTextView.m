@@ -29,30 +29,15 @@
 
 @end
 
-static BOOL enableExperimentalDeadLockFix = NO;
-static BOOL enableMentionSelectFix = NO;
-static BOOL enableMentionsPluginV2 = YES;
+static BOOL enableMentionsPluginV2 = NO;
 static BOOL enableMentionsCreationStateMachineV2 = NO;
 
 @implementation HKWTextView
 
-+ (BOOL)enableExperimentalDeadLockFix {
-    return enableExperimentalDeadLockFix;
-}
-+ (void)setEnableExperimentalDeadLockFix:(BOOL)enabled {
-    enableExperimentalDeadLockFix = enabled;
-}
-
-+ (BOOL)enableMentionSelectFix {
-    return enableMentionSelectFix;
-}
-+ (void)setEnableMentionSelectFix:(BOOL)enabled {
-    enableMentionSelectFix = enabled;
-}
-
 + (BOOL)enableMentionsPluginV2 {
     return enableMentionsPluginV2;
 }
+
 + (void)setEnableMentionsPluginV2:(BOOL)enabled {
     enableMentionsPluginV2 = enabled;
 }
@@ -60,6 +45,7 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
 + (BOOL)enableMentionsCreationStateMachineV2 {
     return enableMentionsCreationStateMachineV2;
 }
+
 + (void)setEnableMentionsCreationStateMachineV2:(BOOL)enabled {
     enableMentionsCreationStateMachineV2 = enabled;
 }
