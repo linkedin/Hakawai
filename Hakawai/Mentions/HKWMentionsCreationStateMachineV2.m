@@ -669,14 +669,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     self.state = HKWMentionsCreationStateQuiescent;
     __strong __auto_type delegate = self.delegate;
 
-    if (HKWTextView.enableMentionSelectFix) {
-        // Delegate selected callback should fire prior to creationMention which triggers textView callbacks
-        [delegate selected:entity atIndexPath:indexPath];
-        [delegate createMention:mention startingLocation:self.startingLocation];
-    } else {
-        [delegate createMention:mention startingLocation:self.startingLocation];
-        [delegate selected:entity atIndexPath:indexPath];
-    }
+    [delegate createMention:mention startingLocation:self.startingLocation];
+    [delegate selected:entity atIndexPath:indexPath];
 }
 
 #pragma mark - Development

@@ -32,13 +32,7 @@
  */
 - (void)transformTextAtRange:(NSRange)range
              withTransformer:(NSAttributedString *(^)(NSAttributedString *))transformer {
-    if (HKWTextView.enableExperimentalDeadLockFix) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self transformTextAtRangeImpl:range withTransformer:transformer];
-        });
-    } else {
-        [self transformTextAtRangeImpl:range withTransformer:transformer];
-    }
+    [self transformTextAtRangeImpl:range withTransformer:transformer];
 }
 
 - (void)transformTextAtRangeImpl:(NSRange)range
@@ -122,13 +116,7 @@
  to make sure it won't be synchronized to cause a deadlock. Apple Feedback Tracking number: [FB6828895]
  */
 -(void)insertTextAttachment:(NSTextAttachment *)attachment location:(NSUInteger)location {
-    if (HKWTextView.enableExperimentalDeadLockFix) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self insertTextAttachmentImpl:attachment location:location];
-        });
-    } else {
-        [self insertTextAttachmentImpl:attachment location:location];
-    }
+    [self insertTextAttachmentImpl:attachment location:location];
 }
 
 - (void)insertTextAttachmentImpl:(NSTextAttachment *)attachment location:(NSUInteger)location {

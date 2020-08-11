@@ -41,12 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface HKWTextView : UITextView
 
-+ (BOOL) enableExperimentalDeadLockFix;
-+ (BOOL) enableMentionSelectFix;
 + (BOOL) enableMentionsPluginV2;
 + (BOOL) enableMentionsCreationStateMachineV2;
-+ (void) setEnableExperimentalDeadLockFix:(BOOL)enabled;
-+ (void) setEnableMentionSelectFix:(BOOL)enabled;
 + (void) setEnableMentionsPluginV2:(BOOL)enabled;
 + (void) setEnableMentionsCreationStateMachineV2:(BOOL)enabled;
 
