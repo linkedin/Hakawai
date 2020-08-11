@@ -114,4 +114,21 @@ BOOL HKW_rectIsDegenerate(CGRect rect) {
     return (rect.size.width == 0 || rect.size.height == 0);
 }
 
+/**
+ Returns whether the user is currently engaging in a long press gesture by querying the state of the view's long press gesture recognizers
+
+ @return Boolean indicating whether the user is currently long pressing
+ */
+- (BOOL)isCurrentlyLongPressing {
+    for (NSUInteger i = 0; i < self.gestureRecognizers.count; i++) {
+        UIGestureRecognizer *recognizer = self.gestureRecognizers[i];
+        if ([recognizer isKindOfClass:[UILongPressGestureRecognizer class]]
+            && (recognizer.state == UIGestureRecognizerStateBegan
+            || recognizer.state == UIGestureRecognizerStateChanged)) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 @end

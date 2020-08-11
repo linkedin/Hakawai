@@ -853,7 +853,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     [self.creationStateMachine dataReturnedWithEmptyResults:isEmptyResults keystringEndsWithWhiteSpace:keystringEndsWithWhiteSpace];
 }
 
-- (void)highlightMentionIfNeededForCursorLocationV2:(NSUInteger)cursorLocation {
+- (void)highlightMentionIfNeededForCursorLocation:(NSUInteger)cursorLocation {
     __strong __auto_type parentTextView = self.parentTextView;
     const NSRange textFullRange = HKW_FULL_RANGE(parentTextView.attributedText);
 
@@ -918,14 +918,25 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     if (range.length > 0) {
         return;
     }
+
+    NSUInteger cursorLocation = range.location;
+
     // Highlight mention if needed
-    [self highlightMentionIfNeededForCursorLocationV2:range.location];
+    [self highlightMentionIfNeededForCursorLocation:cursorLocation];
+
+    // If we are not currently long pressing, handle mentions creation. This to avoid querying for mentions when the selection change is due to a long press
+    if (![self.parentTextView isCurrentlyLongPressing]) {
+        [self handleMentionsCreationInText:textView.text atLocation:cursorLocation];
+    }
+}
+
+- (void)handleMentionsCreationInText:(NSString *)text atLocation:(NSUInteger)location {
     // Find a mentions query from the last control char if there is one
-    NSString *query = [self mentionsQueryInText:textView.text location:range.location];
+    NSString *query = [self mentionsQueryInText:text location:location];
     if (query) {
         // first character is control character,rest of string is query
         [self fetchMentionWithPrefix:[query substringFromIndex:1]
-                          atLocation:range.location
+                          atLocation:location
                usingControlCharacter:YES
                     controlCharacter:[query characterAtIndex:0]];
     } else {

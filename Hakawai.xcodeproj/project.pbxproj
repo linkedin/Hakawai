@@ -594,6 +594,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 44A295D822134C7600B73558 /* Hakawai.debug.xcconfig */;
 			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -605,6 +606,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 44A295D922134C7600B73558 /* Hakawai.release.xcconfig */;
 			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = s;
 			};
 			name = Release;
 		};
@@ -613,6 +615,7 @@
 			baseConfigurationReference = C7279F7F7F1F30EF0603FB9B /* Pods-Hakawai.debug.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/Hakawai.dst;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -625,6 +628,7 @@
 			baseConfigurationReference = B05DA0DBC0625091FC4456C0 /* Pods-Hakawai.release.xcconfig */;
 			buildSettings = {
 				DSTROOT = /tmp/Hakawai.dst;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -641,6 +645,7 @@
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
 				INFOPLIST_FILE = "HakawaiTests/HakawaiTests-Info.plist";
@@ -658,6 +663,7 @@
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Hakawai/Hakawai-Prefix.pch";
 				INFOPLIST_FILE = "HakawaiTests/HakawaiTests-Info.plist";
