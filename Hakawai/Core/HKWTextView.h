@@ -65,7 +65,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, nullable) id<UITextViewDelegate> simpleDelegate;
 
-
 #pragma mark - API (plug-ins)
 
 /// An array containing references to the simple plug-ins registered with the text view
@@ -99,13 +98,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)removeSimplePluginNamed:(NSString *)name;
 
-
 /*!
  Inform the the textview that it was programatically updated (e.g. setText: or setAttributedText:) so that associated
  plugins can update their state accordingly.
  */
 -(void) textViewDidProgrammaticallyUpdate;
-
 
 #pragma mark - API (plug-in status)
 

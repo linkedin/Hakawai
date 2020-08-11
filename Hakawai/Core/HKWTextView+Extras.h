@@ -53,4 +53,11 @@
  */
 - (unichar)characterPrecedingLocation:(NSInteger)location;
 
+/**
+ Returns whether the user is currently engaging in a long press gesture by querying the state of the view's long press gesture recognizers
+
+ @return Boolean indicating whether the user is currently long pressing
+ */
+- (BOOL)isCurrentlyLongPressing;
+
 @end

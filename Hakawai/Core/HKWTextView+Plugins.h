@@ -76,7 +76,6 @@ typedef NS_ENUM(NSInteger, HKWAccessoryViewMode) {
  */
 - (CGRect)rectForSingleLineViewportInMode:(HKWViewportMode)mode;
 
-
 #pragma mark - API (helper views)
 
 /*!
@@ -113,7 +112,6 @@ typedef NS_ENUM(NSInteger, HKWAccessoryViewMode) {
  Allow a plug-in to set the custom top level view.
  */
 - (void)setTopLevelViewForAccessoryViewPositioning:(UIView *)view;
-
 
 #pragma mark - API (autocorrect)
 

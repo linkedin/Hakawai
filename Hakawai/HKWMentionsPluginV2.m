@@ -913,24 +913,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return returnValue;
 }
 
-/**
- Returns whether the user is currently engaging in a long press gesture by querying the state of the view's long press gesture recognizers
-
- @return Boolean indicating whether the user is currently long pressing
- */
-- (BOOL)isCurrentlyLongPressing {
-    __strong __auto_type parentTextView = self.parentTextView;
-    for (NSUInteger i = 0; i < parentTextView.gestureRecognizers.count; i++) {
-        UIGestureRecognizer *recognizer = parentTextView.gestureRecognizers[i];
-        if ([recognizer isKindOfClass:[UILongPressGestureRecognizer class]]
-            && (recognizer.state == UIGestureRecognizerStateBegan
-            || recognizer.state == UIGestureRecognizerStateChanged)) {
-            return YES;
-        }
-    }
-    return NO;
-}
-
 - (void)textViewDidChangeSelection:(UITextView *)textView {
     NSRange range = textView.selectedRange;
     if (range.length > 0) {
@@ -943,7 +925,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     [self highlightMentionIfNeededForCursorLocation:cursorLocation];
 
     // If we are not currently long pressing, handle mentions creation. This to avoid querying for mentions when the selection change is due to a long press
-    if (![self isCurrentlyLongPressing]) {
+    if (![self.parentTextView isCurrentlyLongPressing]) {
         [self handleMentionsCreationInText:textView.text atLocation:cursorLocation];
     }
 }
