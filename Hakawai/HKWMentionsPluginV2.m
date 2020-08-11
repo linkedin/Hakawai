@@ -853,7 +853,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     [self.creationStateMachine dataReturnedWithEmptyResults:isEmptyResults keystringEndsWithWhiteSpace:keystringEndsWithWhiteSpace];
 }
 
-- (void)highlightMentionIfNeededForCursorLocationV2:(NSUInteger)cursorLocation {
+- (void)highlightMentionIfNeededForCursorLocation:(NSUInteger)cursorLocation {
     __strong __auto_type parentTextView = self.parentTextView;
     const NSRange textFullRange = HKW_FULL_RANGE(parentTextView.attributedText);
 
@@ -913,19 +913,48 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return returnValue;
 }
 
+/**
+ Returns whether the user is currently engaging in a long press gesture by querying the state of the view's long press gesture recognizers
+
+ @return Boolean indicating whether the user is currently long pressing
+ */
+- (BOOL)isCurrentlyLongPressing {
+    __strong __auto_type parentTextView = self.parentTextView;
+    for (NSUInteger i = 0; i < parentTextView.gestureRecognizers.count; i++) {
+        UIGestureRecognizer *recognizer = parentTextView.gestureRecognizers[i];
+        if ([recognizer isKindOfClass:[UILongPressGestureRecognizer class]]
+            && (recognizer.state == UIGestureRecognizerStateBegan
+            || recognizer.state == UIGestureRecognizerStateChanged)) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (void)textViewDidChangeSelection:(UITextView *)textView {
     NSRange range = textView.selectedRange;
     if (range.length > 0) {
         return;
     }
+
+    NSUInteger cursorLocation = range.location;
+
     // Highlight mention if needed
-    [self highlightMentionIfNeededForCursorLocationV2:range.location];
+    [self highlightMentionIfNeededForCursorLocation:cursorLocation];
+
+    // If we are not currently long pressing, handle mentions creation. This to avoid querying for mentions when the selection change is due to a long press
+    if (![self isCurrentlyLongPressing]) {
+        [self handleMentionsCreationInText:textView.text atLocation:cursorLocation];
+    }
+}
+
+- (void)handleMentionsCreationInText:(NSString *)text atLocation:(NSUInteger)location {
     // Find a mentions query from the last control char if there is one
-    NSString *query = [self mentionsQueryInText:textView.text location:range.location];
+    NSString *query = [self mentionsQueryInText:text location:location];
     if (query) {
         // first character is control character,rest of string is query
         [self fetchMentionWithPrefix:[query substringFromIndex:1]
-                          atLocation:range.location
+                          atLocation:location
                usingControlCharacter:YES
                     controlCharacter:[query characterAtIndex:0]];
     } else {
