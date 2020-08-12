@@ -1055,7 +1055,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Actually create the mention
     NSString *mentionText = mention.mentionText;
     __strong __auto_type parentTextView = self.parentTextView;
-    NSUInteger currentLocation = parentTextView.selectedRange.location;
     NSAssert(parentTextView.selectedRange.length == 0,
              @"Cannot create a mention unless cursor is in insertion mode.");
     UIFont *parentFont = parentTextView.fontSetByApp;
@@ -1066,51 +1065,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSRange rangeToTransform;
     // Find where previous control character was, and replace mention at that point
     NSUInteger controlCharLocation = [HKWMentionsPluginV2 mostRecentControlCharacterLocationInText:parentTextView.text controlCharacterSet:self.controlCharacterSet];
-    NSString *const wordAfterControlChar = [HKWMentionsPluginV2 wordAfterLocation:controlCharLocation text:parentTextView.text];
-    rangeToTransform = NSMakeRange(controlCharLocation, wordAfterControlChar.length);
-
-    /*
-     When the textview text that matches the mention text is not the first part of the mention text,
-     we must check the text preceding the current cursor location
-     to see if it matches the first part of the mention text
-     and change the range of text to be transformed accordingly
-     e.g. mention text is "Bruce Wayne" & the matched part is "wayn"
-     textview text is "... bruce wayn| ..."
-     here the rangeToTransform will only replace "wayn"
-     and the textview text will become "... bruce Bruce Wayne ..."
-     The following code checks for & prevents this from happening
-     */
-    // Get the text from the textview that was matched for the mention & trim white spaces
-
-    NSAssert(parentTextView.text, @"Text of parent textview should not be nil.");
-    NSString *matchedText = [parentTextView.text substringWithRange:NSMakeRange(location, currentLocation - location)];
-    matchedText = [matchedText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-
-    // If the matched text is the first part of the mention text, we don't need any further calculation
-    // e.g. matched text is "bruc"
-    BOOL hasPrefix = matchedText && [mentionText rangeOfString:matchedText options:NSCaseInsensitiveSearch | NSAnchoredSearch].location != NSNotFound;
-
-    if (!hasPrefix) {
-        // Add white space to the start of the mention & get range for the text in mention
-        matchedText = [NSString stringWithFormat:@" %@", matchedText];
-        NSRange matchedTextRange = [mentionText rangeOfString:matchedText options:NSCaseInsensitiveSearch];
-        if (matchedTextRange.location != NSNotFound
-            && matchedTextRange.location + 1 < mentionText.length) {
-            // Get the first part of mention text (preceding the matched text)
-            NSString *excessStringToReplace = [mentionText substringWithRange:NSMakeRange(0, matchedTextRange.location + 1)];
-            NSUInteger excessLength = excessStringToReplace.length;
-            if (location >= excessLength) {
-                // Get similar length string from the text view preceding location
-                NSString *stringFromTextView = [parentTextView.text substringWithRange:NSMakeRange(location - excessLength, excessLength)];
-                // If the first part of mention text matches the string from textview preceding the cursor,
-                // we adjust the range of text to transform to include the excess string as well
-                if (stringFromTextView && [stringFromTextView caseInsensitiveCompare:excessStringToReplace] == NSOrderedSame) {
-                    rangeToTransform = NSMakeRange(rangeToTransform.location - excessLength, rangeToTransform.length + excessLength);
-                    location = rangeToTransform.location;
-                }
-            }
-        }
-    }
+    // Replace until the end of the word at the current cursor location
+    NSUInteger endOfWordToReplace = [self endOfValidWordInText:parentTextView.text afterLocation:location];
+    rangeToTransform = NSMakeRange(controlCharLocation, endOfWordToReplace - controlCharLocation);
 
     [parentTextView transformTextAtRange:rangeToTransform
                          withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
@@ -1132,14 +1089,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         return [self typingAttributesByStrippingMentionAttributes:currentAttributes];
     }];
     // Move the cursor
-    // Since cursor is already updated in simple refactor, we move it back one character
-    parentTextView.selectedRange = NSMakeRange(location + [mentionText length]  - 1, 0);
+    parentTextView.selectedRange = NSMakeRange(controlCharLocation + [mentionText length], 0);
     parentTextView.shouldRejectAutocorrectInsertions = NO;
 
     // Inform the delegate (if appropriate)
     __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
     if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPlugin:createdMention:atLocation:)]) {
-        [strongStateChangeDelegate mentionsPlugin:self createdMention:mention atLocation:location];
+        [strongStateChangeDelegate mentionsPlugin:self createdMention:mention atLocation:controlCharLocation];
     }
     // Invoke the parent text view's delegate if appropriate, since a mention was added and the text changed.
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;
