@@ -916,7 +916,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
 
         // Bleach a mention if the insertion intersects with it
-        // This is needed if a user autocorrects a mention name
+        // This is needed if a user autocorrects a mention name from the black pop up menu over a piece of text
         NSRange mentionRange;
         id attribute = [textView.attributedText attribute:HKWMentionAttributeName atIndex:range.location effectiveRange:&mentionRange];
         if (attribute && NSIntersectionRange(mentionRange, range).length > 0) {
@@ -1064,7 +1064,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
-- (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)location {
+- (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)cursorLocation {
     if (!mention) {
         return;
     }
@@ -1084,7 +1084,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Find where previous control character was, and replace mention at that point
     NSUInteger controlCharLocation = [HKWMentionsPluginV2 mostRecentControlCharacterLocationInText:parentTextView.text controlCharacterSet:self.controlCharacterSet];
     // Replace until the end of the word at the current cursor location
-    NSUInteger endOfWordToReplace = [self endOfValidWordInText:parentTextView.text afterLocation:location];
+    NSUInteger endOfWordToReplace = [self endOfValidWordInText:parentTextView.text afterLocation:cursorLocation];
     rangeToTransform = NSMakeRange(controlCharLocation, endOfWordToReplace - controlCharLocation);
 
     [parentTextView transformTextAtRange:rangeToTransform
