@@ -779,7 +779,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSRange mentionRange;
     HKWMentionsAttribute __unused *mention = [self mentionAttributePrecedingLocation:location
                                                                                range:&mentionRange];
-    if (mentionRange.location > controlCharLocation) {
+    if (mention && (mentionRange.location + mentionRange.length >= controlCharLocation)) {
         return NSNotFound;
     }
 
@@ -887,13 +887,17 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 // JIRA: POST-14031
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     BOOL returnValue = YES;
+    // In simple refactor, we only focus on insertions and deletions in order to allow for personalization/deletions/bleaching of mentions
 
-    // In simple refactor, we only focus on insertions and deletions in order to allow for personalization/deletions/bleaching of mentions.
+    // Handle deletion of mentions characters
     if (text.length == 0 && range.length == 1) {
         [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
         self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
         returnValue = [self shouldAllowCharacterDeletionAtLocation:range.location];
     }
+
+    // TODO: Handle deletion of range of characters
+    // JIRA: POST-14257
 
     //  If character is inserted within a mention then bleach the mention.
     if (text.length > 0 && range.length == 0 && self.currentlySelectedMentionRange.location != NSNotFound) {
@@ -905,9 +909,23 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
     }
 
-    // Remove any mention selection that still exists, since it should go away upon any text change
-    [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
-    self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+    // If more than one character is inserted
+    if (text.length > 0 && range.length > 0) {
+        // Remove any current selections
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
+        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+
+        // Bleach a mention if the insertion intersects with it
+        // This is needed if a user autocorrects a mention name
+        NSRange mentionRange;
+        id attribute = [textView.attributedText attribute:HKWMentionAttributeName atIndex:range.location effectiveRange:&mentionRange];
+        if (attribute && NSIntersectionRange(mentionRange, range).length > 0) {
+            [self bleachExistingMentionAtRange:mentionRange];
+        }
+
+        // Reset selected range so that any autocorrect gets placed in the correct location
+        textView.selectedRange = range;
+    }
 
     [self stripCustomAttributesFromTypingAttributes];
     return returnValue;

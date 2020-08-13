@@ -61,7 +61,11 @@
                       [MentionEntity entityWithName:@"John Hopcroft" entityId:@"24"],
                       [MentionEntity entityWithName:@"Robert Tarjan" entityId:@"25"],
                       [MentionEntity entityWithName:@"John McCarthy" entityId:@"6"],  // DupeTesting: Second instance. New Page.
-                      [MentionEntity entityWithName:@"John McCarthy" entityId:@"6"]]; // DupeTesting: Third instance. Same Page.
+                      [MentionEntity entityWithName:@"John McCarthy" entityId:@"6"], // DupeTesting: Third instance. Same Page.
+                      // Entity that has an autocorrect-able first name
+                      [MentionEntity entityWithName:@"Asd Tarjan" entityId:@"26"],
+                      [MentionEntity entityWithName:@"Asd Tarjan2 👍" entityId:@"27"],
+                      [MentionEntity entityWithName:@"TEST @" entityId:@"28"]];
 }
 
 

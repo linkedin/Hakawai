@@ -497,7 +497,7 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         CGFloat oldY = self.viewportContentOffset.y;
         CGFloat oldX = self.viewportContentOffset.x;
         // Check for NaN (e.g. from caretRectForPosition:)
-        if (!isnan(oldX) && !isnan(newOffsetY) && newOffsetY != oldY) {
+        if (!isnan(oldX) && !isnan(newOffsetY) && !(newOffsetY >= CGFLOAT_MAX) && newOffsetY != oldY) {
             self.viewportContentOffset = CGPointMake(oldX, newOffsetY);
             [self setContentOffset:self.viewportContentOffset animated:NO];
             if ([self.controlFlowPlugin respondsToSelector:@selector(singleLineViewportChanged)]) {
