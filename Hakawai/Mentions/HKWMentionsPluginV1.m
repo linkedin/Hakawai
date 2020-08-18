@@ -668,10 +668,10 @@
     if (!mention) { return NO; }
     // See if the delegate will allow the mention to be trimmed
     __strong __auto_type delegate = self.defaultChooserViewDelegate;
-    __strong __auto_type customChooserViewDelegate = self.customChooserViewDelegate;
+    __strong __auto_type strongCustomChooserViewDelegate = self.customChooserViewDelegate;
     BOOL delegateImplementsCustomTrimming = [delegate respondsToSelector:@selector(trimmedNameForEntity:)];
     BOOL delegateAllowsTrimming = NO;
-    if ([customChooserViewDelegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
+    if ([strongCustomChooserViewDelegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
         delegateAllowsTrimming = [delegate entityCanBeTrimmed:mention];
     } else if ([delegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
         delegateAllowsTrimming = [delegate entityCanBeTrimmed:mention];
@@ -928,7 +928,7 @@
     BOOL returnValue = YES;
     __strong __auto_type parentTextView = self.parentTextView;
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;
-    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
+    __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
     switch (self.state) {
         case HKWMentionsStateQuiescent: {
             [self.startDetectionStateMachine deleteTypedCharacter:deletedChar
@@ -1037,8 +1037,8 @@
                 location = parentTextView.selectedRange.location;
 
                 // Notify the plugin's state change delegate that a mention was trimmed.
-                if ([stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:trimmedMention:atLocation:)]) {
-                    [stateChangeDelegate mentionsPlugin:self trimmedMention:self.currentlySelectedMention atLocation:location];
+                if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPlugin:trimmedMention:atLocation:)]) {
+                    [strongStateChangeDelegate mentionsPlugin:self trimmedMention:self.currentlySelectedMention atLocation:location];
                 }
                 // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
                 if (self.notifyTextViewDelegateOnMentionTrim
@@ -1085,8 +1085,8 @@
                 }
                 location = locationAfterDeletion;
                 // Notify the plugin's state change delegate that a mention was deleted.
-                if ([stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:deletedMention:atLocation:)]) {
-                    [stateChangeDelegate mentionsPlugin:self deletedMention:currentMention atLocation:location];
+                if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPlugin:deletedMention:atLocation:)]) {
+                    [strongStateChangeDelegate mentionsPlugin:self deletedMention:currentMention atLocation:location];
                 }
 
                 // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
@@ -1719,10 +1719,10 @@
                                completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
     // set up the chooser view prior to data request in order to support fully customized view
     [self.creationStateMachine setupChooserViewIfNeeded];
-    __strong __auto_type customChooserViewDelegate = self.customChooserViewDelegate;
-    if (customChooserViewDelegate) {
-        [customChooserViewDelegate didUpdateKeyString:keyString
-                                     controlCharacter:character];
+    __strong __auto_type strongCustomChooserViewDelegate = self.customChooserViewDelegate;
+    if (strongCustomChooserViewDelegate) {
+        [strongCustomChooserViewDelegate didUpdateKeyString:keyString
+                                           controlCharacter:character];
     } else {
         [self.defaultChooserViewDelegate asyncRetrieveEntitiesForKeyString:keyString
                                                                 searchType:type
@@ -1791,9 +1791,9 @@
 
 - (void)selected:(id<HKWMentionsEntityProtocol>)entity atIndexPath:(NSIndexPath *)indexPath {
     // Inform the delegate (if appropriate)
-    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
-    if ([stateChangeDelegate respondsToSelector:@selector(selected:atIndexPath:)]) {
-        [stateChangeDelegate selected:entity atIndexPath:indexPath];
+    __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
+    if ([strongStateChangeDelegate respondsToSelector:@selector(selected:atIndexPath:)]) {
+        [strongStateChangeDelegate selected:entity atIndexPath:indexPath];
     }
 }
 
@@ -1896,9 +1896,9 @@
     parentTextView.shouldRejectAutocorrectInsertions = NO;
 
     // Inform the delegate (if appropriate)
-    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
-    if ([stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:createdMention:atLocation:)]) {
-        [stateChangeDelegate mentionsPlugin:self createdMention:mention atLocation:location];
+    __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
+    if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPlugin:createdMention:atLocation:)]) {
+        [strongStateChangeDelegate mentionsPlugin:self createdMention:mention atLocation:location];
     }
     // Invoke the parent text view's delegate if appropriate, since a mention was added and the text changed.
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;
@@ -2014,9 +2014,9 @@
 - (void)accessoryViewStateWillChange:(BOOL)activated {
     if (activated) {
         // Tell state change delegate that the chooser view will open.
-        __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
-        if ([stateChangeDelegate respondsToSelector:@selector(mentionsPluginWillActivateChooserView:)]) {
-            [stateChangeDelegate mentionsPluginWillActivateChooserView:self];
+        __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
+        if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPluginWillActivateChooserView:)]) {
+            [strongStateChangeDelegate mentionsPluginWillActivateChooserView:self];
         }
     }
     else {
@@ -2027,13 +2027,13 @@
 }
 
 - (void)accessoryViewActivated:(BOOL)activated {
-    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
+    __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
     if (activated) {
         __strong __auto_type parentTextView = self.parentTextView;
         parentTextView.shouldRejectAutocorrectInsertions = YES;
         [parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
-        if ([stateChangeDelegate respondsToSelector:@selector(mentionsPluginActivatedChooserView:)]) {
-            [stateChangeDelegate mentionsPluginActivatedChooserView:self];
+        if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPluginActivatedChooserView:)]) {
+            [strongStateChangeDelegate mentionsPluginActivatedChooserView:self];
         }
         if (self.viewportLocksToTopUponMentionCreation) {
             [parentTextView enterSingleLineViewportMode:HKWViewportModeTop captureTouches:YES];
@@ -2044,8 +2044,8 @@
     }
     else {
         // Tell state change delegate that the chooser view has been closed.
-        if ([stateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
-            [stateChangeDelegate mentionsPluginDeactivatedChooserView:self];
+        if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
+            [strongStateChangeDelegate mentionsPluginDeactivatedChooserView:self];
         }
     }
 }
@@ -2084,15 +2084,15 @@
     HKW_STATE_LOG(@"STATE TRANSITION: %@ --> %@", nameForMentionsState(_state), nameForMentionsState(state));
 
     // Inform the delegate, if one exists
-    __strong __auto_type stateChangeDelegate = self.stateChangeDelegate;
-    if ([stateChangeDelegate respondsToSelector:@selector(mentionsPlugin:stateChangedTo:from:)]) {
+    __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
+    if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPlugin:stateChangedTo:from:)]) {
         if (state == HKWMentionsStartDetectionStateCreatingMention && _state != HKWMentionsStartDetectionStateCreatingMention) {
-            [stateChangeDelegate mentionsPlugin:self
+            [strongStateChangeDelegate mentionsPlugin:self
                                  stateChangedTo:HKWMentionsPluginStateCreatingMention
                                            from:HKWMentionsPluginStateQuiescent];
         }
         else if (state != HKWMentionsStartDetectionStateCreatingMention && _state == HKWMentionsStartDetectionStateCreatingMention) {
-            [stateChangeDelegate mentionsPlugin:self
+            [strongStateChangeDelegate mentionsPlugin:self
                                  stateChangedTo:HKWMentionsPluginStateQuiescent
                                            from:HKWMentionsPluginStateCreatingMention];
         }

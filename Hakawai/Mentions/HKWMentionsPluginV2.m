@@ -1390,7 +1390,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 // TODO: Remove this call
 // JIRA: POST-14031
-- (void)textViewDidProgrammaticallyUpdate:(UITextView * _Null_unspecified)textView {
+- (void)textViewDidProgrammaticallyUpdate:(UITextView * _Null_unspecified __unused)textView {
     return;
 }
 
