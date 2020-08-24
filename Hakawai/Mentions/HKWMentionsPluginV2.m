@@ -1082,7 +1082,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     NSRange rangeToTransform;
     // Find where previous control character was, and replace mention at that point
-    NSUInteger controlCharLocation = [HKWMentionsPluginV2 mostRecentControlCharacterLocationInText:parentTextView.text controlCharacterSet:self.controlCharacterSet];
+    NSString *substringUntilCursor = [parentTextView.text substringToIndex:cursorLocation];
+    NSUInteger controlCharLocation = [HKWMentionsPluginV2 mostRecentControlCharacterLocationInText:substringUntilCursor
+                                                                               controlCharacterSet:self.controlCharacterSet];
     // Replace until the end of the word at the current cursor location
     NSUInteger endOfWordToReplace = [self endOfValidWordInText:parentTextView.text afterLocation:cursorLocation];
     rangeToTransform = NSMakeRange(controlCharLocation, endOfWordToReplace - controlCharLocation);
