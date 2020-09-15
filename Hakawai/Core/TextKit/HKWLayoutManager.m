@@ -36,7 +36,7 @@ typedef NSMutableArray RectValuesBuffer;
     // -------------------------------------------------------------------------------------------------------------- //
     // Handle drawing background for the new rounded rect background attribute.
     NSArray *tuples = [self roundedRectBackgroundAttributeTuplesInTextStorage:self.textStorage
-                                                                  withinRange:glyphsToShow];
+                                                                  withinGlyphRange:glyphsToShow];
     NSArray *roundedRectBackgroundRectArrays = [self rectArraysForRoundedRectBackgroundAttributeTuples:tuples
                                                                                        inTextContainer:self.textContainers[0]];
     if ([roundedRectBackgroundRectArrays count] == 0) {
@@ -85,22 +85,19 @@ typedef NSMutableArray RectValuesBuffer;
  rectangle background (RRB) attribute, and the RRB value object itself.
  */
 - (NSArray *)roundedRectBackgroundAttributeTuplesInTextStorage:(NSTextStorage *)textStorage
-                                                   withinRange:(NSRange)range {
+                                              withinGlyphRange:(NSRange)glyphRange {
     NSMutableArray *buffer = [NSMutableArray array];
-    if (!textStorage || range.location == NSNotFound) {
+    if (!textStorage || glyphRange.location == NSNotFound) {
         return nil;
     }
 
-    // Avoid out of bounds crashes that can happen when typing in languages like Tamil
-    NSRange adjustedRange;
-    if (range.location + range.length > textStorage.length) {
-        adjustedRange = NSMakeRange(range.location, textStorage.length - range.location);
-    } else {
-        adjustedRange = range;
-    }
+    // Convert from glyph to character range, because we will be enumerating over the characters to apply attributes
+    // Glyphs and character ranges are usually equal in English, but can be very different in other languages like Tamil, Farsi and Arabic
+    // https://www.icu-project.org/docs/papers/forms_of_unicode/
+    NSRange characterRange = [self characterRangeForGlyphRange:glyphRange actualGlyphRange:nil];
 
     // Go through the attributes in the given range and pick out the ones that correspond to the
-    [textStorage enumerateAttributesInRange:adjustedRange
+    [textStorage enumerateAttributesInRange:characterRange
                                     options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
                                  usingBlock:^(NSDictionary *attrs, NSRange attributeRange, __unused BOOL *stop) {
                                      for (NSString *attr in attrs) {

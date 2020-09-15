@@ -21,7 +21,7 @@
 
 @interface HKWLayoutManager ()
 - (NSArray *)roundedRectBackgroundAttributeTuplesInTextStorage:(NSTextStorage *)textStorage
-                                                   withinRange:(NSRange)range;
+                                              withinGlyphRange:(NSRange)glyphRange;
 @end
 
 SpecBegin(layoutManager)
@@ -39,11 +39,61 @@ describe(@"roundedRectBackgroundAttributeTuples method", ^{
 
     it(@"should not crash with with invalid ranges", ^{
         NSRange range = NSMakeRange(0, 100);
-        NSArray *result = [layoutManager roundedRectBackgroundAttributeTuplesInTextStorage:textView.textStorage withinRange:range];
+        NSArray *result = [layoutManager roundedRectBackgroundAttributeTuplesInTextStorage:textView.textStorage withinGlyphRange:range];
         expect(result).notTo.beNil();
     });
-    
+});
 
+describe(@"long non-english languages", ^{
+    __block HKWTextView *textView;
+    __block HKWLayoutManager *layoutManager;
+    NSString *baseString = @"«می‌شه منبعش رو هم بگین؟»"
+""
+"  احتمالا شما هم با این سؤال و سؤالات مشابه‌ش ذیل پست‌های لینکدین برخورد کردین. و خب به نظرم مطلب باید طوری باشه که اصلا این سؤالات پرسیده نشه"
+""
+ "   دلیل اصلی این پست اینه که می‌بینم بعضی دوستان اینفوگرافیک‌ها و آمارهایی رو به اشتراک می‌ذارن، بدون ذکر منبعش. وقتی هم که از منبع پرسیده می‌شه، یا جواب نمی‌دن و یا با ارجاع به یه منبع مبهم سؤال رو از سر باز می‌کنن"
+""
+    "ذکر منابع یه رفتار حرفه‌ایه که محدود به زمینه‌ی خاصی هم نیست. طرح، عکس، آمار و هر نوع محتوای دیگه‌ای رو اگر به اشتراک می‌ذاریم، منبعش رو هم باهاش همراه کنیم"
+""
+    "منبع علاوه بر اینکه کارکرد رعایت حق تولیدکننده محتوا رو داره، برای راستی‌آزمایی اطلاعات بسیار مهمه. اون‌هم در زمانه‌ای که انواع و اقسام اطلاعات جعلی و بی‌پایه پخش می‌شه"
+    "آوردن منابع برای کسب اطلاعات بیشتر هم خیلی کاربردیه. مثلا ممکنه کسی به خود آمار و اعداد علاقه‌ای نداشته باشه، ولی کنجکاو باشه که روش تحقیق استفاده‌شده چی بوده"
+""
+    "پس بیایم بیش از اون‌که به فکر لایک و جذب مخاطب باشیم، حرفه‌ای رفتار کنیم و اطلاعات و محتوا رو با منبعش به اشتراک بذاریم"
+""
+    "#ذکر_منبع"
+""
+    "(منبع عکس هم سایت"
+         "    9GAG)";
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        textView.attributedText = [[NSAttributedString alloc] initWithString:baseString];
+        layoutManager = (HKWLayoutManager *)textView.layoutManager;
+    });
+
+    it(@"should not crash with glyph range longer than character range", ^{
+        NSRange glyphRange = NSMakeRange(1039, 121);
+        NSArray *result = [layoutManager roundedRectBackgroundAttributeTuplesInTextStorage:textView.textStorage withinGlyphRange:glyphRange];
+        expect(result).notTo.beNil();
+    });
+
+    it(@"should not crash with glyph range longer than character range 2", ^{
+        NSRange glyphRange = NSMakeRange(800, 323);
+        NSArray *result = [layoutManager roundedRectBackgroundAttributeTuplesInTextStorage:textView.textStorage withinGlyphRange:glyphRange];
+        expect(result).notTo.beNil();
+    });
+
+    it(@"should not crash with glyph range shorter than character range", ^{
+        NSRange glyphRange = NSMakeRange(605, 352);
+        NSArray *result = [layoutManager roundedRectBackgroundAttributeTuplesInTextStorage:textView.textStorage withinGlyphRange:glyphRange];
+        expect(result).notTo.beNil();
+    });
+
+    it(@"should not crash with glyph range shorter than character range 2", ^{
+        NSRange glyphRange = NSMakeRange(0, 193);
+        NSArray *result = [layoutManager roundedRectBackgroundAttributeTuplesInTextStorage:textView.textStorage withinGlyphRange:glyphRange];
+        expect(result).notTo.beNil();
+    });
 });
 
 SpecEnd
