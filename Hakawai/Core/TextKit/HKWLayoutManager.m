@@ -36,7 +36,7 @@ typedef NSMutableArray RectValuesBuffer;
     // -------------------------------------------------------------------------------------------------------------- //
     // Handle drawing background for the new rounded rect background attribute.
     NSArray *tuples = [self roundedRectBackgroundAttributeTuplesInTextStorage:self.textStorage
-                                                                  withinGlyphRange:glyphsToShow];
+                                                             withinGlyphRange:glyphsToShow];
     NSArray *roundedRectBackgroundRectArrays = [self rectArraysForRoundedRectBackgroundAttributeTuples:tuples
                                                                                        inTextContainer:self.textContainers[0]];
     if ([roundedRectBackgroundRectArrays count] == 0) {
