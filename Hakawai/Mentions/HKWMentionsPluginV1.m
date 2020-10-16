@@ -2129,7 +2129,6 @@
         }
         return _creationStateMachine;
     } else {
-        //TODO: init V1 version
         if (!_creationStateMachine) {
             _creationStateMachine = [HKWMentionsCreationStateMachineV1 stateMachineWithDelegate:self];
         }

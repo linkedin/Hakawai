@@ -33,28 +33,21 @@ describe(@"transformTextAtRange with plain text", ^{
         [textView transformTextAtRange:NSMakeRange(0, 3) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"#### TEST ####"];
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"#### TEST #### quick brown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"#### TEST #### quick brown fox jumps over the lazy dog");
     });
 
     it(@"should properly transform text in middle", ^{
         [textView transformTextAtRange:NSMakeRange(5, 12) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"blah_string"];
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The qblah_stringox jumps over the lazy dog");
-        });
-        
+        expect(textView.text).to.equal(@"The qblah_stringox jumps over the lazy dog");
     });
 
     it(@"should properly transform text at end", ^{
         [textView transformTextAtRange:NSMakeRange(31, 12) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"a fat bear"];
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The quick brown fox jumps over a fat bear");
-        });
+        expect(textView.text).to.equal(@"The quick brown fox jumps over a fat bear");
     });
 
     it(@"should properly ignore ranges whose beginnings are out of range", ^{
@@ -68,9 +61,7 @@ describe(@"transformTextAtRange with plain text", ^{
         [textView transformTextAtRange:NSMakeRange(10, 1000) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"~~~~ !!!! ~~~~"];
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The quick ~~~~ !!!! ~~~~");
-        });
+        expect(textView.text).to.equal(@"The quick ~~~~ !!!! ~~~~");
     });
 
     it(@"should properly add text to an empty text view", ^{
@@ -79,18 +70,14 @@ describe(@"transformTextAtRange with plain text", ^{
         [textView transformTextAtRange:NSMakeRange(0, 1) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:baseString];
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(baseString);
-        });
+        expect(textView.text).to.equal(baseString);
     });
 
     it(@"should properly handle an empty string for transformed text", ^{
         [textView transformTextAtRange:NSMakeRange(0, 11) withTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return nil;
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"rown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"rown fox jumps over the lazy dog");
     });
 
     it(@"should properly ignore a nil block", ^{
@@ -121,9 +108,7 @@ describe(@"transformTextAtRange with attributed text", ^{
         for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *fColor = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i < location + [replacementString length]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    expect(fColor).to.equal([UIColor redColor]);
-                });
+                expect(fColor).to.equal([UIColor redColor]);
             }
             else {
                 expect(fColor).to.beNil;
@@ -145,9 +130,7 @@ describe(@"transformTextAtRange with attributed text", ^{
         for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *fColor = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:i effectiveRange:NULL];
             UIColor *expectColor = (i >= location && i < location + [replacementString length]) ? [UIColor redColor] : [UIColor greenColor];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                expect(fColor).to.equal(expectColor);
-            });
+            expect(fColor).to.equal(expectColor);
         }
     });
 
@@ -190,9 +173,7 @@ describe(@"transformSelectedTextWithTransformer", ^{
         [textView transformSelectedTextWithTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"#### TEST ####"];
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"#### TEST #### quick brown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"#### TEST #### quick brown fox jumps over the lazy dog");
     });
 
     it(@"should properly transform selected text with a zero selection length", ^{
@@ -200,9 +181,7 @@ describe(@"transformSelectedTextWithTransformer", ^{
         [textView transformSelectedTextWithTransformer:^NSAttributedString *(__unused NSAttributedString *s) {
             return [[NSAttributedString alloc] initWithString:@"#### TEST ####"];
         }];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The #### TEST ####quick brown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"The #### TEST ####quick brown fox jumps over the lazy dog");
     });
 });
 
@@ -221,24 +200,17 @@ describe(@"insertPlainText", ^{
 
     it(@"should properly insert text at beginning", ^{
         [textView insertPlainText:@"1234567890" location:0];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"1234567890The quick brown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"1234567890The quick brown fox jumps over the lazy dog");
     });
 
     it(@"should properly insert text in the middle", ^{
         [textView insertPlainText:@"HELLO_WORLD" location:4];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The HELLO_WORLDquick brown fox jumps over the lazy dog");
-        });
-        
+        expect(textView.text).to.equal(@"The HELLO_WORLDquick brown fox jumps over the lazy dog");
     });
 
     it(@"should properly insert text at end", ^{
         [textView insertPlainText:@"*^*^*^*^*^" location:43];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The quick brown fox jumps over the lazy dog*^*^*^*^*^");
-        });
+        expect(textView.text).to.equal(@"The quick brown fox jumps over the lazy dog*^*^*^*^*^");
     });
 });
 
@@ -260,16 +232,12 @@ describe(@"insertAttributedText", ^{
     it(@"should properly insert attributed text at beginning", ^{
         NSUInteger location = 0;
         [textView insertAttributedText:insertString location:location];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"1234567890The quick brown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"1234567890The quick brown fox jumps over the lazy dog");
         
         for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *bgColor = [textView.attributedText attribute:NSBackgroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i < location + [insertString length]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    expect(bgColor).to.equal([UIColor purpleColor]);
-                });
+                expect(bgColor).to.equal([UIColor purpleColor]);
             }
             else {
                 expect(bgColor).to.beNil;
@@ -280,15 +248,11 @@ describe(@"insertAttributedText", ^{
     it(@"should properly insert text in the middle", ^{
         NSUInteger location = 4;
         [textView insertAttributedText:insertString location:location];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The 1234567890quick brown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"The 1234567890quick brown fox jumps over the lazy dog");
         for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *bgColor = [textView.attributedText attribute:NSBackgroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i < location + [insertString length]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    expect(bgColor).to.equal([UIColor purpleColor]);
-                });
+                expect(bgColor).to.equal([UIColor purpleColor]);
             }
             else {
                 expect(bgColor).to.beNil;
@@ -299,9 +263,7 @@ describe(@"insertAttributedText", ^{
     it(@"should properly insert text at end", ^{
         NSUInteger location = 43;
         [textView insertAttributedText:insertString location:location];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The quick brown fox jumps over the lazy dog1234567890");
-        });
+        expect(textView.text).to.equal(@"The quick brown fox jumps over the lazy dog1234567890");
         for (NSUInteger i=0; i<[textView.attributedText length]; i++) {
             UIColor *bgColor = [textView.attributedText attribute:NSBackgroundColorAttributeName atIndex:i effectiveRange:NULL];
             if (i >= location && i <= location + [insertString length]) {
@@ -340,10 +302,7 @@ describe(@"insertTextAttachment", ^{
     it(@"should properly insert a text attachment", ^{
         [textView insertTextAttachment:attachment location:11];
         id object = [textView.attributedText attribute:NSAttachmentAttributeName atIndex:11 effectiveRange:NULL];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(object).to.equal(attachment);
-        });
-        
+        expect(object).to.equal(attachment);
     });
 
     it(@"should properly ignore a nil text attachment", ^{
@@ -374,23 +333,17 @@ describe(@"removeTextForRange", ^{
 
     it(@"should properly remove text at beginning", ^{
         [textView removeTextForRange:NSMakeRange(0, 2)];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"e quick brown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"e quick brown fox jumps over the lazy dog");
     });
 
     it(@"should properly remove text in the middle", ^{
         [textView removeTextForRange:NSMakeRange(5, 7)];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The qown fox jumps over the lazy dog");
-        });
+        expect(textView.text).to.equal(@"The qown fox jumps over the lazy dog");
     });
 
     it(@"should properly remove text at end", ^{
         [textView removeTextForRange:NSMakeRange(31, 12)];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(textView.text).to.equal(@"The quick brown fox jumps over ");
-        });
+        expect(textView.text).to.equal(@"The quick brown fox jumps over ");
     });
 
     it(@"should properly remove text for a zero-length range", ^{

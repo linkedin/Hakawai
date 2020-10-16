@@ -30,6 +30,54 @@
 - (BOOL)stringValidForMentionsCreation:(NSString *)string;
 @end
 
+@interface HKWDummyMentionsDefaultChooserViewDelegate : NSObject <HKWMentionsDefaultChooserViewDelegate>
+
+@property (nonatomic) NSArray<NSString *> *trimmableStrings;
+
+- (instancetype)initWithTrimmableStrings:(NSArray<NSString *> *)trimmableStrings;
+
+- (BOOL)entityCanBeTrimmed:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity;
+
+- (nonnull NSString *)trimmedNameForEntity:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity;
+
+@end
+
+@implementation HKWDummyMentionsDefaultChooserViewDelegate
+
+- (instancetype)initWithTrimmableStrings:(NSArray<NSString *> *)trimmableStrings;
+{
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    self.trimmableStrings = trimmableStrings;
+    return self;
+}
+
+- (BOOL)entityCanBeTrimmed:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity {
+    return [self.trimmableStrings containsObject:entity.entityName];
+}
+
+- (nonnull NSString *)trimmedNameForEntity:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity {
+    return [entity.entityName componentsSeparatedByString:@" "][0];
+}
+
+- (void)asyncRetrieveEntitiesForKeyString:(nonnull NSString *)keyString searchType:(HKWMentionsSearchType)type controlCharacter:(unichar)character completion:(void (^ _Null_unspecified)(NSArray * _Null_unspecified, BOOL, BOOL))completionBlock {
+}
+
+
+- (UITableViewCell * _Null_unspecified)cellForMentionsEntity:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity withMatchString:(NSString * _Null_unspecified)matchString tableView:(UITableView * _Null_unspecified)tableView atIndexPath:(NSIndexPath * _Null_unspecified)indexPath {
+    return nil;
+}
+
+
+- (CGFloat)heightForCellForMentionsEntity:(id<HKWMentionsEntityProtocol> _Null_unspecified)entity tableView:(UITableView * _Null_unspecified)tableView {
+    return 0.0;
+}
+
+
+@end
+
 SpecBegin(mentionPluginsSetup)
 
 describe(@"basic mentions plugin setup - MENTIONS PLUGIN V1", ^{
@@ -98,9 +146,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V1", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(1);
         
 
         [textView insertText:@" "];
@@ -109,9 +155,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V1", ^{
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(2);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(2);
     });
 
     it(@"should properly handle mentions containing emoji", ^{
@@ -124,9 +168,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V1", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(1);
         
 
         [textView insertText:@" "];
@@ -134,9 +176,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V1", ^{
         [textView insertText:m2.mentionText];
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(2);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(2);
     });
 
     it(@"should properly handle mentions containing only emoji", ^{
@@ -149,9 +189,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V1", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(1);
 
         [textView insertText:@" "];
 
@@ -159,9 +197,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V1", ^{
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(2);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(2);
     });
 });
 
@@ -185,10 +221,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V2", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
-
+        expect(mentionsPlugin.mentions.count).to.equal(1);
 
         [textView insertText:@" "];
 
@@ -196,9 +229,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V2", ^{
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(2);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(2);
     });
 
     it(@"should properly handle mentions containing emoji", ^{
@@ -211,9 +242,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V2", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(1);
 
 
         [textView insertText:@" "];
@@ -221,9 +250,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V2", ^{
         [textView insertText:m2.mentionText];
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(2);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(2);
     });
 
     it(@"should properly handle mentions containing only emoji", ^{
@@ -236,9 +263,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V2", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(1);
 
         [textView insertText:@" "];
 
@@ -246,9 +271,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V2", ^{
         m2.range = NSMakeRange(m1.mentionText.length + 1, m2.mentionText.length);
         [mentionsPlugin addMention:m2];
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(2);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(2);
     });
 });
 
@@ -319,25 +342,18 @@ describe(@"deleting and reading mentions - MENTIONS PLUGIN V1", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(1);
 
         // the first attempt to delete mention should select the mention and modify the state. No changes apply to the mention and text
         BOOL deletionResult1 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(m1.mentionText.length-1, 1) replacementText:@""];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(deletionResult1).to.equal(NO);
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
-        
+        expect(deletionResult1).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(1);
 
         // the second attempt deletes the whole mention
         BOOL deletionResult2 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(m1.mentionText.length-1, 1) replacementText:@""];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(deletionResult2).to.equal(NO);
-            expect(mentionsPlugin.mentions.count).to.equal(0);
-            expect([textView.text length]).to.equal(0);
-        });
+        expect(deletionResult2).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        expect([textView.text length]).to.equal(0);
         
 
     });
@@ -362,20 +378,70 @@ describe(@"deleting and reading mentions - MENTIONS PLUGIN V2", ^{
         m1.range = NSMakeRange(0, m1.mentionText.length);
 
         [mentionsPlugin addMention:m1];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(mentionsPlugin.mentions.count).to.equal(1);
-        });
+        expect(mentionsPlugin.mentions.count).to.equal(1);
 
         // delete the whole mention
         BOOL deletionResult2 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(m1.mentionText.length-1, 1) replacementText:@""];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            expect(deletionResult2).to.equal(NO);
-            expect(mentionsPlugin.mentions.count).to.equal(0);
-            expect([textView.text length]).to.equal(0);
-        });
-
-
+        expect(deletionResult2).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        expect([textView.text length]).to.equal(0);
     });
+
+    it(@"should properly handle range mention deletion", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"Asdf ghjkl" identifier:@"1"];
+        HKWMentionsAttribute *m2 = [HKWMentionsAttribute mentionWithText:@"Asdf ghjkll" identifier:@"2"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+
+        [textView insertText:m1.mentionText];
+        NSString *string = @" Hello ";
+        [textView insertText:string];
+        [textView insertText:m2.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        m2.range = NSMakeRange(m1.mentionText.length + string.length, m2.mentionText.length);
+
+        [mentionsPlugin addMention:m1];
+        [mentionsPlugin addMention:m2];
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+
+        // delete the whole mention
+        NSUInteger middleOfMention1 = m1.mentionText.length/2;
+        BOOL deletionResult2 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(middleOfMention1, m1.mentionText.length+string.length+m2.mentionText.length/2-middleOfMention1) replacementText:@""];
+        expect(deletionResult2).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        expect([textView.text length]).to.equal(0);
+    });
+
+    it(@"should properly handle range mention deletion with trimming", ^{
+        NSString *firstString = @"Asdf ghjkl";
+        NSString *secondString = @"Asdf ghjkll";
+        HKWDummyMentionsDefaultChooserViewDelegate *delegate = [[HKWDummyMentionsDefaultChooserViewDelegate alloc] initWithTrimmableStrings:@[firstString, secondString]];
+        mentionsPlugin.defaultChooserViewDelegate = delegate;
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:firstString identifier:@"3"];
+        HKWMentionsAttribute *m2 = [HKWMentionsAttribute mentionWithText:secondString identifier:@"4"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+
+        [textView insertText:m1.mentionText];
+        NSString *string = @" Hello ";
+        [textView insertText:string];
+        [textView insertText:m2.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        m2.range = NSMakeRange(m1.mentionText.length + string.length, m2.mentionText.length);
+
+        [mentionsPlugin addMention:m1];
+        [mentionsPlugin addMention:m2];
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+
+        // delete the whole mention
+        NSUInteger middleOfMention1 = m1.mentionText.length/2;
+        BOOL deletionResult2 = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(middleOfMention1, m1.mentionText.length+string.length+m2.mentionText.length/2-middleOfMention1) replacementText:@""];
+        expect(deletionResult2).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        expect([textView.text length]).to.equal(m1.mentionText.length + m2.mentionText.length);
+    });
+
+         
 });
 
 SpecEnd
