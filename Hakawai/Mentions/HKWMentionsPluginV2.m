@@ -849,7 +849,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 /**
  Return whether or not to allow text view to process a multi-character deletion.
 
- If the deletion intersects with a mention either at the beginning or the end, do not allow the text view to process the deletion, and handle the deletion ourselves, either personalizing the relevant mentions or removing them
+ Handle deletion manually only when the selection range's start or end location intersects with a mention. i.e:
+
+ | NonMentionWord FirstName Last|Name
+ FirstNa|me lastName NonMentionWord|
+ FirstName1 LastN|ame1 NonMentionWord FirstNa|me2 LastName2
+
+ When the selection range doesn't intersect with a mention, or there is a mention but it is contained fully within the range, we directly let text view handle it as a simple deletion.
 
  @param range Range of multicharacter deletion
  @return whether or not to allow the text view to process the deletion
@@ -865,11 +871,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     HKWMentionsAttribute *mentionAtEndOfRange = [self mentionAttributePrecedingLocation:range.location+range.length
                                                                                   range:&mentionRangeAtEndOfRange];
 
-    // If there is no mention intersecting the start or the end of the range, allow the text view to handle it
+    // no special handling needed if the cursor is at the beginning of the mention,
     BOOL doesStartOfRangeIntersectWithMention = mentionAtStartOfRange && mentionRangeAtStartOfRange.location != range.location;
+    // no special handling needed if the range extends fully to the end of the mention
     BOOL doesEndOfRangeIntersectWithMention = mentionAtEndOfRange
     && mentionRangeAtEndOfRange.location + mentionRangeAtEndOfRange.length != range.location + range.length;
 
+    // If there is no mention intersecting the start or the end of the range, allow the text view to handle it
     if (!doesStartOfRangeIntersectWithMention && !doesEndOfRangeIntersectWithMention) {
         return YES;
     }
