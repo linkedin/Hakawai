@@ -797,53 +797,140 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  @return whether or not to allow the text view to process the deletion
  */
 - (BOOL)shouldAllowCharacterDeletionAtLocation:(NSUInteger)location {
-    BOOL returnValue = YES;
     __strong __auto_type parentTextView = self.parentTextView;
     __strong __auto_type externalDelegate = parentTextView.externalDelegate;
     NSRange mentionRange;
     HKWMentionsAttribute *mentionAtDeleteLocation = [self mentionAttributeAtLocation:location
                                                                                range:&mentionRange];
-    // If the deleted character was part of a mention
-    if (mentionAtDeleteLocation) {
-        // Trim or delete the mention
-        NSString *trimmedString = nil;
-        BOOL canTrim = [self mentionCanBeTrimmed:mentionAtDeleteLocation trimmedString:&trimmedString];
-        if (canTrim) {
-            // Trim mention to first word only
-            NSAssert([trimmedString length] > 0,
-                     @"Cannot trim a mention to zero length");
-            mentionAtDeleteLocation.mentionText = trimmedString;
-            [parentTextView transformTextAtRange:mentionRange
-                                 withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
-            }];
-            // Move the cursor into position.
-            parentTextView.selectedRange = NSMakeRange(mentionRange.location + [trimmedString length],
-                                                       0);
-            // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
-            if (self.notifyTextViewDelegateOnMentionTrim
-                && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                [externalDelegate textViewDidChange:parentTextView];
-            }
-        } else {
-            // Delete mention entirely
-            NSUInteger locationAfterDeletion = mentionRange.location;
-            [parentTextView transformTextAtRange:mentionRange
-                                 withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
-                return (NSAttributedString *)nil;
-            }];
-            [self stripCustomAttributesFromTypingAttributes];
-            parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
-            
-            // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
-            if (self.notifyTextViewDelegateOnMentionDeletion
-                && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                [externalDelegate textViewDidChange:parentTextView];
+    // If the deleted character was not part of a mention, just allow the text view to handle it
+    if (!mentionAtDeleteLocation) {
+        return YES;
+    }
+
+    // Otherwise trim or delete the mention
+    NSString *trimmedString = nil;
+    BOOL canTrim = [self mentionCanBeTrimmed:mentionAtDeleteLocation trimmedString:&trimmedString];
+    if (canTrim) {
+        // Trim mention to first word only
+        NSAssert([trimmedString length] > 0,
+                 @"Cannot trim a mention to zero length");
+        mentionAtDeleteLocation.mentionText = trimmedString;
+        [parentTextView transformTextAtRange:mentionRange
+                             withTransformer:^NSAttributedString *(NSAttributedString *input) {
+            return [input attributedSubstringFromRange:NSMakeRange(0, [trimmedString length])];
+        }];
+        // Move the cursor into position.
+        parentTextView.selectedRange = NSMakeRange(mentionRange.location + [trimmedString length],
+                                                   0);
+        // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
+        if (self.notifyTextViewDelegateOnMentionTrim
+            && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+            [externalDelegate textViewDidChange:parentTextView];
+        }
+    } else {
+        // Delete mention entirely
+        NSUInteger locationAfterDeletion = mentionRange.location;
+        [parentTextView transformTextAtRange:mentionRange
+                             withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
+            return (NSAttributedString *)nil;
+        }];
+        [self stripCustomAttributesFromTypingAttributes];
+        parentTextView.selectedRange = NSMakeRange(locationAfterDeletion, 0);
+
+        // Notify the parent text view's external delegate that the text changed, since a mention was deleted.
+        if (self.notifyTextViewDelegateOnMentionDeletion
+            && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+            [externalDelegate textViewDidChange:parentTextView];
+        }
+    }
+    return NO;
+}
+
+/**
+ Return whether or not to allow text view to process a multi-character deletion.
+
+ Handle deletion manually only when the selection range's start or end location intersects with a mention. i.e:
+
+ | NonMentionWord FirstName Last|Name
+ FirstNa|me lastName NonMentionWord|
+ FirstName1 LastN|ame1 NonMentionWord FirstNa|me2 LastName2
+
+ When the selection range doesn't intersect with a mention, or there is a mention but it is contained fully within the range, we directly let text view handle it as a simple deletion.
+
+ @param range Range of multicharacter deletion
+ @return whether or not to allow the text view to process the deletion
+ */
+- (BOOL)shouldAllowDeletionAtRange:(NSRange)range {
+    __strong __auto_type parentTextView = self.parentTextView;
+    __strong __auto_type externalDelegate = parentTextView.externalDelegate;
+    NSRange mentionRangeAtStartOfRange;
+    HKWMentionsAttribute *mentionAtStartOfRange = [self mentionAttributeAtLocation:range.location
+                                                                             range:&mentionRangeAtStartOfRange];
+
+    NSRange mentionRangeAtEndOfRange;
+    HKWMentionsAttribute *mentionAtEndOfRange = [self mentionAttributePrecedingLocation:range.location+range.length
+                                                                                  range:&mentionRangeAtEndOfRange];
+
+    // no special handling needed if the cursor is at the beginning of the mention,
+    BOOL doesStartOfRangeIntersectWithMention = mentionAtStartOfRange && mentionRangeAtStartOfRange.location != range.location;
+    // no special handling needed if the range extends fully to the end of the mention
+    BOOL doesEndOfRangeIntersectWithMention = mentionAtEndOfRange
+    && mentionRangeAtEndOfRange.location + mentionRangeAtEndOfRange.length != range.location + range.length;
+
+    // If there is no mention intersecting the start or the end of the range, allow the text view to handle it
+    if (!doesStartOfRangeIntersectWithMention && !doesEndOfRangeIntersectWithMention) {
+        return YES;
+    }
+
+    NSRange deletionRange = range;
+    NSString *trimmedMentionAtStartOfRange = nil;
+    if (doesStartOfRangeIntersectWithMention) {
+        // If start of range intersects with a mention, expand the deletion range to encompass that mention
+        deletionRange = NSMakeRange(mentionRangeAtStartOfRange.location, range.location-mentionRangeAtStartOfRange.location+range.length);
+        [self mentionCanBeTrimmed:mentionAtStartOfRange trimmedString:&trimmedMentionAtStartOfRange];
+    }
+    NSString *trimmedMentionAtEndOfRange = nil;
+    if (doesEndOfRangeIntersectWithMention) {
+        // If end of range intersects with a mention, expand the deletion range to encompass that mention
+        deletionRange = NSMakeRange(deletionRange.location, mentionRangeAtEndOfRange.location-deletionRange.location + mentionRangeAtEndOfRange.length);
+        [self mentionCanBeTrimmed:mentionAtEndOfRange trimmedString:&trimmedMentionAtEndOfRange];
+    }
+
+    [parentTextView transformTextAtRange:deletionRange
+                         withTransformer:^NSAttributedString *(NSAttributedString *input) {
+        NSMutableAttributedString *returnString = nil;
+        if (trimmedMentionAtStartOfRange) {
+            mentionAtStartOfRange.mentionText = trimmedMentionAtStartOfRange;
+            // If there's a trimmed mention at the start of a range, maintain it through the deletion
+            returnString = [[input attributedSubstringFromRange:NSMakeRange(0, [trimmedMentionAtStartOfRange length])] mutableCopy];
+        }
+
+        if (mentionAtStartOfRange != mentionAtEndOfRange) {
+            if (trimmedMentionAtEndOfRange) {
+                // If there's a trimmed mention at the end of a range, maintain it through the deletion
+                mentionAtEndOfRange.mentionText = trimmedMentionAtEndOfRange;
+                NSAttributedString *attributedTrimmedMentionAtEndOfRange = [parentTextView.attributedText attributedSubstringFromRange:NSMakeRange(mentionRangeAtEndOfRange.location, trimmedMentionAtEndOfRange.length)];
+                if (returnString) {
+                    [returnString appendAttributedString:attributedTrimmedMentionAtEndOfRange];
+                } else {
+                    returnString = [attributedTrimmedMentionAtEndOfRange mutableCopy];
+                }
             }
         }
-        returnValue = NO;
+        return returnString;
+    }];
+
+    // Update the cursor to be at the beginning of the deletion range, or after the trimmed mention at the start if there was one
+    parentTextView.selectedRange = NSMakeRange(deletionRange.location + [trimmedMentionAtStartOfRange length],
+                                               0);
+
+    [self stripCustomAttributesFromTypingAttributes];
+    // Notify the parent text view's external delegate that the text changed, since a mention was trimmed.
+    if (self.notifyTextViewDelegateOnMentionTrim
+        && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [externalDelegate textViewDidChange:parentTextView];
     }
-    return returnValue;
+    return NO;
 }
 
 #pragma mark - Plug-in protocol
@@ -896,8 +983,10 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         returnValue = [self shouldAllowCharacterDeletionAtLocation:range.location];
     }
 
-    // TODO: Handle deletion of range of characters
-    // JIRA: POST-14257
+    // Handle when a multi-character deletion overlaps a mention
+    if (text.length == 0 && range.length > 1) {
+        returnValue = [self shouldAllowDeletionAtRange:range];
+    }
 
     //  If character is inserted within a mention then bleach the mention.
     if (text.length > 0 && range.length == 0 && self.currentlySelectedMentionRange.location != NSNotFound) {

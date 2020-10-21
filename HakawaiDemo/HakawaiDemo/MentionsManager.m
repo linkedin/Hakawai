@@ -65,7 +65,8 @@
                       // Entity that has an autocorrect-able first name
                       [MentionEntity entityWithName:@"Asd Tarjan" entityId:@"26"],
                       [MentionEntity entityWithName:@"Asd Tarjan2 👍" entityId:@"27"],
-                      [MentionEntity entityWithName:@"TEST @" entityId:@"28"]];
+                      [MentionEntity entityWithName:@"TEST @" entityId:@"28"],
+                      [MentionEntity entityWithName:@"긴 기 ㅣ" entityId:@"29"]];
 }
 
 
