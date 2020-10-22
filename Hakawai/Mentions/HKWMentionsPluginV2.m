@@ -595,7 +595,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 - (HKWMentionsAttribute *)mentionAttributeAtLocation:(NSUInteger)location
                                                range:(NSRangePointer)range {
     __strong __auto_type parentTextView = self.parentTextView;
-    if (location > [parentTextView.attributedText length]) {
+    if (location == [parentTextView.attributedText length]) {
+        return nil;
+    } else if (location > [parentTextView.attributedText length]) {
         NSAssert(NO, @"Can't have a location beyond bounds of parent view");
         return nil;
     }
@@ -1004,12 +1006,17 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
         self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
 
-        // Bleach a mention if the insertion intersects with it
+        // Bleach a mention if the insertion intersects with it, either at the beginning or the end
         // This is needed if a user autocorrects a mention name from the black pop up menu over a piece of text
-        NSRange mentionRange;
-        id attribute = [textView.attributedText attribute:HKWMentionAttributeName atIndex:range.location effectiveRange:&mentionRange];
-        if (attribute && NSIntersectionRange(mentionRange, range).length > 0) {
-            [self bleachExistingMentionAtRange:mentionRange];
+        NSRange mentionRangeAtStartOfRange;
+        id attributeAtStartOfRange = [textView.attributedText attribute:HKWMentionAttributeName atIndex:range.location effectiveRange:&mentionRangeAtStartOfRange];
+        if (attributeAtStartOfRange && NSIntersectionRange(mentionRangeAtStartOfRange, range).length > 0) {
+            [self bleachExistingMentionAtRange:mentionRangeAtStartOfRange];
+        }
+        NSRange mentionRangeAtEndOfRange;
+        id attributeAtEndOfRange = [textView.attributedText attribute:HKWMentionAttributeName atIndex:range.location+range.length-1 effectiveRange:&mentionRangeAtEndOfRange];
+        if (attributeAtEndOfRange && NSIntersectionRange(mentionRangeAtEndOfRange, range).length > 0) {
+            [self bleachExistingMentionAtRange:mentionRangeAtEndOfRange];
         }
 
         // Reset selected range so that any autocorrect gets placed in the correct location
@@ -1049,6 +1056,28 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     } else {
         // if there isn't a query, cancel entity creation
         [self.creationStateMachine cancelMentionCreation];
+    }
+}
+
+- (void)textView:(UITextView *)textView willPasteTextInRange:(NSRange)range {
+    if (self.currentlySelectedMentionRange.location != NSNotFound) {
+        [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
+        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+    } else {
+        NSRange mentionRangeAtStartOfRange;
+        HKWMentionsAttribute *mentionAtStartOfRange = [self mentionAttributeAtLocation:range.location range:&mentionRangeAtStartOfRange];
+        BOOL doesStartOfRangeIntersectWithMention = mentionAtStartOfRange && mentionRangeAtStartOfRange.location != range.location;
+        if (doesStartOfRangeIntersectWithMention) {
+            [self bleachExistingMentionAtRange:mentionRangeAtStartOfRange];
+        }
+
+        NSRange mentionRangeAtEndOfRange;
+        HKWMentionsAttribute *mentionAtEndOfRange = [self mentionAttributePrecedingLocation:range.location+range.length range:&mentionRangeAtEndOfRange];
+        BOOL doesEndOfRangeIntersectWithMention = mentionAtEndOfRange
+        && mentionRangeAtEndOfRange.location + mentionRangeAtEndOfRange.length != range.location + range.length;
+        if (doesEndOfRangeIntersectWithMention) {
+            [self bleachExistingMentionAtRange:mentionRangeAtEndOfRange];
+        }
     }
 }
 

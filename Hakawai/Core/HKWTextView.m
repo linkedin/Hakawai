@@ -27,6 +27,8 @@
 
 @property (nonatomic, readwrite) BOOL wasPaste;
 
+@property (nonatomic) NSAttributedString *copyString;
+
 @end
 
 static BOOL enableMentionsPluginV2 = NO;
@@ -164,18 +166,40 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
     }
 }
 
-
 #pragma mark - UIResponder
 
-- (void)paste:(id)sender {
-    [super paste:sender];
-    self.wasPaste = YES;
-    __strong __auto_type externalDelegate = self.externalDelegate;
-    if ([externalDelegate respondsToSelector:@selector(textViewDidHaveTextPastedIn:)]) {
-        [externalDelegate textViewDidHaveTextPastedIn:self];
+- (void)copy:(id)sender {
+    // In order to maintain mentions styling, save the attributed string for the current copy action
+    if (enableMentionsPluginV2) {
+        self.copyString = [self.attributedText attributedSubstringFromRange:self.selectedRange];
     }
+    [super copy:sender];
 }
 
+- (void)cut:(id)sender {
+    // In order to maintain mentions styling, save the attributed string for the current cut action
+    if (enableMentionsPluginV2) {
+        self.copyString = [self.attributedText attributedSubstringFromRange:self.selectedRange];
+    }
+    [super cut:sender];
+}
+
+- (void)paste:(id)sender {
+    if (enableMentionsPluginV2 && self.copyString) {
+        // In order to maintain mentions styling, insert the saved copyString into the attributed text
+        NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.copyString.length;
+        NSRange selectionRangeBeforePaste = self.selectedRange;
+        // Let control plugin know that text will be pasted, so it can remove any existing mentions attributes at that point
+        [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange];
+        NSMutableAttributedString *string = [self.attributedText mutableCopy];
+        [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:self.copyString];
+        [self setAttributedText:string];
+        self.selectedRange = NSMakeRange(cursorLocationAfterPaste, 0);
+    } else {
+        [super paste:sender];
+    }
+    self.wasPaste = YES;
+}
 
 #pragma mark - Plugin Handling
 
@@ -659,6 +683,13 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         _simplePluginsDictionary = [NSMutableDictionary dictionary];
     }
     return _simplePluginsDictionary;
+}
+
+- (NSAttributedString *)copyString {
+    if (!_copyString) {
+        _copyString = [[NSAttributedString alloc] init];
+    }
+    return _copyString;
 }
 
 - (NSMutableDictionary *)customTypingAttributes {
