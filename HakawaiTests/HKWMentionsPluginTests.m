@@ -714,5 +714,34 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
         expect(textView.text).to.equal(@"FirstName LastName FirstName LastName");
     });
+
+    it(@"paste mention with range", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"1"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Add a space so the mentions don't bleed into each other
+        NSString *nonMentionText = @" NonMentionWord";
+        [textView insertText:nonMentionText];
+
+        // Text is:
+        // FirstName LastName NonMentionWord
+
+        // Copy FirstName LastName
+        textView.selectedRange = NSMakeRange(0, m1.mentionText.length);
+        [textView copy:nil];
+        // Paste FirstName LastName over half of first name
+        // FirstName|FirstName LastName|, where || denote mention attributes
+        textView.selectedRange = NSMakeRange(m1.mentionText.length/2, m1.mentionText.length/2 + nonMentionText.length);
+        [textView paste:nil];
+
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.location).to.equal(m1.mentionText.length/2);
+        expect(textView.text).to.equal(@"FirstNameFirstName LastName");
+    });
 });
 SpecEnd
