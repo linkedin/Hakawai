@@ -174,6 +174,11 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 -(void)textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
 
 /*!
+ Inform the plugin that the textview will paste text
+ */
+-(void)textView:(nonnull UITextView *)textView willPasteTextInRange:(NSRange)range;
+
+/*!
  Extract mentions attributes from an attributed string. The array of mentions attribute objects returned by this method
  can be passed directly into the \c addMentions: method on the plug-in.
  */

@@ -27,6 +27,11 @@
 
 @property (nonatomic, readwrite) BOOL wasPaste;
 
+/**
+String maintaining the most recently copied attributed string from this text view
+ */
+@property (nonatomic, copy, nullable, readwrite) NSAttributedString *copyString;
+
 @end
 
 static BOOL enableMentionsPluginV2 = NO;
@@ -127,12 +132,21 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
     return replacement;
 }
 
+- (void)dealloc {
+    if (enableMentionsPluginV2) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+    }
+}
+
 - (void)setup {
     self.delegate = self;
     self.firstResponderIsCycling = NO;
     self.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.abstractionLayer = [HKWAbstractionLayer instanceWithTextView:self changeRejection:YES];
+    if (enableMentionsPluginV2) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pasteboardChanged) name:UIPasteboardChangedNotification object:nil];
+    }
 }
 
 - (NSLayoutConstraint *)translatedConstraintFor:(NSLayoutConstraint *)constraint originalObject:(id)original {
@@ -164,18 +178,49 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
     }
 }
 
-
 #pragma mark - UIResponder
 
-- (void)paste:(id)sender {
-    [super paste:sender];
-    self.wasPaste = YES;
-    __strong __auto_type externalDelegate = self.externalDelegate;
-    if ([externalDelegate respondsToSelector:@selector(textViewDidHaveTextPastedIn:)]) {
-        [externalDelegate textViewDidHaveTextPastedIn:self];
+- (void)copy:(id)sender {
+    // Copy first, since we clear copyString each time the pasteboard is updated
+    [super copy:sender];
+    if (enableMentionsPluginV2) {
+        // In order to maintain mentions styling, save the attributed string for the current copy action
+        self.copyString = [self.attributedText attributedSubstringFromRange:self.selectedRange];
     }
 }
 
+- (void)cut:(id)sender {
+    // Cut first, since we clear copyString each time the pasteboard is updated
+    // Save the text before the cut happens, because afterwords it will be gone
+    NSAttributedString *preCutText = [self.attributedText attributedSubstringFromRange:self.selectedRange];
+    [super cut:sender];
+    if (enableMentionsPluginV2) {
+        // In order to maintain mentions styling, save the attributed string for the current cut action
+        self.copyString = preCutText;
+    }
+}
+
+- (void)paste:(id)sender {
+    if (enableMentionsPluginV2 && [self.copyString length] > 0) {
+        // In order to maintain mentions styling, insert the saved copyString into the attributed text
+        NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.copyString.length;
+        NSRange selectionRangeBeforePaste = self.selectedRange;
+        // Let control plugin know that text will be pasted, so it can remove any existing mentions attributes at that point
+        [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange];
+        NSMutableAttributedString *string = [self.attributedText mutableCopy];
+        [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:self.copyString];
+        [self setAttributedText:string];
+        self.selectedRange = NSMakeRange(cursorLocationAfterPaste, 0);
+    } else {
+        [super paste:sender];
+    }
+    self.wasPaste = YES;
+}
+
+- (void)pasteboardChanged {
+    // Every time the pasteboard is changed, clear the copy string so we can actually paste in from other sources
+    self.copyString = nil;
+}
 
 #pragma mark - Plugin Handling
 
@@ -659,6 +704,13 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         _simplePluginsDictionary = [NSMutableDictionary dictionary];
     }
     return _simplePluginsDictionary;
+}
+
+- (NSAttributedString *)copyString {
+    if (!_copyString) {
+        _copyString = [[NSAttributedString alloc] init];
+    }
+    return _copyString;
 }
 
 - (NSMutableDictionary *)customTypingAttributes {
