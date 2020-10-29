@@ -66,7 +66,14 @@
                       [MentionEntity entityWithName:@"Asd Tarjan" entityId:@"26"],
                       [MentionEntity entityWithName:@"Asd Tarjan2 👍" entityId:@"27"],
                       [MentionEntity entityWithName:@"TEST @" entityId:@"28"],
-                      [MentionEntity entityWithName:@"긴 기 ㅣ" entityId:@"29"]];
+                      // korean
+                      [MentionEntity entityWithName:@"긴 기 ㅣ" entityId:@"29"],
+                      // "asdf" on persian keyboard
+                      [MentionEntity entityWithName:@"شسیب شسیب شسی شسیب شس" entityId:@"30"],
+                      [MentionEntity entityWithName:@"😀😀 😁😁" entityId:@"31"],
+                      // japanese
+                      [MentionEntity entityWithName:@"らい" entityId:@"32"],
+                      [MentionEntity entityWithName:@"Asd Tarjan2 👍👍" entityId:@"33"],];
 }
 
 

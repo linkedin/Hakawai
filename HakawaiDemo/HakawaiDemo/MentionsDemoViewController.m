@@ -49,7 +49,7 @@ BOOL HKW_systemVersionIsAtLeast(NSString *version);
         // Set up the mentions system
         HKWMentionsChooserPositionMode mode = HKWMentionsChooserPositionModeEnclosedTop;
         // In this demo, the user may explicitly begin a mention with either the '@' or '+' characters
-        NSCharacterSet *controlCharacters = [NSCharacterSet characterSetWithCharactersInString:@"@+"];
+        NSCharacterSet *controlCharacters = [NSCharacterSet characterSetWithCharactersInString:@"@+＠"];
         // The user may also begin a mention by typing three characters (set searchLength to 0 to disable)
         id<HKWMentionsPlugin> mentionsPlugin;
         if (HKWTextView.enableMentionsPluginV2) {

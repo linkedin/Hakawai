@@ -129,12 +129,21 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
     return replacement;
 }
 
+- (void)dealloc {
+    if (enableMentionsPluginV2) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+    }
+}
+
 - (void)setup {
     self.delegate = self;
     self.firstResponderIsCycling = NO;
     self.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.abstractionLayer = [HKWAbstractionLayer instanceWithTextView:self changeRejection:YES];
+    if (enableMentionsPluginV2) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pasteboardChanged) name:UIPasteboardChangedNotification object:nil];
+    }
 }
 
 - (NSLayoutConstraint *)translatedConstraintFor:(NSLayoutConstraint *)constraint originalObject:(id)original {
@@ -169,23 +178,27 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
 #pragma mark - UIResponder
 
 - (void)copy:(id)sender {
-    // In order to maintain mentions styling, save the attributed string for the current copy action
+    // Copy first, since we clear copyString each time the pasteboard is updated
+    [super copy:sender];
     if (enableMentionsPluginV2) {
+        // In order to maintain mentions styling, save the attributed string for the current copy action
         self.copyString = [self.attributedText attributedSubstringFromRange:self.selectedRange];
     }
-    [super copy:sender];
 }
 
 - (void)cut:(id)sender {
-    // In order to maintain mentions styling, save the attributed string for the current cut action
-    if (enableMentionsPluginV2) {
-        self.copyString = [self.attributedText attributedSubstringFromRange:self.selectedRange];
-    }
+    // Cut first, since we clear copyString each time the pasteboard is updated
+    // Save the text before the cut happens, because afterwords it will be gone
+    NSAttributedString *preCutText = [self.attributedText attributedSubstringFromRange:self.selectedRange];
     [super cut:sender];
+    if (enableMentionsPluginV2) {
+        // In order to maintain mentions styling, save the attributed string for the current cut action
+        self.copyString = preCutText;
+    }
 }
 
 - (void)paste:(id)sender {
-    if (enableMentionsPluginV2 && self.copyString) {
+    if (enableMentionsPluginV2 && [self.copyString length] > 0) {
         // In order to maintain mentions styling, insert the saved copyString into the attributed text
         NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.copyString.length;
         NSRange selectionRangeBeforePaste = self.selectedRange;
@@ -199,6 +212,11 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         [super paste:sender];
     }
     self.wasPaste = YES;
+}
+
+- (void)pasteboardChanged {
+    // Every time the pasteboard is changed, clear the copy string so we can actually paste in from other sources
+    self.copyString = nil;
 }
 
 #pragma mark - Plugin Handling
