@@ -73,7 +73,9 @@
                       [MentionEntity entityWithName:@"😀😀 😁😁" entityId:@"31"],
                       // japanese
                       [MentionEntity entityWithName:@"らい" entityId:@"32"],
-                      [MentionEntity entityWithName:@"Asd Tarjan2 👍👍" entityId:@"33"],];
+                      [MentionEntity entityWithName:@"Asd Tarjan2 👍👍" entityId:@"33"],
+                      [MentionEntity entityWithName:@"😀FirstName1😀 😁LastName2😁" entityId:@"34"],
+                      [MentionEntity entityWithName:@"🦋FirstName1🦋 🐛LastName2🐛" entityId:@"35"]];
 }
 
 

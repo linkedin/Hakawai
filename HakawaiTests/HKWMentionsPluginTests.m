@@ -656,6 +656,7 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
 
         expect(mentionsPlugin.mentions.count).to.equal(1);
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.location).to.equal(m1.mentionText.length/2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.length).to.equal(m1.mentionText.length);
         expect(textView.text).to.equal(@"FirstNameFirstName LastName LastName");
     });
 
@@ -678,12 +679,13 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
         textView.selectedRange = NSMakeRange(0, m1.mentionText.length+1);
         [textView copy:nil];
         // Paste FirstName LastName at beginning, leaving:
-        // |FirstName LastName||FirstName LastName, where || denote mention attributes
+        // |FirstName LastName||FirstName LastName|, where || denote mention attributes
         textView.selectedRange = NSMakeRange(0, 0);
         [textView paste:nil];
 
         expect(mentionsPlugin.mentions.count).to.equal(2);
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
         expect(textView.text).to.equal(@"FirstName LastName FirstName LastName ");
     });
 
@@ -706,12 +708,13 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
         textView.selectedRange = NSMakeRange(0, m1.mentionText.length);
         [textView copy:nil];
         // Paste FirstName LastName at beginning, leaving:
-        // |FirstName LastName||FirstName LastName, where || denote mention attributes
+        // |FirstName LastName||FirstName LastName|, where || denote mention attributes
         textView.selectedRange = NSMakeRange(m1.mentionText.length+1, 0);
         [textView paste:nil];
 
         expect(mentionsPlugin.mentions.count).to.equal(2);
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
         expect(textView.text).to.equal(@"FirstName LastName FirstName LastName");
     });
 
@@ -741,6 +744,7 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
 
         expect(mentionsPlugin.mentions.count).to.equal(1);
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.location).to.equal(m1.mentionText.length/2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.length).to.equal(m1.mentionText.length);
         expect(textView.text).to.equal(@"FirstNameFirstName LastName");
     });
 
@@ -769,6 +773,7 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
 
         expect(mentionsPlugin.mentions.count).to.equal(2);
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
         expect(textView.text).to.equal(@"FirstName LastName 😁😁 FirstName LastName 😁😁");
     });
 
@@ -798,6 +803,7 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
 
         expect(mentionsPlugin.mentions.count).to.equal(2);
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
         expect(textView.text).to.equal(@"FirstName LastName FirstName LastName");
 
         // Override pasteboard with "CopyText"
@@ -809,8 +815,10 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
 
         expect(mentionsPlugin.mentions.count).to.equal(2);
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
         // Need small delay so text view has time to paste
         expect(textView.text).after(1).to.equal(@"FirstName LastName FirstName LastNameCopyText");
     });
 });
+
 SpecEnd

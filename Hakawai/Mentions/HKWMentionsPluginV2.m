@@ -604,7 +604,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSAttributedString *parentText = parentTextView.attributedText;
     id value = [parentText attribute:HKWMentionAttributeName
                              atIndex:location
-                           effectiveRange:range];
+               longestEffectiveRange:range
+                             inRange:HKW_FULL_RANGE(parentText)];
     if ([value isKindOfClass:[HKWMentionsAttribute class]]) {
         // Typechecking
         return (HKWMentionsAttribute *)value;
@@ -954,7 +955,10 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 
     NSRange range;
-    id attribute = [parentTextView.attributedText attribute:HKWMentionAttributeName atIndex:cursorLocation effectiveRange:&range];
+    id attribute = [parentTextView.attributedText attribute:HKWMentionAttributeName
+                                                    atIndex:cursorLocation
+                                      longestEffectiveRange:&range
+                                                    inRange:HKW_FULL_RANGE(parentTextView.attributedText)];;
 
     // If there is a mention at the given location, select it
     // - unless the cursor is right at the beginning of the mention. We only want to select if the cursor is within it
@@ -1008,16 +1012,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
         // Bleach a mention if the insertion intersects with it, either at the beginning or the end
         // This is needed if a user autocorrects a mention name from the black pop up menu over a piece of text
-        NSRange mentionRangeAtStartOfRange;
-        id attributeAtStartOfRange = [textView.attributedText attribute:HKWMentionAttributeName atIndex:range.location effectiveRange:&mentionRangeAtStartOfRange];
-        if (attributeAtStartOfRange && NSIntersectionRange(mentionRangeAtStartOfRange, range).length > 0) {
-            [self bleachExistingMentionAtRange:mentionRangeAtStartOfRange];
-        }
-        NSRange mentionRangeAtEndOfRange;
-        id attributeAtEndOfRange = [textView.attributedText attribute:HKWMentionAttributeName atIndex:range.location+range.length-1 effectiveRange:&mentionRangeAtEndOfRange];
-        if (attributeAtEndOfRange && NSIntersectionRange(mentionRangeAtEndOfRange, range).length > 0) {
-            [self bleachExistingMentionAtRange:mentionRangeAtEndOfRange];
-        }
+        [self bleachMentionsIntersectingWithRange:range];
 
         // Reset selected range so that any autocorrect gets placed in the correct location
         textView.selectedRange = range;
@@ -1025,6 +1020,23 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     [self stripCustomAttributesFromTypingAttributes];
     return returnValue;
+}
+
+- (void)bleachMentionsIntersectingWithRange:(NSRange)range {
+    NSRange mentionRangeAtStartOfRange;
+    HKWMentionsAttribute *mentionAtStartOfRange = [self mentionAttributeAtLocation:range.location range:&mentionRangeAtStartOfRange];
+    BOOL doesStartOfRangeIntersectWithMention = mentionAtStartOfRange && mentionRangeAtStartOfRange.location != range.location;
+    if (doesStartOfRangeIntersectWithMention) {
+        [self bleachExistingMentionAtRange:mentionRangeAtStartOfRange];
+    }
+
+    NSRange mentionRangeAtEndOfRange;
+    HKWMentionsAttribute *mentionAtEndOfRange = [self mentionAttributePrecedingLocation:range.location+range.length range:&mentionRangeAtEndOfRange];
+    BOOL doesEndOfRangeIntersectWithMention = mentionAtEndOfRange
+    && mentionRangeAtEndOfRange.location + mentionRangeAtEndOfRange.length != range.location + range.length;
+    if (doesEndOfRangeIntersectWithMention) {
+        [self bleachExistingMentionAtRange:mentionRangeAtEndOfRange];
+    }
 }
 
 - (void)textViewDidChangeSelection:(UITextView *)textView {
@@ -1064,20 +1076,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
         self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
     } else {
-        NSRange mentionRangeAtStartOfRange;
-        HKWMentionsAttribute *mentionAtStartOfRange = [self mentionAttributeAtLocation:range.location range:&mentionRangeAtStartOfRange];
-        BOOL doesStartOfRangeIntersectWithMention = mentionAtStartOfRange && mentionRangeAtStartOfRange.location != range.location;
-        if (doesStartOfRangeIntersectWithMention) {
-            [self bleachExistingMentionAtRange:mentionRangeAtStartOfRange];
-        }
-
-        NSRange mentionRangeAtEndOfRange;
-        HKWMentionsAttribute *mentionAtEndOfRange = [self mentionAttributePrecedingLocation:range.location+range.length range:&mentionRangeAtEndOfRange];
-        BOOL doesEndOfRangeIntersectWithMention = mentionAtEndOfRange
-        && mentionRangeAtEndOfRange.location + mentionRangeAtEndOfRange.length != range.location + range.length;
-        if (doesEndOfRangeIntersectWithMention) {
-            [self bleachExistingMentionAtRange:mentionRangeAtEndOfRange];
-        }
+        // If this paste is happening over a range that intersects with a mention, bleach that mention
+        [self bleachMentionsIntersectingWithRange:range];
     }
 }
 

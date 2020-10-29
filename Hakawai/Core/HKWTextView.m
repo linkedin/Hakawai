@@ -27,7 +27,10 @@
 
 @property (nonatomic, readwrite) BOOL wasPaste;
 
-@property (nonatomic) NSAttributedString *copyString;
+/**
+String maintaining the most recently copied attributed string from this text view
+ */
+@property (nonatomic, copy, nullable, readwrite) NSAttributedString *copyString;
 
 @end
 

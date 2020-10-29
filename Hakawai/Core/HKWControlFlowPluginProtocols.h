@@ -50,7 +50,7 @@
 /*!
  If available, this method is called when the text view is about to paste text
  */
--(void) textView:(UITextView *)textView willPasteTextInRange:(NSRange)range;
+- (void)textView:(UITextView *)textView willPasteTextInRange:(NSRange)range;
 
 @end
 
