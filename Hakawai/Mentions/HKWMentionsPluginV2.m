@@ -30,6 +30,13 @@
 
 @interface HKWMentionsPluginV2 () <HKWMentionsCreationStateMachineProtocol>
 
+/**
+ Whether or not initial setup has been performed. If the text view is the first responder already when the plug-in is
+ set, initial setup should be performed immediately. However, if it's not, setup should be deferred until editing is
+ going to begin, so that the text view doesn't snatch first-responder status from a different control.
+ */
+@property (nonatomic) BOOL initialSetupPerformed;
+
 @property (nonatomic, strong) id<HKWMentionsCreationStateMachine> creationStateMachine;
 
 @property (nonatomic, strong) NSDictionary *mentionSelectedAttributes;
@@ -242,15 +249,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 - (void)initialSetup {
     __strong __auto_type parentTextView = self.parentTextView;
 
-    // Disable 'undo'; it doesn't work right with mentions yet
-    self.shouldEnableUndoUponUnregistration = [parentTextView.undoManager isUndoRegistrationEnabled];
-    [parentTextView.undoManager disableUndoRegistration];
-
-    // Disable spell checking
+    // Disable spell checking since we do not want it under mentions text, and there's no way to have it under normal text and not have it under mention text
     [parentTextView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
 
     // Fetch initial mentions
     [self.creationStateMachine fetchInitialMentions];
+
+    self.initialSetupPerformed = YES;
 }
 
 // Delegate method called when the plug-in is unregistered from a text view. Cleans up the state of the text view.
@@ -263,10 +268,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     [parentTextView detachAccessoryView:self.chooserView];
     [self.creationStateMachine resetChooserView];
 
-    // Enable 'undo' if this plug-in is being unregistered
-    if (self.shouldEnableUndoUponUnregistration) {
-        [parentTextView.undoManager enableUndoRegistration];
-    }
     // Restore the parent text view's spell checking
     [parentTextView restoreOriginalSpellChecking:NO];
 }
@@ -419,6 +420,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         return;
     }
     __strong __auto_type parentTextView = self.parentTextView;
+    // Save selection range before toggling, so we can restore it afterwards
+    NSRange previousSelectedRange = parentTextView.selectedRange;
 #ifdef DEBUG
     // For development: assert that a mention actually exists
     NSRange dataRange;
@@ -460,6 +463,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     if (!selected) {
         [self stripCustomAttributesFromTypingAttributes];
     }
+    // Restore previously selected range
+    parentTextView.selectedRange = previousSelectedRange;
 }
 
 /*!
@@ -473,6 +478,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
     NSMutableArray *ranges = [NSMutableArray array];
     __strong __auto_type parentTextView = self.parentTextView;
+    // Save selection range before bleaching, so we can restore it afterwards
+    NSRange previousSelectedRange = parentTextView.selectedRange;
     [parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(parentTextView.attributedText)
                                                       options:0
                                                    usingBlock:^(NSDictionary *attrs, NSRange range, __unused BOOL *stop) {
@@ -505,6 +512,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                  return [buffer copy];
                              }];
     }
+    // Restore previously selected range
+    parentTextView.selectedRange = previousSelectedRange;
     return [ranges count];
 }
 
@@ -517,6 +526,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         return;
     }
     __strong __auto_type parentTextView = self.parentTextView;
+    // Save selection range before bleaching, so we can restore it afterwards
+    NSRange previousSelectedRange = parentTextView.selectedRange;
 #ifdef DEBUG
     // For development: assert that a mention actually exists
     NSRange dataRange;
@@ -549,6 +560,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         }
         return [buffer copy];
     }];
+    // Restore previously selected range
+    parentTextView.selectedRange = previousSelectedRange;
 }
 
 /*!
@@ -1015,7 +1028,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         [self bleachMentionsIntersectingWithRange:range];
 
         // Reset selected range so that any autocorrect gets placed in the correct location
-        textView.selectedRange = range;
     }
 
     [self stripCustomAttributesFromTypingAttributes];
@@ -1082,9 +1094,17 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (BOOL)textViewShouldBeginEditing:(__unused UITextView *)textView {
-    // TODO: Figure out initial fetch for simple refactor
-    // JIRA: POST-13736
+    if (!self.initialSetupPerformed) {
+        [self initialSetup];
+    }
     return YES;
+}
+
+- (void)textViewDidEndEditing:(__unused UITextView *)textView {
+    [self.creationStateMachine cancelMentionCreation];
+    if (self.viewportLocksUponMentionCreation) {
+        [self.parentTextView exitSingleLineViewportMode];
+    }
 }
 
 #pragma mark - Fetch Mentions
@@ -1160,15 +1180,14 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  creation state machine).
  */
 - (void)performMentionCreationEndCleanup {
+    __strong __auto_type parentTextView = self.parentTextView;
     if (self.viewportLocksUponMentionCreation) {
-        [self.parentTextView exitSingleLineViewportMode];
+        [parentTextView exitSingleLineViewportMode];
     }
+    [parentTextView restoreOriginalAutocorrection:YES];
 }
 
 - (void)cancelMentionFromStartingLocation:(__unused NSUInteger)location {
-    // Note that if the mention was cancelled because the user typed a whitespace and caused no search results to return
-    //  as a result, the desired behavior is to allow the start detection state machine to immediately begin searching
-    //  (without waiting for a second space).
     __strong __auto_type parentTextView = self.parentTextView;
     parentTextView.shouldRejectAutocorrectInsertions = NO;
     [parentTextView restoreOriginalAutocorrection:YES];
@@ -1365,7 +1384,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
     if (activated) {
         __strong __auto_type parentTextView = self.parentTextView;
-        parentTextView.shouldRejectAutocorrectInsertions = YES;
         [parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
         if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPluginActivatedChooserView:)]) {
             [strongStateChangeDelegate mentionsPluginActivatedChooserView:self];

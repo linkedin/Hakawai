@@ -621,6 +621,77 @@ describe(@"deleting and reading mentions - MENTIONS PLUGIN V2", ^{
         expect([textView.text length]).to.equal(m1.mentionText.length);
         expect(textView.text).to.equal(@"FirstName1");
     });
+
+    it(@"should properly handle range mention deletion with trimming - personalization - intersects beginning/end - PERSIAN", ^{
+        NSString *firstString = @"شسیب شسیب";
+        NSString *secondString = @"شسیب شسیب";
+        HKWDummyMentionsDefaultChooserViewDelegate *delegate = [[HKWDummyMentionsDefaultChooserViewDelegate alloc] initWithTrimmableStrings:@[firstString, secondString]];
+        mentionsPlugin.defaultChooserViewDelegate = delegate;
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:firstString identifier:@"6"];
+        HKWMentionsAttribute *m2 = [HKWMentionsAttribute mentionWithText:secondString identifier:@"7"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+
+        [textView insertText:m1.mentionText];
+        NSString *string = @" NonMentionWord ";
+        [textView insertText:string];
+        [textView insertText:m2.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        m2.range = NSMakeRange(m1.mentionText.length + string.length, m2.mentionText.length);
+
+        [mentionsPlugin addMention:m1];
+        [mentionsPlugin addMention:m2];
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+
+        // Text is:
+        // FirstName1 LastName1 NonMentionWord FirstName2 LastName2
+
+        // personalize both mentions
+        NSUInteger middleOfMention1 = m1.mentionText.length/2;
+        BOOL deletionResult = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(middleOfMention1, m1.mentionText.length+string.length+m2.mentionText.length/2-middleOfMention1) replacementText:@""];
+        expect(deletionResult).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        expect([textView.text length]).to.equal(m1.mentionText.length + m2.mentionText.length);
+        expect(textView.text).to.equal([NSString stringWithFormat:@"%@%@", [delegate trimmedNameForEntity:m1], [delegate trimmedNameForEntity:m2]]);
+    });
+
+    it(@"should properly handle range mention deletion with trimming - personalization - intersects beginning/end EMOJI", ^{
+        NSString *firstString = @"😁FirstName1😁 LastName1😁";
+        NSString *secondString = @"😁FirstName2😁 LastName2😁";
+        HKWDummyMentionsDefaultChooserViewDelegate *delegate = [[HKWDummyMentionsDefaultChooserViewDelegate alloc] initWithTrimmableStrings:@[firstString, secondString]];
+        mentionsPlugin.defaultChooserViewDelegate = delegate;
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:firstString identifier:@"8"];
+        HKWMentionsAttribute *m2 = [HKWMentionsAttribute mentionWithText:secondString identifier:@"9"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+
+        [textView insertText:m1.mentionText];
+        NSString *string = @" NonMentionWord ";
+        [textView insertText:string];
+        [textView insertText:m2.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        m2.range = NSMakeRange(m1.mentionText.length + string.length, m2.mentionText.length);
+
+        [mentionsPlugin addMention:m1];
+        [mentionsPlugin addMention:m2];
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+
+        // Text is:
+        // FirstName1 LastName1 NonMentionWord FirstName2 LastName2
+
+        // personalize both mentions
+        NSUInteger middleOfMention1 = [m1.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 8;
+        NSUInteger mentionLength1 = [m1.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+        NSUInteger middleOfMention2 = [m2.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 8;
+        BOOL deletionResult = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(middleOfMention1, mentionLength1+string.length+middleOfMention2-middleOfMention1) replacementText:@""];
+        expect(deletionResult).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        NSUInteger newMentionLength1 = [m1.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+        NSUInteger newMentionLength2 = [m2.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+        NSUInteger textViewLength = [textView.text lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+        expect(textViewLength).to.equal(newMentionLength1 + newMentionLength2);
+        expect(textView.text).to.equal([NSString stringWithFormat:@"%@%@", [delegate trimmedNameForEntity:m1], [delegate trimmedNameForEntity:m2]]);
+    });
 });
 
 describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
