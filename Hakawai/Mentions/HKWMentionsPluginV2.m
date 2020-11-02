@@ -1026,8 +1026,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         // Bleach a mention if the insertion intersects with it, either at the beginning or the end
         // This is needed if a user autocorrects a mention name from the black pop up menu over a piece of text
         [self bleachMentionsIntersectingWithRange:range];
-
-        // Reset selected range so that any autocorrect gets placed in the correct location
     }
 
     [self stripCustomAttributesFromTypingAttributes];
