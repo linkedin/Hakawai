@@ -191,6 +191,7 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
     __block HKWTDummyMentionsManager *mentionsManager;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = YES;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp
                                                         controlCharacters:[NSCharacterSet characterSetWithCharactersInString:@"@"]
@@ -198,6 +199,10 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
         mentionsManager = [[HKWTDummyMentionsManager alloc] init];
         mentionsPlugin.defaultChooserViewDelegate = mentionsManager;
         [textView setControlFlowPlugin:mentionsPlugin];
+    });
+
+    afterAll(^{
+        HKWTextView.enableMentionsPluginV2 = NO;
     });
 
     it(@"should not show mention list for email", ^{
@@ -318,6 +323,7 @@ describe(@"Test basic mention typing logic in multiple languages - MENTIONS PLUG
 
      beforeEach(^{
          HKWTextView.enableMentionsCreationStateMachineV2 = YES;
+         HKWTextView.enableMentionsPluginV2 = YES;
          textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
          mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp
                                                          controlCharacters:[NSCharacterSet characterSetWithCharactersInString:@"@"]
@@ -328,6 +334,7 @@ describe(@"Test basic mention typing logic in multiple languages - MENTIONS PLUG
      });
 
      afterAll(^{
+         HKWTextView.enableMentionsPluginV2 = NO;
          HKWTextView.enableMentionsCreationStateMachineV2 = NO;
      });
 
