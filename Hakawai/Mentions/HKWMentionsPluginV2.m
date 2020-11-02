@@ -252,9 +252,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Disable spell checking since we do not want it under mentions text, and there's no way to have it under normal text and not have it under mention text
     [parentTextView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
 
-    // Fetch initial mentions
-    [self.creationStateMachine fetchInitialMentions];
-
     self.initialSetupPerformed = YES;
 }
 

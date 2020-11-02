@@ -301,19 +301,6 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
     }
     expect(entityArray.count).to.equal(5);
     });
-
-    it(@"should trigger initial fetch mentions request when text begins editing", ^{
-        NSArray *entityArray;
-            [textView.delegate textViewShouldBeginEditing:textView];
-        if (HKWTextView.enableMentionsCreationStateMachineV2) {
-            HKWMentionsCreationStateMachineV2 *sm2 = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
-            entityArray = sm2.dataProvider.entityArray;
-        } else {
-            HKWMentionsCreationStateMachineV1 *sm1 = (HKWMentionsCreationStateMachineV1 *)mentionsPlugin.creationStateMachine;
-            entityArray = sm1.entityArray;
-        }
-        expect(entityArray.count).to.equal(1);
-    });
 });
 
 describe(@"Test basic mention typing logic in multiple languages - MENTIONS PLUGIN V2", ^{
