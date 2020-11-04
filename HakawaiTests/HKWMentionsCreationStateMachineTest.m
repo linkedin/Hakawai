@@ -35,6 +35,8 @@
 
 @property (nonatomic) HKWMentionDataProvider *dataProvider;
 
+@property (nonatomic, strong) NSMutableString *stringBuffer;
+
 @end
 
 @interface HKWMentionDataProvider ()
@@ -189,6 +191,7 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
     __block HKWTDummyMentionsManager *mentionsManager;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = YES;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp
                                                         controlCharacters:[NSCharacterSet characterSetWithCharactersInString:@"@"]
@@ -196,6 +199,10 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
         mentionsManager = [[HKWTDummyMentionsManager alloc] init];
         mentionsPlugin.defaultChooserViewDelegate = mentionsManager;
         [textView setControlFlowPlugin:mentionsPlugin];
+    });
+
+    afterAll(^{
+        HKWTextView.enableMentionsPluginV2 = NO;
     });
 
     it(@"should not show mention list for email", ^{
@@ -294,10 +301,88 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
     }
     expect(entityArray.count).to.equal(5);
     });
+});
 
-    it(@"should trigger initial fetch mentions request when text begins editing", ^{
-    // TODO: Enable this test for V2
-    // JIRA: POST-13796
+describe(@"Test basic mention typing logic in multiple languages - MENTIONS PLUGIN V2", ^{
+    __block HKWTextView *textView;
+    __block HKWMentionsPluginV2 *mentionsPlugin;
+    __block HKWTDummyMentionsManager *mentionsManager;
+
+     beforeEach(^{
+         HKWTextView.enableMentionsCreationStateMachineV2 = YES;
+         HKWTextView.enableMentionsPluginV2 = YES;
+         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+         mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp
+                                                         controlCharacters:[NSCharacterSet characterSetWithCharactersInString:@"@"]
+                                                              searchLength:0];
+         mentionsManager = [[HKWTDummyMentionsManager alloc] init];
+         mentionsPlugin.defaultChooserViewDelegate = mentionsManager;
+         [textView setControlFlowPlugin:mentionsPlugin];
+     });
+
+     afterAll(^{
+         HKWTextView.enableMentionsPluginV2 = NO;
+         HKWTextView.enableMentionsCreationStateMachineV2 = NO;
+     });
+
+    it(@"test with english", ^{
+        [textView insertText:@"@"];
+        [textView insertText:@"a"];
+        // Text: @a
+        HKWMentionsCreationStateMachineV2 *creationStateMachine = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        expect(creationStateMachine.stringBuffer).to.equal(@"a");
+        [textView insertText:@"b"];
+        // Text: @ab
+        expect(creationStateMachine.stringBuffer).to.equal(@"ab");
+        [textView deleteBackward];
+        // Text: @a
+        expect(creationStateMachine.stringBuffer).to.equal(@"a");
+        [textView deleteBackward];
+        // Text: @
+        expect(creationStateMachine.stringBuffer).to.equal(@"");
+        [textView insertText:@"ab"];
+        // Text: @ab
+        expect(creationStateMachine.stringBuffer).to.equal(@"ab");
+    });
+
+    it(@"test with korean hanji", ^{
+        [textView insertText:@"@"];
+        [textView insertText:@"ㄱ"];
+        // Text: @ㄱ
+        HKWMentionsCreationStateMachineV2 *creationStateMachine = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        expect(creationStateMachine.stringBuffer).to.equal(@"ㄱ");
+        [textView insertText:@"ㅣ"];
+        // Text: @ㄱㅣ
+        expect(creationStateMachine.stringBuffer).to.equal(@"ㄱㅣ");
+        [textView deleteBackward];
+        // Text: @ㄱ
+        expect(creationStateMachine.stringBuffer).to.equal(@"ㄱ");
+        [textView deleteBackward];
+        // Text: @
+        expect(creationStateMachine.stringBuffer).to.equal(@"");
+        [textView insertText:@"ㄱㅣ"];
+        // Text: @ㄱㅣ
+        expect(creationStateMachine.stringBuffer).to.equal(@"ㄱㅣ");
+    });
+
+    it(@"test with emojis", ^{
+        [textView insertText:@"@"];
+        [textView insertText:@"😁"];
+        // Text: @😁
+        HKWMentionsCreationStateMachineV2 *creationStateMachine = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        expect(creationStateMachine.stringBuffer).to.equal(@"😁");
+        [textView insertText:@"😁"];
+        // Text: @😁😁
+        expect(creationStateMachine.stringBuffer).to.equal(@"😁😁");
+        [textView deleteBackward];
+        // Text: @😁
+        expect(creationStateMachine.stringBuffer).to.equal(@"😁");
+        [textView deleteBackward];
+        // Text: @
+        expect(creationStateMachine.stringBuffer).to.equal(@"");
+        [textView insertText:@"asdf 😁"];
+        // Text: @asdf 😁
+        expect(creationStateMachine.stringBuffer).to.equal(@"asdf 😁");
     });
 });
 

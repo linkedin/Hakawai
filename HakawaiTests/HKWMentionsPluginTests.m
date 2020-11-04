@@ -621,6 +621,275 @@ describe(@"deleting and reading mentions - MENTIONS PLUGIN V2", ^{
         expect([textView.text length]).to.equal(m1.mentionText.length);
         expect(textView.text).to.equal(@"FirstName1");
     });
+
+    it(@"should properly handle range mention deletion with trimming - personalization - intersects beginning/end - PERSIAN", ^{
+        NSString *firstString = @"شسیب شسیب";
+        NSString *secondString = @"شسیب شسیب";
+        HKWDummyMentionsDefaultChooserViewDelegate *delegate = [[HKWDummyMentionsDefaultChooserViewDelegate alloc] initWithTrimmableStrings:@[firstString, secondString]];
+        mentionsPlugin.defaultChooserViewDelegate = delegate;
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:firstString identifier:@"6"];
+        HKWMentionsAttribute *m2 = [HKWMentionsAttribute mentionWithText:secondString identifier:@"7"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+
+        [textView insertText:m1.mentionText];
+        NSString *string = @" NonMentionWord ";
+        [textView insertText:string];
+        [textView insertText:m2.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        m2.range = NSMakeRange(m1.mentionText.length + string.length, m2.mentionText.length);
+
+        [mentionsPlugin addMention:m1];
+        [mentionsPlugin addMention:m2];
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+
+        // Text is:
+        // FirstName1 LastName1 NonMentionWord FirstName2 LastName2
+
+        // personalize both mentions
+        NSUInteger middleOfMention1 = m1.mentionText.length/2;
+        BOOL deletionResult = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(middleOfMention1, m1.mentionText.length+string.length+m2.mentionText.length/2-middleOfMention1) replacementText:@""];
+        expect(deletionResult).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        expect([textView.text length]).to.equal(m1.mentionText.length + m2.mentionText.length);
+        expect(textView.text).to.equal([NSString stringWithFormat:@"%@%@", [delegate trimmedNameForEntity:m1], [delegate trimmedNameForEntity:m2]]);
+    });
+
+    it(@"should properly handle range mention deletion with trimming - personalization - intersects beginning/end EMOJI", ^{
+        NSString *firstString = @"😁FirstName1😁 LastName1😁";
+        NSString *secondString = @"😁FirstName2😁 LastName2😁";
+        HKWDummyMentionsDefaultChooserViewDelegate *delegate = [[HKWDummyMentionsDefaultChooserViewDelegate alloc] initWithTrimmableStrings:@[firstString, secondString]];
+        mentionsPlugin.defaultChooserViewDelegate = delegate;
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:firstString identifier:@"8"];
+        HKWMentionsAttribute *m2 = [HKWMentionsAttribute mentionWithText:secondString identifier:@"9"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+
+        [textView insertText:m1.mentionText];
+        NSString *string = @" NonMentionWord ";
+        [textView insertText:string];
+        [textView insertText:m2.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        m2.range = NSMakeRange(m1.mentionText.length + string.length, m2.mentionText.length);
+
+        [mentionsPlugin addMention:m1];
+        [mentionsPlugin addMention:m2];
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+
+        // Text is:
+        // FirstName1 LastName1 NonMentionWord FirstName2 LastName2
+
+        // personalize both mentions
+        NSUInteger middleOfMention1 = [m1.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 8;
+        NSUInteger mentionLength1 = [m1.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+        NSUInteger middleOfMention2 = [m2.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 8;
+        BOOL deletionResult = [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(middleOfMention1, mentionLength1+string.length+middleOfMention2-middleOfMention1) replacementText:@""];
+        expect(deletionResult).to.equal(NO);
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        NSUInteger newMentionLength1 = [m1.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+        NSUInteger newMentionLength2 = [m2.mentionText lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+        NSUInteger textViewLength = [textView.text lengthOfBytesUsingEncoding:NSUTF32StringEncoding] / 4;
+        expect(textViewLength).to.equal(newMentionLength1 + newMentionLength2);
+        expect(textView.text).to.equal([NSString stringWithFormat:@"%@%@", [delegate trimmedNameForEntity:m1], [delegate trimmedNameForEntity:m2]]);
+    });
+});
+
+describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
+    __block HKWTextView *textView;
+    __block HKWMentionsPluginV2 *mentionsPlugin;
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        HKWTextView.enableMentionsPluginV2 = YES;
+        mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
+        [textView setControlFlowPlugin:mentionsPlugin];
+    });
+
+    it(@"paste mention inside mention", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"1"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Text is:
+        // FirstName LastName
+
+        // Copy FirstName LastName
+        textView.selectedRange = NSMakeRange(0, m1.mentionText.length);
+        [textView copy:nil];
+        // Paste FirstName LastName in middle of existing FirstName LastName, leaving:
+        // FirstName|FirstName LastName| LastName, where || denote mention attributes
+        textView.selectedRange = NSMakeRange(m1.mentionText.length/2, 0);
+        [textView paste:nil];
+
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.location).to.equal(m1.mentionText.length/2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.length).to.equal(m1.mentionText.length);
+        expect(textView.text).to.equal(@"FirstNameFirstName LastName LastName");
+    });
+
+    it(@"paste mention at beginning of text", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"1"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Add a space so the mentions don't bleed into each other
+        [textView insertText:@" "];
+
+        // Text is:
+        // FirstName LastName
+
+        // Copy FirstName LastName
+        textView.selectedRange = NSMakeRange(0, m1.mentionText.length+1);
+        [textView copy:nil];
+        // Paste FirstName LastName at beginning, leaving:
+        // |FirstName LastName||FirstName LastName|, where || denote mention attributes
+        textView.selectedRange = NSMakeRange(0, 0);
+        [textView paste:nil];
+
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
+        expect(textView.text).to.equal(@"FirstName LastName FirstName LastName ");
+    });
+
+    it(@"paste mention at end of text", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"1"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Add a space so the mentions don't bleed into each other
+        [textView insertText:@" "];
+
+        // Text is:
+        // FirstName LastName
+
+        // Copy FirstName LastName
+        textView.selectedRange = NSMakeRange(0, m1.mentionText.length);
+        [textView copy:nil];
+        // Paste FirstName LastName at beginning, leaving:
+        // |FirstName LastName||FirstName LastName|, where || denote mention attributes
+        textView.selectedRange = NSMakeRange(m1.mentionText.length+1, 0);
+        [textView paste:nil];
+
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
+        expect(textView.text).to.equal(@"FirstName LastName FirstName LastName");
+    });
+
+    it(@"paste mention with range", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"1"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Add a space so the mentions don't bleed into each other
+        NSString *nonMentionText = @" NonMentionWord";
+        [textView insertText:nonMentionText];
+
+        // Text is:
+        // FirstName LastName NonMentionWord
+
+        // Copy FirstName LastName
+        textView.selectedRange = NSMakeRange(0, m1.mentionText.length);
+        [textView copy:nil];
+        // Paste FirstName LastName over half of first name
+        // FirstName|FirstName LastName|, where || denote mention attributes
+        textView.selectedRange = NSMakeRange(m1.mentionText.length/2, m1.mentionText.length/2 + nonMentionText.length);
+        [textView paste:nil];
+
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.location).to.equal(m1.mentionText.length/2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[0]).range.length).to.equal(m1.mentionText.length);
+        expect(textView.text).to.equal(@"FirstNameFirstName LastName");
+    });
+
+    it(@"paste mention with emojis", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName 😁😁" identifier:@"2"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Add a space so the mentions don't bleed into each other
+        [textView insertText:@" "];
+
+        // Text is:
+        // FirstName LastName
+
+        // Copy FirstName LastName
+        textView.selectedRange = NSMakeRange(0, m1.mentionText.length);
+        [textView copy:nil];
+        // Paste FirstName LastName at end, leaving:
+        // |FirstName LastName 😁😁| |FirstName LastName 😁😁|, where || denote mention attributes
+        textView.selectedRange = NSMakeRange(m1.mentionText.length+1, 0);
+        [textView paste:nil];
+
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
+        expect(textView.text).to.equal(@"FirstName LastName 😁😁 FirstName LastName 😁😁");
+    });
+
+    it(@"paste from outside after copyString set", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"3"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Add a space so the mentions don't bleed into each other
+        [textView insertText:@" "];
+
+        // Text is:
+        // FirstName LastName
+
+        // Copy FirstName LastName
+        textView.selectedRange = NSMakeRange(0, m1.mentionText.length);
+        [textView copy:nil];
+
+        // Paste FirstName LastName at end, leaving:
+        // |FirstName LastName| |FirstName LastName|, where || denote mention attributes
+        textView.selectedRange = NSMakeRange(m1.mentionText.length+1, 0);
+        [textView paste:nil];
+
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
+        expect(textView.text).to.equal(@"FirstName LastName FirstName LastName");
+
+        // Override pasteboard with "CopyText"
+        [UIPasteboard generalPasteboard].items = @[@{@"public.utf8-plain-text":@"CopyText"}];
+        [textView paste:nil];
+
+        // Paste CopyText at end, leaving:
+        // |FirstName LastName| |FirstName LastName|CopyText, where || denote mention attributes
+
+        expect(mentionsPlugin.mentions.count).to.equal(2);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
+        expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
+        // Need small delay so text view has time to paste
+        expect(textView.text).after(1).to.equal(@"FirstName LastName FirstName LastNameCopyText");
+    });
 });
 
 describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{

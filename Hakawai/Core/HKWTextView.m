@@ -347,7 +347,9 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         return [self.abstractionLayer textViewShouldChangeTextInRange:range replacementText:replacementText wasPaste:self.wasPaste];
     }
 
-    if (!isDictationText && self.shouldRejectAutocorrectInsertions && [replacementText length] > 1 && !self.wasPaste) {
+    // TODO: Remove shouldRejectAutocorrectInsertions and wasPaste as they are hacks, not needed with cursor-based mention refactor
+    // JIRA: POST-14031
+    if (!enableMentionsPluginV2 && !isDictationText && self.shouldRejectAutocorrectInsertions && [replacementText length] > 1 && !self.wasPaste) {
         return NO;
     }
     self.wasPaste = NO;
