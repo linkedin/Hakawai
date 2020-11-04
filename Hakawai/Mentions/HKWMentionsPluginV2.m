@@ -228,7 +228,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
-// Delegate method called when the plug-in is registered to a text view. Actual setup takes place in 'initialSetup'.
 - (void)performInitialSetup {
     __strong __auto_type parentTextView = self.parentTextView;
     NSAssert(parentTextView != nil, @"Internal error: parent text view is nil; it should have been set already");
