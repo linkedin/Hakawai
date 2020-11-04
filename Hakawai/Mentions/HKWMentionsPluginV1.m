@@ -1797,7 +1797,7 @@
     }
 }
 
-- (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)location {
+- (void)createMention:(HKWMentionsAttribute *)mention cursorLocation:(NSUInteger)location {
     if (self.state != HKWMentionsStartDetectionStateCreatingMention || !mention) {
         return;
     }
