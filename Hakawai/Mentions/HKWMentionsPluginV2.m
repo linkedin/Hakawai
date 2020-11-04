@@ -30,13 +30,6 @@
 
 @interface HKWMentionsPluginV2 () <HKWMentionsCreationStateMachineProtocol>
 
-/**
- Whether or not initial setup has been performed. If the text view is the first responder already when the plug-in is
- set, initial setup should be performed immediately. However, if it's not, setup should be deferred until editing is
- going to begin, so that the text view doesn't snatch first-responder status from a different control.
- */
-@property (nonatomic) BOOL initialSetupPerformed;
-
 @property (nonatomic, strong) id<HKWMentionsCreationStateMachine> creationStateMachine;
 
 @property (nonatomic, strong) NSDictionary *mentionSelectedAttributes;
@@ -239,20 +232,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 - (void)performInitialSetup {
     __strong __auto_type parentTextView = self.parentTextView;
     NSAssert(parentTextView != nil, @"Internal error: parent text view is nil; it should have been set already");
-    if (parentTextView.isFirstResponder) {
-        [self initialSetup];
-    }
-}
-
-/// Perform initial setup and put the mentions plug-in into a known good state. This setup takes place the first time
-/// the text view becomes the first responder, or immediately if the text view already is the first responder.
-- (void)initialSetup {
-    __strong __auto_type parentTextView = self.parentTextView;
-
     // Disable spell checking since we do not want it under mentions text, and there's no way to have it under normal text and not have it under mention text
     [parentTextView overrideSpellCheckingWith:UITextSpellCheckingTypeNo];
-
-    self.initialSetupPerformed = YES;
 }
 
 // Delegate method called when the plug-in is unregistered from a text view. Cleans up the state of the text view.
@@ -1086,13 +1067,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         // If this paste is happening over a range that intersects with a mention, bleach that mention
         [self bleachMentionsIntersectingWithRange:range];
     }
-}
-
-- (BOOL)textViewShouldBeginEditing:(__unused UITextView *)textView {
-    if (!self.initialSetupPerformed) {
-        [self initialSetup];
-    }
-    return YES;
 }
 
 - (void)textViewDidEndEditing:(__unused UITextView *)textView {
