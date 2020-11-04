@@ -1169,7 +1169,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
-- (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)cursorLocation {
+- (void)createMention:(HKWMentionsAttribute *)mention cursorLocation:(NSUInteger)cursorLocation {
     if (!mention) {
         return;
     }

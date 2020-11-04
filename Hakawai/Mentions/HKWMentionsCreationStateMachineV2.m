@@ -71,6 +71,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 @property (nonatomic) HKWMentionsCreationChooserState chooserState;
 
 @property (nonatomic, strong) UIView<HKWChooserViewProtocol> *entityChooserView;
+// TODO: Update to cursorLocation with ramp of plugin v2
+// JIRA: POST-14031
 @property (nonatomic) NSUInteger startingLocation;
 /// What the last relevant action the user took within the text view was.
 @property (nonatomic) HKWMentionsCreationAction lastTriggerAction;
@@ -669,7 +671,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     self.state = HKWMentionsCreationStateQuiescent;
     __strong __auto_type delegate = self.delegate;
 
-    [delegate createMention:mention startingLocation:self.startingLocation];
+    [delegate createMention:mention cursorLocation:self.startingLocation];
     [delegate selected:entity atIndexPath:indexPath];
 }
 

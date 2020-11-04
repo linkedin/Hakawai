@@ -978,7 +978,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     self.state = HKWMentionsCreationStateQuiescent;
     __strong __auto_type delegate = self.delegate;
 
-    [delegate createMention:mention startingLocation:self.startingLocation];
+    [delegate createMention:mention cursorLocation:self.startingLocation];
     [delegate selected:entity atIndexPath:indexPath];
 }
 

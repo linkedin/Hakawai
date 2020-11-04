@@ -49,7 +49,7 @@
  Inform the delegate that a new mention annotation should be created. Relevant metadata are contained in the \c mention
  argument. This method also moves the editor view out of the mention creation state.
  */
-- (void)createMention:(HKWMentionsAttribute *)mention startingLocation:(NSUInteger)location;
+- (void)createMention:(HKWMentionsAttribute *)mention cursorLocation:(NSUInteger)cursorLocation;
 
 /*!
  Inform the delegate an entity was selected as a result of user input.
