@@ -202,13 +202,14 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
 
 - (void)paste:(id)sender {
     if (enableMentionsPluginV2 && [self.copyString length] > 0) {
+        __strong __auto_type copyString = self.copyString;
         // In order to maintain mentions styling, insert the saved copyString into the attributed text
         NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.copyString.length;
         NSRange selectionRangeBeforePaste = self.selectedRange;
         // Let control plugin know that text will be pasted, so it can remove any existing mentions attributes at that point
         [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange];
         NSMutableAttributedString *string = [self.attributedText mutableCopy];
-        [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:self.copyString];
+        [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:copyString];
         [self setAttributedText:string];
         self.selectedRange = NSMakeRange(cursorLocationAfterPaste, 0);
     } else {

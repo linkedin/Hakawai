@@ -2088,13 +2088,13 @@
     if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPlugin:stateChangedTo:from:)]) {
         if (state == HKWMentionsStartDetectionStateCreatingMention && _state != HKWMentionsStartDetectionStateCreatingMention) {
             [strongStateChangeDelegate mentionsPlugin:self
-                                 stateChangedTo:HKWMentionsPluginStateCreatingMention
-                                           from:HKWMentionsPluginStateQuiescent];
+                                       stateChangedTo:HKWMentionsPluginStateCreatingMention
+                                                 from:HKWMentionsPluginStateQuiescent];
         }
         else if (state != HKWMentionsStartDetectionStateCreatingMention && _state == HKWMentionsStartDetectionStateCreatingMention) {
             [strongStateChangeDelegate mentionsPlugin:self
-                                 stateChangedTo:HKWMentionsPluginStateQuiescent
-                                           from:HKWMentionsPluginStateCreatingMention];
+                                       stateChangedTo:HKWMentionsPluginStateQuiescent
+                                                 from:HKWMentionsPluginStateCreatingMention];
         }
     }
 
@@ -2206,6 +2206,10 @@
  */
 - (unichar)getExplicitSearchControlCharacter {
     return self.creationStateMachine.explicitSearchControlCharacter;
+}
+
+- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(__unused NSRange)range {
+    return;
 }
 
 #pragma mark - Developer

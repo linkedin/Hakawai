@@ -968,7 +968,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 // TODO: Remove text view from call
 // JIRA: POST-14031
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+- (BOOL)textView:(__unused UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     BOOL returnValue = YES;
     // In simple refactor, we only focus on insertions and deletions in order to allow for personalization/deletions/bleaching of mentions
 
@@ -1029,6 +1029,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 - (void)textViewDidChangeSelection:(UITextView *)textView {
     NSRange range = textView.selectedRange;
     if (range.length > 0) {
+        // If there is a multicharacter range, we unselect any mentions currently selected
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
+        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
         return;
     }
 
@@ -1058,7 +1061,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
-- (void)textView:(UITextView *)textView willPasteTextInRange:(NSRange)range {
+- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(NSRange)range {
     if (self.currentlySelectedMentionRange.location != NSNotFound) {
         [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
         self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
