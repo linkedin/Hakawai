@@ -357,6 +357,19 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return YES;
 }
 
+- (NSDictionary *)defaultTextAttributes {
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSMutableDictionary *returnDict = [[NSMutableDictionary alloc] init];
+    UIFont *parentFont = parentTextView.fontSetByApp;
+    UIColor *parentColor = parentTextView.textColorSetByApp;
+    if (parentFont) {
+        returnDict[NSFontAttributeName] = parentFont;
+    }
+    if (parentColor) {
+        returnDict[NSForegroundColorAttributeName] = parentColor;
+    }
+    return returnDict;
+}
 /*!
  Build a new typing attributes dictionary by stripping mentions-specific attributes from an original attributes
  dictionary and, if applicable, restoring default attributes from the parent text view.
@@ -366,14 +379,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     for (NSString *key in self.mentionUnselectedAttributes) {
         [d removeObjectForKey:key];
     }
-    // Restore the font and/or text color, if the app set either explicitly at any point.
-    __strong __auto_type parentTextView = self.parentTextView;
-    if (parentTextView.fontSetByApp) {
-        d[NSFontAttributeName] = parentTextView.fontSetByApp;
-    }
-    if (parentTextView.textColorSetByApp) {
-        d[NSForegroundColorAttributeName] = parentTextView.textColorSetByApp;
-    }
+    // Restore the default typing attributes, if the app set either explicitly at any point.
+    [d addEntriesFromDictionary:self.defaultTextAttributes];
     return d;
 }
 
@@ -471,23 +478,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                                            [ranges addObject:[NSValue valueWithRange:range]];
                                                        }
                                                    }];
-    NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
-    NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     for (NSValue *v in ranges) {
-        [parentTextView transformTextAtRange:[v rangeValue]
-                             withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                                 NSMutableAttributedString *buffer = [input mutableCopy];
-                                 [buffer removeAttribute:HKWMentionAttributeName range:HKW_FULL_RANGE(input)];
-                                 // NOTE: We may need to add support for capturing and restoring any attributes
-                                 //  overwritten by applying the special mentions attributes in the future.
-                                 for (NSString *key in unselectedAttributes) {
-                                     [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
-                                 }
-                                 for (NSString *key in selectedAttributes) {
-                                     [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
-                                 }
-                                 return [buffer copy];
-                             }];
+        [self stripMentionAttributesAtRange:[v rangeValue]];
     }
     // Restore previously selected range
     parentTextView.selectedRange = previousSelectedRange;
@@ -521,7 +513,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
              (unsigned long)range.location, (unsigned long)range.length, (unsigned long)dataRange.location,
              (unsigned long)dataRange.length);
 #endif
+    [self stripMentionAttributesAtRange:range];
+    // Restore previously selected range
+    parentTextView.selectedRange = previousSelectedRange;
+}
 
+- (void)stripMentionAttributesAtRange:(NSRange)range {
+    __strong __auto_type parentTextView = self.parentTextView;
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
     [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
@@ -535,10 +533,12 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         for (NSString *key in unselectedAttributes) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
+        // Restore default attributes to text
+        for (NSString *key in self.defaultTextAttributes) {
+            [buffer addAttribute:key value:self.defaultTextAttributes[key] range:HKW_FULL_RANGE(input)];
+        }
         return [buffer copy];
     }];
-    // Restore previously selected range
-    parentTextView.selectedRange = previousSelectedRange;
 }
 
 /*!

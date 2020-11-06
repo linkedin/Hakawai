@@ -212,6 +212,8 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:copyString];
         [self setAttributedText:string];
         self.selectedRange = NSMakeRange(cursorLocationAfterPaste, 0);
+        // Inform delegate that text view has changed since we are overriding the normal paste behavior that would do so automatically
+        [self.delegate textViewDidChange:self];
     } else {
         [super paste:sender];
     }
