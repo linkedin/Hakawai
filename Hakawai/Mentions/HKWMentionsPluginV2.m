@@ -471,31 +471,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                                            [ranges addObject:[NSValue valueWithRange:range]];
                                                        }
                                                    }];
-    NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
-    NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     for (NSValue *v in ranges) {
-        [parentTextView transformTextAtRange:[v rangeValue]
-                             withTransformer:^NSAttributedString *(NSAttributedString *input) {
-                                 NSMutableAttributedString *buffer = [input mutableCopy];
-                                 [buffer removeAttribute:HKWMentionAttributeName range:HKW_FULL_RANGE(input)];
-                                 // NOTE: We may need to add support for capturing and restoring any attributes
-                                 //  overwritten by applying the special mentions attributes in the future.
-                                 for (NSString *key in unselectedAttributes) {
-                                     [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
-                                 }
-                                 for (NSString *key in selectedAttributes) {
-                                     [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
-                                 }
-                                 UIFont *parentFont = parentTextView.fontSetByApp;
-                                 UIColor *parentColor = parentTextView.textColorSetByApp;
-                                 if (parentFont) {
-                                     [buffer addAttribute:NSFontAttributeName value:parentFont range:HKW_FULL_RANGE(input)];
-                                 }
-                                 if (parentColor) {
-                                     [buffer addAttribute:NSForegroundColorAttributeName value:parentColor range:HKW_FULL_RANGE(input)];
-                                 }
-                                 return [buffer copy];
-                             }];
+        [self bleachMentionAtRangeHelper:[v rangeValue]];
     }
     // Restore previously selected range
     parentTextView.selectedRange = previousSelectedRange;
@@ -529,7 +506,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
              (unsigned long)range.location, (unsigned long)range.length, (unsigned long)dataRange.location,
              (unsigned long)dataRange.length);
 #endif
+    [self bleachMentionAtRangeHelper:range];
+    // Restore previously selected range
+    parentTextView.selectedRange = previousSelectedRange;
+}
 
+- (void)bleachMentionAtRangeHelper:(NSRange)range {
+    __strong __auto_type parentTextView = self.parentTextView;
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
     [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
@@ -543,6 +526,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         for (NSString *key in unselectedAttributes) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
+        // Restore parent font/color to text
         UIFont *parentFont = parentTextView.fontSetByApp;
         UIColor *parentColor = parentTextView.textColorSetByApp;
         if (parentFont) {
@@ -553,8 +537,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         }
         return [buffer copy];
     }];
-    // Restore previously selected range
-    parentTextView.selectedRange = previousSelectedRange;
 }
 
 /*!
