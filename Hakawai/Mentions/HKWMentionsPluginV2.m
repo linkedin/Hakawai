@@ -479,7 +479,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                                        }
                                                    }];
     for (NSValue *v in ranges) {
-        [self bleachMentionAtRangeHelper:[v rangeValue]];
+        [self stripMentionAttributesAtRange:[v rangeValue]];
     }
     // Restore previously selected range
     parentTextView.selectedRange = previousSelectedRange;
@@ -513,12 +513,12 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
              (unsigned long)range.location, (unsigned long)range.length, (unsigned long)dataRange.location,
              (unsigned long)dataRange.length);
 #endif
-    [self bleachMentionAtRangeHelper:range];
+    [self stripMentionAttributesAtRange:range];
     // Restore previously selected range
     parentTextView.selectedRange = previousSelectedRange;
 }
 
-- (void)bleachMentionAtRangeHelper:(NSRange)range {
+- (void)stripMentionAttributesAtRange:(NSRange)range {
     __strong __auto_type parentTextView = self.parentTextView;
     NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
     NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
