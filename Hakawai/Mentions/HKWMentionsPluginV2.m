@@ -357,6 +357,19 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return YES;
 }
 
+- (NSDictionary *)defaultTextAttributes {
+    __strong __auto_type parentTextView = self.parentTextView;
+    NSMutableDictionary *returnDict = [[NSMutableDictionary alloc] init];
+    UIFont *parentFont = parentTextView.fontSetByApp;
+    UIColor *parentColor = parentTextView.textColorSetByApp;
+    if (parentFont) {
+        returnDict[NSFontAttributeName] = parentFont;
+    }
+    if (parentColor) {
+        returnDict[NSForegroundColorAttributeName] = parentColor;
+    }
+    return returnDict;
+}
 /*!
  Build a new typing attributes dictionary by stripping mentions-specific attributes from an original attributes
  dictionary and, if applicable, restoring default attributes from the parent text view.
@@ -366,14 +379,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     for (NSString *key in self.mentionUnselectedAttributes) {
         [d removeObjectForKey:key];
     }
-    // Restore the font and/or text color, if the app set either explicitly at any point.
-    __strong __auto_type parentTextView = self.parentTextView;
-    if (parentTextView.fontSetByApp) {
-        d[NSFontAttributeName] = parentTextView.fontSetByApp;
-    }
-    if (parentTextView.textColorSetByApp) {
-        d[NSForegroundColorAttributeName] = parentTextView.textColorSetByApp;
-    }
+    // Restore the default typing attributes, if the app set either explicitly at any point.
+    [d addEntriesFromDictionary:self.defaultTextAttributes];
     return d;
 }
 
@@ -526,14 +533,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         for (NSString *key in unselectedAttributes) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
-        // Restore parent font/color to text
-        UIFont *parentFont = parentTextView.fontSetByApp;
-        UIColor *parentColor = parentTextView.textColorSetByApp;
-        if (parentFont) {
-            [buffer addAttribute:NSFontAttributeName value:parentFont range:HKW_FULL_RANGE(input)];
-        }
-        if (parentColor) {
-            [buffer addAttribute:NSForegroundColorAttributeName value:parentColor range:HKW_FULL_RANGE(input)];
+        // Restore default attributes to text
+        for (NSString *key in self.defaultTextAttributes) {
+            [buffer addAttribute:key value:self.defaultTextAttributes[key] range:HKW_FULL_RANGE(input)];
         }
         return [buffer copy];
     }];
