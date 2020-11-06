@@ -486,6 +486,14 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                  for (NSString *key in selectedAttributes) {
                                      [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
                                  }
+                                 UIFont *parentFont = parentTextView.fontSetByApp;
+                                 UIColor *parentColor = parentTextView.textColorSetByApp;
+                                 if (parentFont) {
+                                     [buffer addAttribute:NSFontAttributeName value:parentFont range:HKW_FULL_RANGE(input)];
+                                 }
+                                 if (parentColor) {
+                                     [buffer addAttribute:NSForegroundColorAttributeName value:parentColor range:HKW_FULL_RANGE(input)];
+                                 }
                                  return [buffer copy];
                              }];
     }
@@ -534,6 +542,14 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         }
         for (NSString *key in unselectedAttributes) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
+        }
+        UIFont *parentFont = parentTextView.fontSetByApp;
+        UIColor *parentColor = parentTextView.textColorSetByApp;
+        if (parentFont) {
+            [buffer addAttribute:NSFontAttributeName value:parentFont range:HKW_FULL_RANGE(input)];
+        }
+        if (parentColor) {
+            [buffer addAttribute:NSForegroundColorAttributeName value:parentColor range:HKW_FULL_RANGE(input)];
         }
         return [buffer copy];
     }];
