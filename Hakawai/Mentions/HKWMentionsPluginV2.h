@@ -35,21 +35,21 @@ NS_ASSUME_NONNULL_BEGIN
  unselected mentions text, and a background color and text color for selected mentions text.
  */
 + (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
-                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
-                                 searchLength:(NSInteger)searchLength
-                              unselectedColor:(UIColor *_Null_unspecified)unselectedColor
-                                selectedColor:(UIColor *_Null_unspecified)selectedColor
-                      selectedBackgroundColor:(UIColor *_Null_unspecified)selectedBackgroundColor;
+                                    controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                                         searchLength:(NSInteger)searchLength
+                                   unhighlightedColor:(UIColor *_Null_unspecified)unhighlightedColor
+                                     highlightedColor:(UIColor *_Null_unspecified)highlightedColor
+                           highlightedBackgroundColor:(UIColor *_Null_unspecified)highlightedBackgroundColor;
 
 /*!
  Instantiate a mentions plug-in with the specified chooser mode, control character set, search length, custom attributes
  to apply to unselected mentions, and custom attributes to apply to selected mentions.
  */
 + (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
-                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
-                                 searchLength:(NSInteger)searchLength
-                  unselectedMentionAttributes:(NSDictionary *_Null_unspecified)unselectedAttributes
-                    selectedMentionAttributes:(NSDictionary *_Null_unspecified)selectedAttributes;
+                                    controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                                         searchLength:(NSInteger)searchLength
+                       unhighlightedMentionAttributes:(NSDictionary *_Null_unspecified)unhighlightedAttributes
+                         highlightedMentionAttributes:(NSDictionary *_Null_unspecified)highlightedAttributes;
 
 @end
 
