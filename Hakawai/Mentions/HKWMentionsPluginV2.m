@@ -108,7 +108,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     plugin.implicitSearchLength = searchLength;
 
     // Validate attribute dictionaries
-    // (unselected mention attributes)
+    // (unhighlighted mention attributes)
     NSMutableSet *badAttributes = [NSMutableSet set];
     for (id attribute in unhighlightedAttributes) {
         if (![attribute isKindOfClass:[NSString class]]
@@ -122,7 +122,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
     plugin.mentionUnhighlightedAttributes = [buffer copy];
 
-    // (selected mention attributes)
+    // (highlighted mention attributes)
     [badAttributes removeAllObjects];
     for (id attribute in highlightedAttributes) {
         if (![attribute isKindOfClass:[NSString class]]
@@ -395,16 +395,16 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 /*!
- Toggle mentions-related formatting for a given portion of text. Mentions can either be 'selected' (annotation
- background, light text color), or 'unselected' (no background, dark text color)
+ Toggle mentions-related formatting for a given portion of text. Mentions can either be 'highlighted' (annotation
+ background, light text color), or 'unhighlighted' (no background, dark text color)
  */
 - (void)toggleMentionsFormattingIfNeededAtRange:(NSRange)range
-                                       selected:(BOOL)selected {
+                                    highlighted:(BOOL)highlighted {
     if (range.location == NSNotFound || range.length == 0) {
         return;
     }
     __strong __auto_type parentTextView = self.parentTextView;
-    // Save selection range before toggling, so we can restore it afterwards
+    // Save cursor selection range before toggling, so we can restore it afterwards, because transformTextAtRange reset it
     NSRange previousSelectedRange = parentTextView.selectedRange;
 #ifdef DEBUG
     // For development: assert that a mention actually exists
@@ -429,8 +429,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Save the range so the cursor doesn't move.
     [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
         NSMutableAttributedString *buffer = [input mutableCopy];
-        NSDictionary *attributesToRemove = (selected ? unhighlightedAttributes : highlightedAttributes);
-        NSDictionary *attributesToAdd = (selected ? highlightedAttributes : unhighlightedAttributes);
+        NSDictionary *attributesToRemove = (highlighted ? unhighlightedAttributes : highlightedAttributes);
+        NSDictionary *attributesToAdd = (highlighted ? highlightedAttributes : unhighlightedAttributes);
         for (NSString *key in attributesToRemove) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
@@ -444,10 +444,10 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         }
         return [buffer copy];
     }];
-    if (!selected) {
+    if (!highlighted) {
         [self stripCustomAttributesFromTypingAttributes];
     }
-    // Restore previously selected range
+    // Restore previously selected cursor range
     parentTextView.selectedRange = previousSelectedRange;
 }
 
@@ -462,7 +462,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
     NSMutableArray *ranges = [NSMutableArray array];
     __strong __auto_type parentTextView = self.parentTextView;
-    // Save selection range before bleaching, so we can restore it afterwards
+    // Save cursor selection range before bleaching, so we can restore it afterwards, because transformTextAtRange reset it
     NSRange previousSelectedRange = parentTextView.selectedRange;
     [parentTextView.attributedText enumerateAttributesInRange:HKW_FULL_RANGE(parentTextView.attributedText)
                                                       options:0
@@ -481,7 +481,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     for (NSValue *v in ranges) {
         [self stripMentionAttributesAtRange:[v rangeValue]];
     }
-    // Restore previously selected range
+    // Restore previously selected cursor range
     parentTextView.selectedRange = previousSelectedRange;
     return [ranges count];
 }
@@ -495,7 +495,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         return;
     }
     __strong __auto_type parentTextView = self.parentTextView;
-    // Save selection range before bleaching, so we can restore it afterwards
+    // Save cursor selection range before bleaching, so we can restore it afterwards, because transformTextAtRange reset it
     NSRange previousSelectedRange = parentTextView.selectedRange;
 #ifdef DEBUG
     // For development: assert that a mention actually exists
@@ -514,7 +514,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
              (unsigned long)dataRange.length);
 #endif
     [self stripMentionAttributesAtRange:range];
-    // Restore previously selected range
+    // Restore previously selected cursor range
     parentTextView.selectedRange = previousSelectedRange;
 }
 
@@ -940,7 +940,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     // If cursor falls out of attributed range, it cannot be in a mention
     if (!(NSLocationInRange(cursorLocation, textFullRange))) {
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
         self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
         return;
     }
@@ -951,18 +951,18 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                       longestEffectiveRange:&range
                                                     inRange:HKW_FULL_RANGE(parentTextView.attributedText)];;
 
-    // If there is a mention at the given location, select it
+    // If there is a mention at the given location, highlight it
     // - unless the cursor is right at the beginning of the mention. We only want to highlight if the cursor is within it
     if ([attribute isKindOfClass:[HKWMentionsAttribute class]] && range.location != cursorLocation) {
         // We don't need to update if we're already in the currently highlighted range
         if (!(NSEqualRanges(range, self.currentlyHighlightedMentionRange))) {
-            [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
-            [self toggleMentionsFormattingIfNeededAtRange:range selected:YES];
+            [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
+            [self toggleMentionsFormattingIfNeededAtRange:range highlighted:YES];
             self.currentlyHighlightedMentionRange = range;
         }
     } else {
         // If we are not in a mention, unhighlight the currently highlighted mention
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
         self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
     }
 }
@@ -975,7 +975,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     // Handle deletion of mentions characters
     if (text.length == 0 && range.length == 1) {
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
         self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
         returnValue = [self shouldAllowCharacterDeletionAtLocation:range.location];
     }
@@ -987,9 +987,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     //  If character is inserted within a mention then bleach the mention.
     if (text.length > 0 && range.length == 0 && self.currentlyHighlightedMentionRange.location != NSNotFound) {
-        const NSRange selectedMentionInternalTextRange = NSMakeRange(self.currentlyHighlightedMentionRange.location + 1,
-                                                                     self.currentlyHighlightedMentionRange.length - 1);
-        if (NSLocationInRange(range.location, selectedMentionInternalTextRange)) {
+        const NSRange highlightedMentionInternalTextRange = NSMakeRange(self.currentlyHighlightedMentionRange.location + 1,
+                                                                        self.currentlyHighlightedMentionRange.length - 1);
+        if (NSLocationInRange(range.location, highlightedMentionInternalTextRange)) {
             [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
         }
         self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
@@ -997,8 +997,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     // If more than one character is inserted
     if (text.length > 0 && range.length > 0) {
-        // Remove any current selections
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        // Remove any current highlightings
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
         self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
 
         // Bleach a mention if the insertion intersects with it, either at the beginning or the end
@@ -1031,7 +1031,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSRange range = textView.selectedRange;
     if (range.length > 0) {
         // If there is a multicharacter range, we unhighlight any mentions currently highlighted
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
         self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
         return;
     }
@@ -1202,7 +1202,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                          withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
         NSMutableDictionary *attributes = [unhighlightedAttributes mutableCopy];
         attributes[HKWMentionAttributeName] = mention;
-        // If the 'unselected attributes' dictionary doesn't contain information on the font
+        // If the 'unhighlighted attributes' dictionary doesn't contain information on the font
         //  or text color, and the text view has a custom font or text color, use those.
         if (!attributes[NSFontAttributeName] && parentFont) {
             attributes[NSFontAttributeName] = parentFont;
