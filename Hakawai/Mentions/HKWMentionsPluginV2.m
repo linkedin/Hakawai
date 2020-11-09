@@ -32,8 +32,8 @@
 
 @property (nonatomic, strong) id<HKWMentionsCreationStateMachine> creationStateMachine;
 
-@property (nonatomic, strong) NSDictionary *mentionSelectedAttributes;
-@property (nonatomic, strong) NSDictionary *mentionUnselectedAttributes;
+@property (nonatomic, strong) NSDictionary *mentionHighlightedAttributes;
+@property (nonatomic, strong) NSDictionary *mentionUnhighlightedAttributes;
 
 @property (nonatomic, readwrite) HKWMentionsChooserPositionMode chooserPositionMode;
 
@@ -46,7 +46,7 @@
 /**
  The range of the currently highlighted mention, if it exists.
  */
-@property (nonatomic) NSRange currentlySelectedMentionRange;
+@property (nonatomic) NSRange currentlyHighlightedMentionRange;
 
 @end
 
@@ -71,32 +71,32 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return [self mentionsPluginWithChooserMode:mode
                              controlCharacters:controlCharacterSet
                                   searchLength:searchLength
-                               unselectedColor:[UIColor blueColor]
-                                 selectedColor:[UIColor whiteColor]
-                       selectedBackgroundColor:[UIColor blackColor]];
+                            unhighlightedColor:[UIColor blueColor]
+                              highlightedColor:[UIColor whiteColor]
+                    highlightedBackgroundColor:[UIColor blackColor]];
 }
 
 + (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
                             controlCharacters:(NSCharacterSet *)controlCharacterSet
                                  searchLength:(NSInteger)searchLength
-                              unselectedColor:(UIColor *)unselectedColor
-                                selectedColor:(UIColor *)selectedColor
-                      selectedBackgroundColor:(UIColor *)selectedBackgroundColor {
-    NSDictionary *unselectedAttributes = @{NSForegroundColorAttributeName: unselectedColor ?: [UIColor blueColor]};
-    NSDictionary *selectedAttributes = @{NSForegroundColorAttributeName: selectedColor ?: [UIColor whiteColor],
-                                         HKWRoundedRectBackgroundAttributeName: [HKWRoundedRectBackgroundAttributeValue valueWithBackgroundColor:selectedBackgroundColor ?: [UIColor blueColor]]};
+                           unhighlightedColor:(UIColor *)unhighlightedColor
+                             highlightedColor:(UIColor *)highlightedColor
+                   highlightedBackgroundColor:(UIColor *)highlightedBackgroundColor {
+    NSDictionary *unhighlightedAttributes = @{NSForegroundColorAttributeName: unhighlightedColor ?: [UIColor blueColor]};
+    NSDictionary *highlightedAttributes = @{NSForegroundColorAttributeName: highlightedColor ?: [UIColor whiteColor],
+                                            HKWRoundedRectBackgroundAttributeName: [HKWRoundedRectBackgroundAttributeValue valueWithBackgroundColor:highlightedBackgroundColor ?: [UIColor blueColor]]};
     return [self mentionsPluginWithChooserMode:mode
                              controlCharacters:controlCharacterSet
                                   searchLength:searchLength
-                   unselectedMentionAttributes:unselectedAttributes
-                     selectedMentionAttributes:selectedAttributes];
+                   unhighlightedMentionAttributes:unhighlightedAttributes
+                     highlightedMentionAttributes:highlightedAttributes];
 }
 
 + (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
                             controlCharacters:(NSCharacterSet *)controlCharacterSet
                                  searchLength:(NSInteger)searchLength
-                  unselectedMentionAttributes:(NSDictionary *)unselectedAttributes
-                    selectedMentionAttributes:(NSDictionary *)selectedAttributes {
+               unhighlightedMentionAttributes:(NSDictionary *)unhighlightedAttributes
+                 highlightedMentionAttributes:(NSDictionary *)highlightedAttributes {
     // Make sure iOS version is 7.1 or greater
     if (!HKW_systemVersionIsAtLeast(@"7.1")) {
         NSAssert(NO, @"Mentions plug-in is only supported for iOS 7.1 or later.");
@@ -110,31 +110,31 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // Validate attribute dictionaries
     // (unselected mention attributes)
     NSMutableSet *badAttributes = [NSMutableSet set];
-    for (id attribute in unselectedAttributes) {
+    for (id attribute in unhighlightedAttributes) {
         if (![attribute isKindOfClass:[NSString class]]
             || [attribute isEqualToString:HKWMentionAttributeName]) {
             [badAttributes addObject:attribute];
         }
     }
-    NSMutableDictionary *buffer = [unselectedAttributes copy] ?: [NSMutableDictionary dictionary];
+    NSMutableDictionary *buffer = [unhighlightedAttributes copy] ?: [NSMutableDictionary dictionary];
     for (id badAttribute in badAttributes) {
         [buffer removeObjectForKey:badAttribute];
     }
-    plugin.mentionUnselectedAttributes = [buffer copy];
+    plugin.mentionUnhighlightedAttributes = [buffer copy];
 
     // (selected mention attributes)
     [badAttributes removeAllObjects];
-    for (id attribute in selectedAttributes) {
+    for (id attribute in highlightedAttributes) {
         if (![attribute isKindOfClass:[NSString class]]
             || [attribute isEqualToString:HKWMentionAttributeName]) {
             [badAttributes addObject:attribute];
         }
     }
-    buffer = [selectedAttributes copy] ?: [NSMutableDictionary dictionary];
+    buffer = [highlightedAttributes copy] ?: [NSMutableDictionary dictionary];
     for (id badAttribute in badAttributes) {
         [buffer removeObjectForKey:badAttribute];
     }
-    plugin.mentionSelectedAttributes = [buffer copy];
+    plugin.mentionHighlightedAttributes = [buffer copy];
 
     return plugin;
 }
@@ -143,7 +143,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     self = [super init];
     if (!self) { return nil; }
 
-    self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+    self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
     self.notifyTextViewDelegateOnMentionCreation = NO;
     self.notifyTextViewDelegateOnMentionTrim = NO;
     self.notifyTextViewDelegateOnMentionDeletion = NO;
@@ -195,7 +195,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     NSUInteger location = parentTextView.selectedRange.location;
     NSRange originalRange = NSMakeRange(location, 0);
-    NSDictionary *mentionAttributes = self.mentionUnselectedAttributes;
+    NSDictionary *mentionAttributes = self.mentionUnhighlightedAttributes;
     // Mentions cannot overlap. In order to avoid inconsistency, destroy any existing mentions that intrude within the
     //  new mention's range.
     [self bleachMentionsWithinRange:mention.range];
@@ -376,7 +376,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  */
 - (NSDictionary *)typingAttributesByStrippingMentionAttributes:(NSDictionary *)originalAttributes {
     NSMutableDictionary *d = [originalAttributes mutableCopy];
-    for (NSString *key in self.mentionUnselectedAttributes) {
+    for (NSString *key in self.mentionUnhighlightedAttributes) {
         [d removeObjectForKey:key];
     }
     // Restore the default typing attributes, if the app set either explicitly at any point.
@@ -424,13 +424,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
              (unsigned long)dataRange.location, (unsigned long)dataRange.length);
 #endif
 
-    NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
-    NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
+    NSDictionary *unhighlightedAttributes = self.mentionUnhighlightedAttributes;
+    NSDictionary *highlightedAttributes = self.mentionHighlightedAttributes;
     // Save the range so the cursor doesn't move.
     [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
         NSMutableAttributedString *buffer = [input mutableCopy];
-        NSDictionary *attributesToRemove = (selected ? unselectedAttributes : selectedAttributes);
-        NSDictionary *attributesToAdd = (selected ? selectedAttributes : unselectedAttributes);
+        NSDictionary *attributesToRemove = (selected ? unhighlightedAttributes : highlightedAttributes);
+        NSDictionary *attributesToAdd = (selected ? highlightedAttributes : unhighlightedAttributes);
         for (NSString *key in attributesToRemove) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
@@ -520,22 +520,23 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 - (void)stripMentionAttributesAtRange:(NSRange)range {
     __strong __auto_type parentTextView = self.parentTextView;
-    NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
-    NSDictionary *selectedAttributes = self.mentionSelectedAttributes;
+    NSDictionary *unhighlightedAttributes = self.mentionUnhighlightedAttributes;
+    NSDictionary *highlightedAttributes = self.mentionHighlightedAttributes;
     [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(NSAttributedString *input) {
         NSMutableAttributedString *buffer = [input mutableCopy];
         [buffer removeAttribute:HKWMentionAttributeName range:HKW_FULL_RANGE(input)];
         // NOTE: We may need to add support for capturing and restoring any attributes overwritten by applying the
         //  special mentions attributes in the future.
-        for (NSString *key in selectedAttributes) {
+        for (NSString *key in highlightedAttributes) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
-        for (NSString *key in unselectedAttributes) {
+        for (NSString *key in unhighlightedAttributes) {
             [buffer removeAttribute:key range:HKW_FULL_RANGE(input)];
         }
         // Restore default attributes to text
         for (NSString *key in self.defaultTextAttributes) {
-            [buffer addAttribute:key value:self.defaultTextAttributes[key] range:HKW_FULL_RANGE(input)];
+            __strong id attributeValue = self.defaultTextAttributes[key];
+            [buffer addAttribute:key value:attributeValue range:HKW_FULL_RANGE(input)];
         }
         return [buffer copy];
     }];
@@ -939,8 +940,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     // If cursor falls out of attributed range, it cannot be in a mention
     if (!(NSLocationInRange(cursorLocation, textFullRange))) {
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
-        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
         return;
     }
 
@@ -951,18 +952,18 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                                     inRange:HKW_FULL_RANGE(parentTextView.attributedText)];;
 
     // If there is a mention at the given location, select it
-    // - unless the cursor is right at the beginning of the mention. We only want to select if the cursor is within it
+    // - unless the cursor is right at the beginning of the mention. We only want to highlight if the cursor is within it
     if ([attribute isKindOfClass:[HKWMentionsAttribute class]] && range.location != cursorLocation) {
-        // We don't need to update if we're already in the currently selected range
-        if (!(NSEqualRanges(range, self.currentlySelectedMentionRange))) {
-            [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
+        // We don't need to update if we're already in the currently highlighted range
+        if (!(NSEqualRanges(range, self.currentlyHighlightedMentionRange))) {
+            [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
             [self toggleMentionsFormattingIfNeededAtRange:range selected:YES];
-            self.currentlySelectedMentionRange = range;
+            self.currentlyHighlightedMentionRange = range;
         }
     } else {
-        // If we are not in a mention, unselect the currently selected mention
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
-        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+        // If we are not in a mention, unhighlight the currently highlighted mention
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
     }
 }
 
@@ -974,8 +975,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     // Handle deletion of mentions characters
     if (text.length == 0 && range.length == 1) {
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
-        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
         returnValue = [self shouldAllowCharacterDeletionAtLocation:range.location];
     }
 
@@ -985,20 +986,20 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 
     //  If character is inserted within a mention then bleach the mention.
-    if (text.length > 0 && range.length == 0 && self.currentlySelectedMentionRange.location != NSNotFound) {
-        const NSRange selectedMentionInternalTextRange = NSMakeRange(self.currentlySelectedMentionRange.location + 1,
-                                                                     self.currentlySelectedMentionRange.length - 1);
+    if (text.length > 0 && range.length == 0 && self.currentlyHighlightedMentionRange.location != NSNotFound) {
+        const NSRange selectedMentionInternalTextRange = NSMakeRange(self.currentlyHighlightedMentionRange.location + 1,
+                                                                     self.currentlyHighlightedMentionRange.length - 1);
         if (NSLocationInRange(range.location, selectedMentionInternalTextRange)) {
-            [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
+            [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
         }
-        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
     }
 
     // If more than one character is inserted
     if (text.length > 0 && range.length > 0) {
         // Remove any current selections
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
-        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
 
         // Bleach a mention if the insertion intersects with it, either at the beginning or the end
         // This is needed if a user autocorrects a mention name from the black pop up menu over a piece of text
@@ -1029,9 +1030,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 - (void)textViewDidChangeSelection:(UITextView *)textView {
     NSRange range = textView.selectedRange;
     if (range.length > 0) {
-        // If there is a multicharacter range, we unselect any mentions currently selected
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlySelectedMentionRange selected:NO];
-        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+        // If there is a multicharacter range, we unhighlight any mentions currently highlighted
+        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange selected:NO];
+        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
         return;
     }
 
@@ -1062,9 +1063,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 - (void)textView:(__unused UITextView *)textView willPasteTextInRange:(NSRange)range {
-    if (self.currentlySelectedMentionRange.location != NSNotFound) {
-        [self bleachExistingMentionAtRange:self.currentlySelectedMentionRange];
-        self.currentlySelectedMentionRange = NSMakeRange(NSNotFound, 0);
+    if (self.currentlyHighlightedMentionRange.location != NSNotFound) {
+        [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
+        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
     } else {
         // If this paste is happening over a range that intersects with a mention, bleach that mention
         [self bleachMentionsIntersectingWithRange:range];
@@ -1185,8 +1186,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
              @"Cannot create a mention unless cursor is in insertion mode.");
     UIFont *parentFont = parentTextView.fontSetByApp;
     UIColor *parentColor = parentTextView.textColorSetByApp;
-    NSAssert(self.mentionUnselectedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
-    NSDictionary *unselectedAttributes = self.mentionUnselectedAttributes;
+    NSAssert(self.mentionHighlightedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
+    NSDictionary *unhighlightedAttributes = self.mentionHighlightedAttributes;
 
     NSRange rangeToTransform;
     // Find where previous control character was, and replace mention at that point
@@ -1199,7 +1200,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
     [parentTextView transformTextAtRange:rangeToTransform
                          withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
-        NSMutableDictionary *attributes = [unselectedAttributes mutableCopy];
+        NSMutableDictionary *attributes = [unhighlightedAttributes mutableCopy];
         attributes[HKWMentionAttributeName] = mention;
         // If the 'unselected attributes' dictionary doesn't contain information on the font
         //  or text color, and the text view has a custom font or text color, use those.
