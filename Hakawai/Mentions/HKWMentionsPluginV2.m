@@ -1187,7 +1187,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     UIFont *parentFont = parentTextView.fontSetByApp;
     UIColor *parentColor = parentTextView.textColorSetByApp;
     NSAssert(self.mentionHighlightedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
-    NSDictionary *unhighlightedAttributes = self.mentionHighlightedAttributes;
+    NSDictionary *unhighlightedAttributes = self.mentionUnhighlightedAttributes;
 
     NSRange rangeToTransform;
     // Find where previous control character was, and replace mention at that point
