@@ -17,10 +17,12 @@
 #import "Expecta.h"
 
 #import "HKWTextView.h"
+#import "HKWTextView+Plugins.h"
 #import "HKWMentionsPlugin.h"
 #import "HKWMentionsPluginV1.h"
 #import "HKWMentionsPluginV2.h"
 #import "HKWMentionsAttribute.h"
+#import "HKWCustomAttributes.h"
 
 @interface HKWMentionsPluginV1 ()
 - (BOOL)stringValidForMentionsCreation:(NSString *)string;
@@ -1087,6 +1089,129 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
         // Need small delay so text view has time to paste
         expect(textView.text).after(1).to.equal(@"FirstName LastName FirstName LastNameCopyText");
+    });
+
+    it(@"paste from outside after maintain attributes", ^{
+        textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        NSString *copyText = @"CopyText";
+        [UIPasteboard generalPasteboard].items = @[@{@"public.utf8-plain-text":copyText}];
+
+        // Paste CopyText at beginning, leaving:
+        textView.selectedRange = NSMakeRange(0, 0);
+        [textView paste:nil];
+
+        // Test that font of pasted text is correct
+        NSRange standardTextFontRange;
+        id standardTextFontAttribute = [textView.attributedText attribute:NSFontAttributeName atIndex:0 longestEffectiveRange:&standardTextFontRange inRange:NSMakeRange(0, textView.attributedText.length)];
+        NSRange standardTextColorRange;
+        id standardTextColorAttribute = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:0 longestEffectiveRange:&standardTextColorRange inRange:NSMakeRange(0, textView.attributedText.length)];
+
+        expect(standardTextFontRange.location).to.equal(0);
+        expect(standardTextFontRange.length).to.equal(copyText.length);
+        expect(standardTextFontAttribute).to.equal(textView.fontSetByApp);
+
+        expect(standardTextColorRange.location).to.equal(0);
+        expect(standardTextColorRange.length).to.equal(copyText.length);
+        expect(standardTextColorAttribute).to.equal(textView.textColorSetByApp);
+
+        // Add mention
+        HKWMentionsAttribute *mention = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"3"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:mention.mentionText];
+        mention.range = NSMakeRange(copyText.length, mention.mentionText.length);
+        [mentionsPlugin addMention:mention];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Paste CopyText at end, leaving:
+        // CopyText|FirstName LastName|CopyText, where || denote mention attributes
+        NSUInteger endOfText = copyText.length + mention.mentionText.length;
+        textView.selectedRange = NSMakeRange(endOfText, 0);
+        [textView paste:nil];
+
+        // Test that font of pasted text is correct
+        NSRange standardTextFontRange2;
+        id standardTextFontAttribute2 = [textView.attributedText attribute:NSFontAttributeName atIndex:endOfText effectiveRange:&standardTextFontRange2];
+        NSRange standardTextColorRange2;
+        id standardTextColorAttribute2 = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:endOfText effectiveRange:&standardTextColorRange2];
+
+        expect(standardTextFontRange2.location).to.equal(copyText.length+mention.mentionText.length);
+        expect(standardTextFontRange2.length).to.equal(copyText.length);
+        expect(standardTextFontAttribute2).to.equal(textView.fontSetByApp);
+
+        expect(standardTextColorRange2.location).to.equal(copyText.length+mention.mentionText.length);
+        expect(standardTextColorRange2.length).to.equal(copyText.length);
+        expect(standardTextColorAttribute2).to.equal(textView.textColorSetByApp);
+    });
+});
+
+describe(@"highlight mentions - MENTIONS PLUGIN V2", ^{
+    __block HKWTextView *textView;
+    __block HKWMentionsPluginV2 *mentionsPlugin;
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        HKWTextView.enableMentionsPluginV2 = YES;
+        mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
+        [textView setControlFlowPlugin:mentionsPlugin];
+    });
+
+    it(@"highlight mention", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"3"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Text is:
+        // FirstName LastName
+
+        // Unhighlighted
+        NSRange unhighlightedRange;
+        id unhighlightedAttribute = [textView.attributedText attribute:HKWRoundedRectBackgroundAttributeName atIndex:m1.mentionText.length/2 longestEffectiveRange:&unhighlightedRange inRange:NSMakeRange(0, textView.attributedText.length)];
+        expect(unhighlightedRange.location).to.equal(0);
+        expect(unhighlightedRange.length).to.equal(m1.mentionText.length);
+        expect(unhighlightedAttribute).to.equal(nil);
+
+        textView.selectedRange = NSMakeRange(m1.mentionText.length/2, 0);
+
+        // Highlighted
+        NSRange highlightedRange;
+        id highlightedAttribute = [textView.attributedText attribute:HKWRoundedRectBackgroundAttributeName atIndex:m1.mentionText.length/2 longestEffectiveRange:&highlightedRange inRange:NSMakeRange(0, textView.attributedText.length)];
+        expect(highlightedRange.location).to.equal(0);
+        expect(highlightedRange.length).to.equal(m1.mentionText.length);
+        expect([highlightedAttribute class]).to.equal([HKWRoundedRectBackgroundAttributeValue class]);
+    });
+
+    it(@"do not highlight mention - multichar select", ^{
+        HKWMentionsAttribute *m1 = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"3"];
+
+        expect(mentionsPlugin.mentions.count).to.equal(0);
+        [textView insertText:m1.mentionText];
+        m1.range = NSMakeRange(0, m1.mentionText.length);
+        [mentionsPlugin addMention:m1];
+        expect(mentionsPlugin.mentions.count).to.equal(1);
+
+        // Text is:
+        // FirstName LastName
+
+        // Unhighlighted
+        NSRange unhighlightedRange;
+        id unhighlightedAttribute = [textView.attributedText attribute:HKWRoundedRectBackgroundAttributeName atIndex:m1.mentionText.length/2 longestEffectiveRange:&unhighlightedRange inRange:NSMakeRange(0, textView.attributedText.length)];
+        expect(unhighlightedRange.location).to.equal(0);
+        expect(unhighlightedRange.length).to.equal(m1.mentionText.length);
+        expect(unhighlightedAttribute).to.equal(nil);
+
+        textView.selectedRange = NSMakeRange(m1.mentionText.length/2, 1);
+
+        // Unhighlighted
+        NSRange unhighlightedRange2;
+        id unhighlightedAttribute2 = [textView.attributedText attribute:HKWRoundedRectBackgroundAttributeName atIndex:m1.mentionText.length/2 longestEffectiveRange:&unhighlightedRange2 inRange:NSMakeRange(0, textView.attributedText.length)];
+        expect(unhighlightedRange2.location).to.equal(0);
+        expect(unhighlightedRange2.length).to.equal(m1.mentionText.length);
+        expect(unhighlightedAttribute2).to.equal(nil);
     });
 });
 

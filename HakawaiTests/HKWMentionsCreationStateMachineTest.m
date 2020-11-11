@@ -386,4 +386,46 @@ describe(@"Test basic mention typing logic in multiple languages - MENTIONS PLUG
     });
 });
 
+describe(@"autocorrect setting - MENTIONS PLUGIN V2", ^{
+    __block HKWTextView *textView;
+    __block HKWMentionsPluginV2 *mentionsPlugin;
+    __block HKWTDummyMentionsManager *mentionsManager;
+
+     beforeEach(^{
+         HKWTextView.enableMentionsCreationStateMachineV2 = YES;
+         HKWTextView.enableMentionsPluginV2 = YES;
+         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+         mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp
+                                                         controlCharacters:[NSCharacterSet characterSetWithCharactersInString:@"@"]
+                                                              searchLength:0];
+         mentionsManager = [[HKWTDummyMentionsManager alloc] init];
+         mentionsPlugin.defaultChooserViewDelegate = mentionsManager;
+         [textView setControlFlowPlugin:mentionsPlugin];
+     });
+
+     afterAll(^{
+         HKWTextView.enableMentionsPluginV2 = NO;
+         HKWTextView.enableMentionsCreationStateMachineV2 = NO;
+     });
+
+    it(@"autocorrect on/off with accessory view", ^{
+        // Autocorrection should begin default
+        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeDefault);
+        [textView insertText:@"@"];
+
+        // Autocorrection should turn to NO when accessory view is activated
+        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeNo);
+        [textView insertText:@"a"];
+
+        // Autocorrection should remain NO while accessory view is activated
+        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeNo);
+        [textView deleteBackward];
+        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeNo);
+        [textView deleteBackward];
+
+        // Autocorrection should return to default when accessory view is deactivated
+        expect(textView.autocorrectionType).to.equal(UITextAutocorrectionTypeDefault);
+    });
+});
+
 SpecEnd
