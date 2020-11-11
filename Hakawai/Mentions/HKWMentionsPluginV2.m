@@ -1007,9 +1007,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         [self bleachMentionsIntersectingWithRange:range];
     }
 
-    // If we just did a non-programmatic paste, insert the text directly and add attributes
-    // This is needed because rich text formatting is off, which strips attribution from pasting, which we want to maintain.
-    // Once (if ever) we turn rich text formatting on, we can remove this.
+    // If we just did a non-programmatic paste, insert the text directly and add proper attributes
     if (self.wasNonProgrammaticPaste && text.length > 0) {
         self.wasNonProgrammaticPaste = NO;
         __strong __auto_type parentTextView = self.parentTextView;
@@ -1083,8 +1081,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
-- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(NSRange)range programmatic:(BOOL)programmatic {
-    if (programmatic) {
+- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(NSRange)range isProgrammatic:(BOOL)isProgrammatic {
+    if (isProgrammatic) {
         // If it was a programmatic paste, we just have to update the mention formatting
         if (self.currentlyHighlightedMentionRange.location != NSNotFound) {
             [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];

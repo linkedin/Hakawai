@@ -52,9 +52,9 @@
 
  @param textView Text view for paste
  @param range Range for paste
- @param programmatic  Whether the pasting is programmatic or not
+ @param isProgrammatic  Whether the pasting is programmatic or not
  */
-- (void)textView:(UITextView *)textView willPasteTextInRange:(NSRange)range programmatic:(BOOL)programmatic;
+- (void)textView:(UITextView *)textView willPasteTextInRange:(NSRange)range isProgrammatic:(BOOL)isProgrammatic;
 
 @end
 

@@ -178,9 +178,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 
  @param textView Text view for paste
  @param range Range for paste
- @param programmatic  Whether the pasting is programmatic or not
+ @param isProgrammatic  Whether the pasting is programmatic or not
  */
-- (void)textView:(nonnull UITextView *)textView willPasteTextInRange:(NSRange)range programmatic:(BOOL)programmatic;
+- (void)textView:(nonnull UITextView *)textView willPasteTextInRange:(NSRange)range isProgrammatic:(BOOL)isProgrammatic;
 
 /*!
  Extract mentions attributes from an attributed string. The array of mentions attribute objects returned by this method
