@@ -86,7 +86,7 @@
 }
 
 - (void)moveInsertionPointMarkerToXPosition:(CGFloat)position {
-    position += self.arrowView.bounds.size.width/2.0;
+    position += self.arrowView.bounds.size.width/(CGFloat)2.0;
     [self setArrowPosition:position];
 }
 
