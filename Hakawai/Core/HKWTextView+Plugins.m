@@ -298,24 +298,34 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     }
     self.overridingAutocapitalization = YES;
     self.originalAutocapitalization = self.autocapitalizationType;
-    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:override]
-                            cancelAnimation:YES
-                disableResignFirstResponder:NO];
+    if (HKWTextView.enableMentionsPluginV2) {
+        self.autocapitalizationType = override;
+        [self reloadInputViews];
+    } else {
+        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:override]
+                                cancelAnimation:YES
+                    disableResignFirstResponder:NO];
+    }
 }
 
 - (void)restoreOriginalAutocapitalization:(BOOL)shouldCycle {
     if (!self.overridingAutocapitalization) {
         return;
     }
-    if (shouldCycle) {
-        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:self.originalAutocapitalization]
-                                cancelAnimation:YES
-                    disableResignFirstResponder:NO];
-    }
-    else {
+    if (HKWTextView.enableMentionsPluginV2) {
         self.autocapitalizationType = self.originalAutocapitalization;
+        [self reloadInputViews];
+    } else {
+        if (shouldCycle) {
+            [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocapitalization:self.originalAutocapitalization]
+                                    cancelAnimation:YES
+                        disableResignFirstResponder:NO];
+        }
+        else {
+            self.autocapitalizationType = self.originalAutocapitalization;
+        }
     }
-    self.overridingSpellChecking = NO;
+    self.overridingAutocapitalization = NO;
 }
 
 - (void)overrideAutocorrectionWith:(UITextAutocorrectionType)override {
@@ -324,22 +334,32 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     }
     self.overridingAutocorrection = YES;
     self.originalAutocorrection = self.autocorrectionType;
-    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:override]
-                            cancelAnimation:YES
-                disableResignFirstResponder:YES];
+    if (HKWTextView.enableMentionsPluginV2) {
+        self.autocorrectionType = override;
+        [self reloadInputViews];
+    } else {
+        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:override]
+                                cancelAnimation:YES
+                    disableResignFirstResponder:YES];
+    }
 }
 
 - (void)restoreOriginalAutocorrection:(BOOL)shouldCycle {
     if (!self.overridingAutocorrection) {
         return;
     }
-    if (shouldCycle) {
-        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:self.originalAutocorrection]
-                                cancelAnimation:YES
-                    disableResignFirstResponder:YES];
-    }
-    else {
+    if (HKWTextView.enableMentionsPluginV2) {
         self.autocorrectionType = self.originalAutocorrection;
+        [self reloadInputViews];
+    } else {
+        if (shouldCycle) {
+            [self cycleFirstResponderStatusWithMode:[HKWTextView modeForAutocorrection:self.originalAutocorrection]
+                                    cancelAnimation:YES
+                        disableResignFirstResponder:YES];
+        }
+        else {
+            self.autocorrectionType = self.originalAutocorrection;
+        }
     }
     self.overridingAutocorrection = NO;
 }
@@ -350,22 +370,32 @@ typedef NS_ENUM(NSInteger, HKWCycleFirstResponderMode) {
     }
     self.overridingSpellChecking = YES;
     self.originalSpellChecking = self.spellCheckingType;
-    [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:override]
-                            cancelAnimation:YES
-                disableResignFirstResponder:NO];
+    if (HKWTextView.enableMentionsPluginV2) {
+        self.spellCheckingType = override;
+        [self reloadInputViews];
+    } else {
+        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:override]
+                                cancelAnimation:YES
+                    disableResignFirstResponder:NO];
+    }
 }
 
 - (void)restoreOriginalSpellChecking:(BOOL)shouldCycle {
     if (!self.overridingSpellChecking) {
         return;
     }
-    if (shouldCycle) {
-        [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:self.originalSpellChecking]
-                                cancelAnimation:YES
-                    disableResignFirstResponder:NO];
-    }
-    else {
+    if (HKWTextView.enableMentionsPluginV2) {
         self.spellCheckingType = self.originalSpellChecking;
+        [self reloadInputViews];
+    } else {
+        if (shouldCycle) {
+            [self cycleFirstResponderStatusWithMode:[HKWTextView modeForSpellChecking:self.originalSpellChecking]
+                                    cancelAnimation:YES
+                        disableResignFirstResponder:NO];
+        }
+        else {
+            self.spellCheckingType = self.originalSpellChecking;
+        }
     }
     self.overridingSpellChecking = NO;
 }
