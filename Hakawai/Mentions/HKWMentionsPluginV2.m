@@ -709,8 +709,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSUInteger i;
     for(i = location; i < text.length ; i++) {
         // If there is a mentions character before there is a whitespace, then this is not a valid word for querying
-        BOOL isMention = [self mentionAttributeAtLocation:i range:nil];
-        if (isMention) {
+        HKWMentionsAttribute *mentionAttribute = [self mentionAttributeAtLocation:i range:nil];
+        if (mentionAttribute) {
             return NSNotFound;
         }
         const unichar character = [text characterAtIndex:i];
