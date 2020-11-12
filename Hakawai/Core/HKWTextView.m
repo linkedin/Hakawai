@@ -207,7 +207,7 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.copyString.length;
         NSRange selectionRangeBeforePaste = self.selectedRange;
         // Let control plugin know that text will be pasted, so it can remove any existing mentions attributes at that point
-        [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange];
+        [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange isProgrammatic:YES];
         NSMutableAttributedString *string = [self.attributedText mutableCopy];
         [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:copyString];
         [self setAttributedText:string];
@@ -215,6 +215,7 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         // Inform delegate that text view has changed since we are overriding the normal paste behavior that would do so automatically
         [self.delegate textViewDidChange:self];
     } else {
+        [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange isProgrammatic:NO];
         [super paste:sender];
     }
     self.wasPaste = YES;

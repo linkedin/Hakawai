@@ -1702,7 +1702,6 @@
                                                        location:location];
 }
 
-
 #pragma mark - Mentions creation state machine protocol
 
 - (CGRect)boundsForParentEditorView {
@@ -2074,7 +2073,6 @@
     return correctedPoint.x + rect.size.width/2;
 }
 
-
 #pragma mark - Properties
 
 - (void)setState:(HKWMentionsState)state {
@@ -2208,7 +2206,7 @@
     return self.creationStateMachine.explicitSearchControlCharacter;
 }
 
-- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(__unused NSRange)range {
+- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(__unused NSRange)range isProgrammatic:(__unused BOOL)isProgrammatic {
     return;
 }
 

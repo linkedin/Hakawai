@@ -57,7 +57,7 @@ typedef NSMutableArray RectValuesBuffer;
             CGRect unionRect = [value CGRectValue];
             // Adjust the rect to increase its padding, and to position it correctly
             unionRect.origin.x += origin.x;
-            unionRect.origin.y += origin.y - (0.5*self.additionalHeight);
+            unionRect.origin.y += origin.y - ((CGFloat)0.5*self.additionalHeight);
             unionRect.size.height += self.additionalHeight;
 
             if (unionRect.size.width < 2*self.cornerRadius || unionRect.size.height < 2*self.cornerRadius) {

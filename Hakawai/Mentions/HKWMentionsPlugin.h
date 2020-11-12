@@ -108,7 +108,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 /// Inform the delegate that the specified mentions plug-in deactivated and hid its chooser view.
 - (void)mentionsPluginDeactivatedChooserView:(id<HKWMentionsPlugin> _Null_unspecified)plugin;
 
-/*! 
+/*!
  Inform the delegate that the specified mentions plug-in created a mention at the given location as a result of user
  input.
 
@@ -174,9 +174,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 -(void)textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
 
 /*!
- Inform the plugin that the textview will paste text
+ If available, this method is called when the text view is about to paste text
+
+ @param textView Text view for paste
+ @param range Range for paste
+ @param isProgrammatic  Whether the pasting is programmatic or not
  */
--(void)textView:(nonnull UITextView *)textView willPasteTextInRange:(NSRange)range;
+- (void)textView:(nonnull UITextView *)textView willPasteTextInRange:(NSRange)range isProgrammatic:(BOOL)isProgrammatic;
 
 /*!
  Extract mentions attributes from an attributed string. The array of mentions attribute objects returned by this method
@@ -258,10 +262,10 @@ Handles the selection from the user. This is only needed for consumers who use c
 
 #pragma mark - Chooser UI Configuration
 
-/*! 
+/*!
  The class of the chooser view to instantiate. Must be a subclass of the \c UIView class. If set to an invalid value or
  nil, defaults to the built-in chooser view.
- 
+
  \note Set this when the mentions plug-in is created; setting it will do nothing after the chooser view is instantiated
  the first time.
 

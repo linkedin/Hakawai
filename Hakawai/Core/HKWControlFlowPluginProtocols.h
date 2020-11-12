@@ -49,8 +49,12 @@
 
 /*!
  If available, this method is called when the text view is about to paste text
+
+ @param textView Text view for paste
+ @param range Range for paste
+ @param isProgrammatic  Whether the pasting is programmatic or not
  */
-- (void)textView:(UITextView *)textView willPasteTextInRange:(NSRange)range;
+- (void)textView:(UITextView *)textView willPasteTextInRange:(NSRange)range isProgrammatic:(BOOL)isProgrammatic;
 
 @end
 

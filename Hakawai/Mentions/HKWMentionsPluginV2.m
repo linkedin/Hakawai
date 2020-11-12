@@ -40,6 +40,7 @@
 @property (nonatomic, readonly) BOOL viewportLocksToTopUponMentionCreation;
 @property (nonatomic, readonly) BOOL viewportLocksToBottomUponMentionCreation;
 @property (nonatomic, readonly) BOOL viewportLocksUponMentionCreation;
+@property (nonatomic, readwrite) BOOL wasNonProgrammaticPaste;
 
 @property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
 
@@ -708,8 +709,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSUInteger i;
     for(i = location; i < text.length ; i++) {
         // If there is a mentions character before there is a whitespace, then this is not a valid word for querying
-        BOOL isMention = [self mentionAttributeAtLocation:i range:nil];
-        if (isMention) {
+        HKWMentionsAttribute *mentionAttribute = [self mentionAttributeAtLocation:i range:nil];
+        if (mentionAttribute) {
             return NSNotFound;
         }
         const unichar character = [text characterAtIndex:i];
@@ -985,7 +986,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         returnValue = [self shouldAllowDeletionAtRange:range];
     }
 
-    //  If character is inserted within a mention then bleach the mention.
+    //  If (at least one) character is inserted within a mention then bleach the mention.
     if (text.length > 0 && range.length == 0 && self.currentlyHighlightedMentionRange.location != NSNotFound) {
         const NSRange highlightedMentionInternalTextRange = NSMakeRange(self.currentlyHighlightedMentionRange.location + 1,
                                                                         self.currentlyHighlightedMentionRange.length - 1);
@@ -995,7 +996,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
     }
 
-    // If more than one character is inserted
+    // If (at least one) character is inserted while the user is selecting a range
     if (text.length > 0 && range.length > 0) {
         // Remove any current highlightings
         [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
@@ -1004,6 +1005,24 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         // Bleach a mention if the insertion intersects with it, either at the beginning or the end
         // This is needed if a user autocorrects a mention name from the black pop up menu over a piece of text
         [self bleachMentionsIntersectingWithRange:range];
+    }
+
+    // If we just did a non-programmatic paste, insert the text directly and add proper attributes
+    if (self.wasNonProgrammaticPaste && text.length > 0) {
+        self.wasNonProgrammaticPaste = NO;
+        __strong __auto_type parentTextView = self.parentTextView;
+        [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
+            return [[NSAttributedString alloc] initWithString:text
+                                                   attributes:[self defaultTextAttributes]];
+        }];
+        parentTextView.selectedRange = NSMakeRange(range.location + [text length], 0);
+        returnValue = NO;
+
+        // Manually notify external delegate that the textView changed
+        id<HKWTextViewDelegate> externalDelegate = parentTextView.externalDelegate;
+        if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
+            [externalDelegate textViewDidChange:parentTextView];
+        }
     }
 
     [self stripCustomAttributesFromTypingAttributes];
@@ -1062,13 +1081,19 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
-- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(NSRange)range {
-    if (self.currentlyHighlightedMentionRange.location != NSNotFound) {
-        [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
-        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
+- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(NSRange)range isProgrammatic:(BOOL)isProgrammatic {
+    if (isProgrammatic) {
+        // If it was a programmatic paste, we just have to update the mention formatting
+        if (self.currentlyHighlightedMentionRange.location != NSNotFound) {
+            [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
+            self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
+        } else {
+            // If this paste is happening over a range that intersects with a mention, bleach that mention
+            [self bleachMentionsIntersectingWithRange:range];
+        }
     } else {
-        // If this paste is happening over a range that intersects with a mention, bleach that mention
-        [self bleachMentionsIntersectingWithRange:range];
+        // If it was not a programmatic paste, we will handle it later when it reaches shouldChangeTextInRange
+        self.wasNonProgrammaticPaste = YES;
     }
 }
 
@@ -1156,13 +1181,11 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     if (self.viewportLocksUponMentionCreation) {
         [parentTextView exitSingleLineViewportMode];
     }
-    [parentTextView restoreOriginalAutocorrection:YES];
 }
 
 - (void)cancelMentionFromStartingLocation:(__unused NSUInteger)location {
     __strong __auto_type parentTextView = self.parentTextView;
     parentTextView.shouldRejectAutocorrectInsertions = NO;
-    [parentTextView restoreOriginalAutocorrection:YES];
 }
 
 - (void)selected:(id<HKWMentionsEntityProtocol>)entity atIndexPath:(NSIndexPath *)indexPath {
@@ -1187,7 +1210,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     UIFont *parentFont = parentTextView.fontSetByApp;
     UIColor *parentColor = parentTextView.textColorSetByApp;
     NSAssert(self.mentionHighlightedAttributes != nil, @"Error! Mention attribute dictionaries should never be nil.");
-    NSDictionary *unhighlightedAttributes = self.mentionHighlightedAttributes;
+    NSDictionary *unhighlightedAttributes = self.mentionUnhighlightedAttributes;
 
     NSRange rangeToTransform;
     // Find where previous control character was, and replace mention at that point
@@ -1354,8 +1377,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 - (void)accessoryViewActivated:(BOOL)activated {
     __strong __auto_type strongStateChangeDelegate = self.stateChangeDelegate;
+    __strong __auto_type parentTextView = self.parentTextView;
     if (activated) {
-        __strong __auto_type parentTextView = self.parentTextView;
         [parentTextView overrideAutocorrectionWith:UITextAutocorrectionTypeNo];
         if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPluginActivatedChooserView:)]) {
             [strongStateChangeDelegate mentionsPluginActivatedChooserView:self];
@@ -1368,6 +1391,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         }
     }
     else {
+        [parentTextView restoreOriginalAutocorrection:YES];
         // Tell state change delegate that the chooser view has been closed.
         if ([strongStateChangeDelegate respondsToSelector:@selector(mentionsPluginDeactivatedChooserView:)]) {
             [strongStateChangeDelegate mentionsPluginDeactivatedChooserView:self];
