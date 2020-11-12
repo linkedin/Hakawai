@@ -1088,60 +1088,7 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.location).to.equal(m1.mentionText.length+1);
         expect(((HKWMentionsAttribute *)mentionsPlugin.mentions[1]).range.length).to.equal(m1.mentionText.length);
         // Need small delay so text view has time to paste
-        expect(textView.text).after(1).to.equal(@"FirstName LastName FirstName LastNameCopyText");
-    });
-
-    it(@"paste from outside after maintain attributes", ^{
-        textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        NSString *copyText = @"CopyText";
-        [UIPasteboard generalPasteboard].items = @[@{@"public.utf8-plain-text":copyText}];
-
-        // Paste CopyText at beginning, leaving:
-        textView.selectedRange = NSMakeRange(0, 0);
-        [textView paste:nil];
-
-        // Test that font of pasted text is correct
-        NSRange standardTextFontRange;
-        id standardTextFontAttribute = [textView.attributedText attribute:NSFontAttributeName atIndex:0 longestEffectiveRange:&standardTextFontRange inRange:NSMakeRange(0, textView.attributedText.length)];
-        NSRange standardTextColorRange;
-        id standardTextColorAttribute = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:0 longestEffectiveRange:&standardTextColorRange inRange:NSMakeRange(0, textView.attributedText.length)];
-
-        expect(standardTextFontRange.location).to.equal(0);
-        expect(standardTextFontRange.length).to.equal(copyText.length);
-        expect(standardTextFontAttribute).to.equal(textView.fontSetByApp);
-
-        expect(standardTextColorRange.location).to.equal(0);
-        expect(standardTextColorRange.length).to.equal(copyText.length);
-        expect(standardTextColorAttribute).to.equal(textView.textColorSetByApp);
-
-        // Add mention
-        HKWMentionsAttribute *mention = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"3"];
-
-        expect(mentionsPlugin.mentions.count).to.equal(0);
-        [textView insertText:mention.mentionText];
-        mention.range = NSMakeRange(copyText.length, mention.mentionText.length);
-        [mentionsPlugin addMention:mention];
-        expect(mentionsPlugin.mentions.count).to.equal(1);
-
-        // Paste CopyText at end, leaving:
-        // CopyText|FirstName LastName|CopyText, where || denote mention attributes
-        NSUInteger endOfText = copyText.length + mention.mentionText.length;
-        textView.selectedRange = NSMakeRange(endOfText, 0);
-        [textView paste:nil];
-
-        // Test that font of pasted text is correct
-        NSRange standardTextFontRange2;
-        id standardTextFontAttribute2 = [textView.attributedText attribute:NSFontAttributeName atIndex:endOfText effectiveRange:&standardTextFontRange2];
-        NSRange standardTextColorRange2;
-        id standardTextColorAttribute2 = [textView.attributedText attribute:NSForegroundColorAttributeName atIndex:endOfText effectiveRange:&standardTextColorRange2];
-
-        expect(standardTextFontRange2.location).to.equal(copyText.length+mention.mentionText.length);
-        expect(standardTextFontRange2.length).to.equal(copyText.length);
-        expect(standardTextFontAttribute2).to.equal(textView.fontSetByApp);
-
-        expect(standardTextColorRange2.location).to.equal(copyText.length+mention.mentionText.length);
-        expect(standardTextColorRange2.length).to.equal(copyText.length);
-        expect(standardTextColorAttribute2).to.equal(textView.textColorSetByApp);
+        expect(textView.text).after(1).will.equal(@"FirstName LastName FirstName LastNameCopyText");
     });
 });
 
