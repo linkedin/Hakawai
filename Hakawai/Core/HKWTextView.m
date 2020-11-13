@@ -201,7 +201,8 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
 }
 
 - (void)paste:(id)sender {
-    if (enableMentionsPluginV2 && [self.copyString length] > 0) {
+    BOOL implementsWillPasteTextInRange = [self.controlFlowPlugin respondsToSelector:@selector(textView:willPasteTextInRange:isProgrammatic:)];
+    if (enableMentionsPluginV2 && [self.copyString length] > 0 && implementsWillPasteTextInRange) {
         __strong __auto_type copyString = self.copyString;
         // In order to maintain mentions styling, insert the saved copyString into the attributed text
         NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.copyString.length;
@@ -215,7 +216,9 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         // Inform delegate that text view has changed since we are overriding the normal paste behavior that would do so automatically
         [self.delegate textViewDidChange:self];
     } else {
-        [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange isProgrammatic:NO];
+        if (implementsWillPasteTextInRange) {
+            [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange isProgrammatic:NO];
+        }
         [super paste:sender];
     }
     self.wasPaste = YES;
