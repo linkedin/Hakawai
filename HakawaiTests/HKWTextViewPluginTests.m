@@ -39,6 +39,11 @@
 - (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction;
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange interaction:(UITextItemInteraction)interaction;
 - (void)handleDictationString:(NSString *)dictationString;
+- (void)touchOverlayViewTapped:(UITapGestureRecognizer *)gestureRecognizer;
+- (BOOL)shouldChangeTextInRange:(NSRange)range
+                replacementText:(NSString *)replacementText
+                isDictationText:(BOOL)isDictationText
+                       textView:(UITextView *)textView;
 @end
 
 SpecBegin(basicPlugins)
@@ -272,6 +277,38 @@ describe(@"control flow plugin API", ^{
         [textView textViewDidChangeSelection:textView];
         [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
         [textView textView:textView shouldInteractWithURL:[NSURL URLWithString:@"example.com"] inRange:NSMakeRange(0, 10) interaction:UITextItemInteractionInvokeDefaultAction];
+    });
+});
+
+describe(@"test basic/dummy control flow plugin", ^{
+    __block HKWTextView *textView;
+
+    beforeEach(^{
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        HKWTBasicDummyPlugin *p1 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p1"];
+        textView.controlFlowPlugin = p1;
+    });
+
+    it(@"Run all functions that use control flow plugin in text view", ^{
+        // Make sure that nothing breaks when you run these basic text view methods with an empty control flow plugin
+        // Need to test the most bare bones plugin to make sure it doesn't break
+        // Basically makes sure we aren't calling any control flow plugin method without an if-responds check around it
+        [textView paste:nil];
+        [textView textViewDidProgrammaticallyUpdate];
+        [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
+        [textView textView:textView shouldInteractWithURL:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
+        [textView touchOverlayViewTapped:nil];
+        [textView handleDictationString:nil];
+        [textView shouldChangeTextInRange:NSMakeRange(0, 0)
+                          replacementText:nil
+                          isDictationText:NO
+                                 textView:textView];
+        [textView textViewShouldBeginEditing:textView];
+        [textView textViewDidBeginEditing:textView];
+        [textView textViewShouldEndEditing:textView];
+        [textView textViewDidEndEditing:textView];
+        [textView textViewDidChange:textView];
+        [textView textViewDidChangeSelection:textView];
     });
 });
 
