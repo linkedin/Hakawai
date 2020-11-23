@@ -2206,7 +2206,7 @@
     return self.creationStateMachine.explicitSearchControlCharacter;
 }
 
-- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(__unused NSRange)range isProgrammatic:(__unused BOOL)isProgrammatic {
+- (void)textView:(__unused UITextView *)textView willProgrammaticallyPasteTextInRange:(__unused NSRange)range {
     return;
 }
 

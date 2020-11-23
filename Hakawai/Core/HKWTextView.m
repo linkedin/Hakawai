@@ -26,15 +26,16 @@
 @property (nonatomic) NSMutableDictionary *simplePluginsDictionary;
 
 @property (nonatomic, readwrite) BOOL wasPaste;
+@property (nonatomic, readwrite) NSInteger generalPasteboardChangeCount;
 
 /**
-String maintaining the most recently copied attributed string from this text view
+ String maintaining the most recently copied attributed string from this text view
  */
-@property (nonatomic, copy, nullable, readwrite) NSAttributedString *copyString;
+@property (nonatomic, copy, nullable, readwrite) NSAttributedString *stringCopiedFromCurrentTextView;
 
 @end
 
-static BOOL enableMentionsPluginV2 = NO;
+static BOOL enableMentionsPluginV2 = YES;
 static BOOL enableMentionsCreationStateMachineV2 = NO;
 
 @implementation HKWTextView
@@ -134,7 +135,7 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
 
 - (void)dealloc {
     if (enableMentionsPluginV2) {
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIPasteboardChangedNotification object:[UIPasteboard generalPasteboard]];
     }
 }
 
@@ -145,7 +146,7 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
 
     self.abstractionLayer = [HKWAbstractionLayer instanceWithTextView:self changeRejection:YES];
     if (enableMentionsPluginV2) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pasteboardChanged) name:UIPasteboardChangedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pasteboardChanged) name:UIPasteboardChangedNotification object:[UIPasteboard generalPasteboard]];
     }
 }
 
@@ -185,7 +186,7 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
     [super copy:sender];
     if (enableMentionsPluginV2) {
         // In order to maintain mentions styling, save the attributed string for the current copy action
-        self.copyString = [self.attributedText attributedSubstringFromRange:self.selectedRange];
+        self.stringCopiedFromCurrentTextView = [self.attributedText attributedSubstringFromRange:self.selectedRange];
     }
 }
 
@@ -196,29 +197,43 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
     [super cut:sender];
     if (enableMentionsPluginV2) {
         // In order to maintain mentions styling, save the attributed string for the current cut action
-        self.copyString = preCutText;
+        self.stringCopiedFromCurrentTextView = preCutText;
+    }
+}
+
+- (void)clearCopyStringIfNeeded {
+    // If the change count has been updated in the general pasteboard, clear the copy string, because it means that a copy was performed in another app.
+    if (self.generalPasteboardChangeCount != [UIPasteboard generalPasteboard].changeCount) {
+        self.stringCopiedFromCurrentTextView = nil;
+        self.generalPasteboardChangeCount = [UIPasteboard generalPasteboard].changeCount;
     }
 }
 
 - (void)paste:(id)sender {
-    BOOL implementsWillPasteTextInRange = [self.controlFlowPlugin respondsToSelector:@selector(textView:willPasteTextInRange:isProgrammatic:)];
-    if (enableMentionsPluginV2 && [self.copyString length] > 0 && implementsWillPasteTextInRange) {
-        __strong __auto_type copyString = self.copyString;
-        // In order to maintain mentions styling, insert the saved copyString into the attributed text
-        NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.copyString.length;
-        NSRange selectionRangeBeforePaste = self.selectedRange;
-        // Let control plugin know that text will be pasted, so it can remove any existing mentions attributes at that point
-        [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange isProgrammatic:YES];
-        NSMutableAttributedString *string = [self.attributedText mutableCopy];
-        [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:copyString];
-        [self setAttributedText:string];
-        self.selectedRange = NSMakeRange(cursorLocationAfterPaste, 0);
-        // Inform delegate that text view has changed since we are overriding the normal paste behavior that would do so automatically
-        [self.delegate textViewDidChange:self];
-    } else {
-        if (implementsWillPasteTextInRange) {
-            [self.controlFlowPlugin textView:self willPasteTextInRange:self.selectedRange isProgrammatic:NO];
+    if (enableMentionsPluginV2) {
+        // Paste the most recently copied string from the current text view, saved in stringCopiedFromCurrentTextView, so that we maintain mentions-styling
+        // while pasting
+        [self clearCopyStringIfNeeded];
+        BOOL implementsWillProgrammaticallyPasteTextInRange = [self.controlFlowPlugin respondsToSelector:@selector(textView:willProgrammaticallyPasteTextInRange:)];
+        // If stringCopiedFromCurrentTextView is set and the proper callback exists to handle the update in the control flow plugin, insert the copied string
+        // programmatically
+        if ([self.stringCopiedFromCurrentTextView length] > 0 && implementsWillProgrammaticallyPasteTextInRange) {
+            __strong __auto_type copyString = self.stringCopiedFromCurrentTextView;
+            // In order to maintain mentions styling, insert the saved copyString into the attributed text
+            NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.stringCopiedFromCurrentTextView.length;
+            NSRange selectionRangeBeforePaste = self.selectedRange;
+            // Let control plugin know that text will be pasted, so it can remove any existing mentions attributes at that point
+            [self.controlFlowPlugin textView:self willProgrammaticallyPasteTextInRange:self.selectedRange];
+            NSMutableAttributedString *string = [self.attributedText mutableCopy];
+            [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:copyString];
+            [self setAttributedText:string];
+            self.selectedRange = NSMakeRange(cursorLocationAfterPaste, 0);
+            // Inform delegate that text view has changed since we are overriding the normal paste behavior that would do so automatically
+            [self.delegate textViewDidChange:self];
+        } else {
+            [super paste:sender];
         }
+    } else {
         [super paste:sender];
     }
     self.wasPaste = YES;
@@ -226,7 +241,10 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
 
 - (void)pasteboardChanged {
     // Every time the pasteboard is changed, clear the copy string so we can actually paste in from other sources
-    self.copyString = nil;
+    self.stringCopiedFromCurrentTextView = nil;
+    // Keep track of the change count in the pasteboard from this app while it's in the foreground, so we know if it's ever changed while the app is in the
+    // background
+    self.generalPasteboardChangeCount = [UIPasteboard generalPasteboard].changeCount;
 }
 
 #pragma mark - Plugin Handling
@@ -715,11 +733,11 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
     return _simplePluginsDictionary;
 }
 
-- (NSAttributedString *)copyString {
-    if (!_copyString) {
-        _copyString = [[NSAttributedString alloc] init];
+- (NSAttributedString *)stringCopiedFromCurrentTextView {
+    if (!_stringCopiedFromCurrentTextView) {
+        _stringCopiedFromCurrentTextView = [[NSAttributedString alloc] init];
     }
-    return _copyString;
+    return _stringCopiedFromCurrentTextView;
 }
 
 - (NSMutableDictionary *)customTypingAttributes {
