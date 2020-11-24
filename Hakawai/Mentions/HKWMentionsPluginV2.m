@@ -40,7 +40,6 @@
 @property (nonatomic, readonly) BOOL viewportLocksToTopUponMentionCreation;
 @property (nonatomic, readonly) BOOL viewportLocksToBottomUponMentionCreation;
 @property (nonatomic, readonly) BOOL viewportLocksUponMentionCreation;
-@property (nonatomic, readwrite) BOOL wasNonProgrammaticPaste;
 
 @property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
 
@@ -1008,27 +1007,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
             // This is also needed if a user autocorrects a mention name from the black pop up menu over a piece of text
             [self bleachMentionsIntersectingWithRange:range];
         }
-
-        // If we just did a non-programmatic paste, insert the text directly and add proper attributes
-        // This is needed because after mentioning, attribution gets
-        if (self.wasNonProgrammaticPaste) {
-            self.wasNonProgrammaticPaste = NO;
-            __strong __auto_type parentTextView = self.parentTextView;
-            [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
-                return [[NSAttributedString alloc] initWithString:text
-                                                       attributes:[self defaultTextAttributes]];
-            }];
-            parentTextView.selectedRange = NSMakeRange(range.location + [text length], 0);
-            returnValue = NO;
-
-            // Manually notify external delegate that the textView changed
-            id<HKWTextViewDelegate> externalDelegate = parentTextView.externalDelegate;
-            if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-                [externalDelegate textViewDidChange:parentTextView];
-            }
-        }
     }
-
     [self stripCustomAttributesFromTypingAttributes];
     return returnValue;
 }
