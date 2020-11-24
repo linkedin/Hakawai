@@ -672,7 +672,7 @@
     BOOL delegateImplementsCustomTrimming = [delegate respondsToSelector:@selector(trimmedNameForEntity:)];
     BOOL delegateAllowsTrimming = NO;
     if ([strongCustomChooserViewDelegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
-        delegateAllowsTrimming = [delegate entityCanBeTrimmed:mention];
+        delegateAllowsTrimming = [strongCustomChooserViewDelegate entityCanBeTrimmed:mention];
     } else if ([delegate respondsToSelector:@selector(entityCanBeTrimmed:)]) {
         delegateAllowsTrimming = [delegate entityCanBeTrimmed:mention];
     }
