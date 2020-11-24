@@ -249,7 +249,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V2", ^{
 
     beforeEach(^{
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-        mentionsPlugin = [HKWMentionsPluginV1 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
+        mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
     });
 
