@@ -488,12 +488,19 @@
  dictionary and, if applicable, restoring default attributes from the parent text view.
  */
 - (NSDictionary *)typingAttributesByStrippingMentionAttributes:(NSDictionary *)originalAttributes {
+    __strong __auto_type parentTextView = self.parentTextView;
+    
+    // If we have the typing attibutes we don't need to try to rip out the selected/unselected attributes
+    if (parentTextView.typingAttributesSetByApp) {
+        return parentTextView.typingAttributesSetByApp;
+    }
+    
     NSMutableDictionary *d = [originalAttributes mutableCopy];
     for (NSString *key in self.mentionUnselectedAttributes) {
         [d removeObjectForKey:key];
     }
+    
     // Restore the font and/or text color, if the app set either explicitly at any point.
-    __strong __auto_type parentTextView = self.parentTextView;
     if (parentTextView.fontSetByApp) {
         d[NSFontAttributeName] = parentTextView.fontSetByApp;
     }
