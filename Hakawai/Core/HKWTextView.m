@@ -35,7 +35,7 @@
 
 @end
 
-static BOOL enableMentionsPluginV2 = YES;
+static BOOL enableMentionsPluginV2 = NO;
 static BOOL enableMentionsCreationStateMachineV2 = NO;
 
 @implementation HKWTextView
