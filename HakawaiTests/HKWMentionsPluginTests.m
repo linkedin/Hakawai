@@ -979,7 +979,7 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
         NSUInteger endOfText = textView.text.length;
         textView.selectedRange = NSMakeRange(endOfText, 0);
         [textView paste:nil];
-        expect(textView.text).after(1).to.equal(@"CopyTextFirstName LastNameCopyText");
+        expect(textView.text).after(2).to.equal(@"CopyTextFirstName LastNameCopyText");
 
         // Test normal font
         expect([mentionsPlugin valueForAttributeWithName:NSFontAttributeName forWordOfLength:copyText.length]).to.equal(textView.fontSetByApp);
