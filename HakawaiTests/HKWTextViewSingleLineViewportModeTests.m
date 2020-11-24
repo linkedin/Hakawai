@@ -83,7 +83,7 @@ describe(@"single line viewport API", ^{
         expect(textView.contentOffset.y).to.equal(30);
         [textView enterSingleLineViewportMode:HKWViewportModeTop captureTouches:NO];
         expect(textView.contentOffset.x).to.equal(0);
-        expect(textView.contentOffset.y).to.equal(3300);
+        expect(round(textView.contentOffset.y)).to.equal(3300);
         [textView exitSingleLineViewportMode];
         expect(textView.contentOffset.x).to.equal(0);
         expect(textView.contentOffset.y).to.equal(30);
