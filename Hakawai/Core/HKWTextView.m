@@ -709,7 +709,7 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
     }
 }
 
-- (void)setTypingAttributes:(NSDictionary<NSAttributedStringKey,id> *)typingAttributes {
+- (void)setTypingAttributes:(NSDictionary *)typingAttributes {
     [super setTypingAttributes:typingAttributes];
     if (typingAttributes) {
         self.typingAttributesSetByApp = typingAttributes;
