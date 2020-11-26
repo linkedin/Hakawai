@@ -26,6 +26,11 @@
 @property (nonatomic) NSMutableDictionary *simplePluginsDictionary;
 
 @property (nonatomic, readwrite) BOOL wasPaste;
+
+/**
+ Saved @c changeCount from the general pasteboard. We update this every time a change is tracked by our text view, and if it's ever not-equal to  `[UIPasteboard generalPasteboard].changeCount`, then we know that
+ a pasteboard change, untracked by our text view, has happened.
+ */
 @property (nonatomic, readwrite) NSInteger generalPasteboardChangeCount;
 
 /**
