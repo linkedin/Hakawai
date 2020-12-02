@@ -40,7 +40,6 @@
 @property (nonatomic, readonly) BOOL viewportLocksToTopUponMentionCreation;
 @property (nonatomic, readonly) BOOL viewportLocksToBottomUponMentionCreation;
 @property (nonatomic, readonly) BOOL viewportLocksUponMentionCreation;
-@property (nonatomic, readwrite) BOOL wasNonProgrammaticPaste;
 
 @property (nonatomic, copy) void(^customModeAttachmentBlock)(UIView *);
 
@@ -218,6 +217,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         return buffer;
     }];
     parentTextView.selectedRange = originalRange;
+    [self stripCustomAttributesFromTypingAttributes];
 }
 
 // Programmatically add a number of mentions to the text view's text.
@@ -974,57 +974,40 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     BOOL returnValue = YES;
     // In simple refactor, we only focus on insertions and deletions in order to allow for personalization/deletions/bleaching of mentions
 
-    // Handle deletion of mentions characters
-    if (text.length == 0 && range.length == 1) {
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
-        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
-        returnValue = [self shouldAllowCharacterDeletionAtLocation:range.location];
-    }
-
-    // Handle when a multi-character deletion overlaps a mention
-    if (text.length == 0 && range.length > 1) {
-        returnValue = [self shouldAllowDeletionAtRange:range];
-    }
-
-    //  If (at least one) character is inserted within a mention then bleach the mention.
-    if (text.length > 0 && range.length == 0 && self.currentlyHighlightedMentionRange.location != NSNotFound) {
-        const NSRange highlightedMentionInternalTextRange = NSMakeRange(self.currentlyHighlightedMentionRange.location + 1,
-                                                                        self.currentlyHighlightedMentionRange.length - 1);
-        if (NSLocationInRange(range.location, highlightedMentionInternalTextRange)) {
-            [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
+    // Deletion
+    if (text.length == 0) {
+        // Single-char
+        if (range.length == 1) {
+            // Handle deletion of mentions characters
+            [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
+            self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
+            returnValue = [self shouldAllowCharacterDeletionAtLocation:range.location];
+        // Multi-char
+        } else {
+            // Handle when a multi-character deletion overlaps a mention
+            returnValue = [self shouldAllowDeletionAtRange:range];
         }
-        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
-    }
+    // Insertion
+    } else {
+        //  If a character is inserted within a mention then bleach the mention.
+        if (range.length == 0 && self.currentlyHighlightedMentionRange.location != NSNotFound) {
+            const NSRange highlightedMentionInternalTextRange = NSMakeRange(self.currentlyHighlightedMentionRange.location + 1,
+                                                                            self.currentlyHighlightedMentionRange.length - 1);
+            if (NSLocationInRange(range.location, highlightedMentionInternalTextRange)) {
+                [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
+            }
+            self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
+        // If at least one character is inserted while the user is selecting a range
+        } else if (range.length > 0) {
+            // Remove any current highlightings
+            [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
+            self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
 
-    // If (at least one) character is inserted while the user is selecting a range
-    if (text.length > 0 && range.length > 0) {
-        // Remove any current highlightings
-        [self toggleMentionsFormattingIfNeededAtRange:self.currentlyHighlightedMentionRange highlighted:NO];
-        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
-
-        // Bleach a mention if the insertion intersects with it, either at the beginning or the end
-        // This is needed if a user autocorrects a mention name from the black pop up menu over a piece of text
-        [self bleachMentionsIntersectingWithRange:range];
-    }
-
-    // If we just did a non-programmatic paste, insert the text directly and add proper attributes
-    if (self.wasNonProgrammaticPaste && text.length > 0) {
-        self.wasNonProgrammaticPaste = NO;
-        __strong __auto_type parentTextView = self.parentTextView;
-        [parentTextView transformTextAtRange:range withTransformer:^NSAttributedString *(__unused NSAttributedString *input) {
-            return [[NSAttributedString alloc] initWithString:text
-                                                   attributes:[self defaultTextAttributes]];
-        }];
-        parentTextView.selectedRange = NSMakeRange(range.location + [text length], 0);
-        returnValue = NO;
-
-        // Manually notify external delegate that the textView changed
-        id<HKWTextViewDelegate> externalDelegate = parentTextView.externalDelegate;
-        if ([externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
-            [externalDelegate textViewDidChange:parentTextView];
+            // Bleach a mention if the insertion intersects with it, either at the beginning or the end
+            // This is also needed if a user autocorrects a mention name from the black pop up menu over a piece of text
+            [self bleachMentionsIntersectingWithRange:range];
         }
     }
-
     [self stripCustomAttributesFromTypingAttributes];
     return returnValue;
 }
@@ -1081,19 +1064,17 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }
 }
 
-- (void)textView:(__unused UITextView *)textView willPasteTextInRange:(NSRange)range isProgrammatic:(BOOL)isProgrammatic {
-    if (isProgrammatic) {
-        // If it was a programmatic paste, we just have to update the mention formatting
-        if (self.currentlyHighlightedMentionRange.location != NSNotFound) {
-            [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
-            self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
-        } else {
-            // If this paste is happening over a range that intersects with a mention, bleach that mention
-            [self bleachMentionsIntersectingWithRange:range];
-        }
+/**
+ We have to update mentions formatting after a programmatic custom paste because we just manually inserted a string, and @c shouldChangeTextInRange is not going to be called
+ */
+- (void)textView:(__unused UITextView *)textView willCustomPasteTextInRange:(NSRange)range {
+    // If it was a programmatic paste, we just have to update the mention formatting
+    if (self.currentlyHighlightedMentionRange.location != NSNotFound) {
+        [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];
+        self.currentlyHighlightedMentionRange = NSMakeRange(NSNotFound, 0);
     } else {
-        // If it was not a programmatic paste, we will handle it later when it reaches shouldChangeTextInRange
-        self.wasNonProgrammaticPaste = YES;
+        // If this paste is happening over a range that intersects with a mention, bleach that mention
+        [self bleachMentionsIntersectingWithRange:range];
     }
 }
 
@@ -1254,6 +1235,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     if (self.notifyTextViewDelegateOnMentionCreation && [externalDelegate respondsToSelector:@selector(textViewDidChange:)]) {
         [externalDelegate textViewDidChange:parentTextView];
     }
+
+    [self stripCustomAttributesFromTypingAttributes];
 }
 
 /// A private method that handles attaching the chooser view when it's enclosed within the text view.

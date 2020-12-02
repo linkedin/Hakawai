@@ -284,6 +284,7 @@ describe(@"test basic/dummy control flow plugin", ^{
     __block HKWTextView *textView;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = NO;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         HKWTBasicDummyPlugin *p1 = [HKWTBasicDummyPlugin dummyPluginWithName:@"p1"];
         textView.controlFlowPlugin = p1;
@@ -293,7 +294,8 @@ describe(@"test basic/dummy control flow plugin", ^{
         // Make sure that nothing breaks when you run these basic text view methods with an empty control flow plugin
         // Need to test the most bare bones plugin to make sure it doesn't break
         // Basically makes sure we aren't calling any control flow plugin method without an if-responds check around it
-        [textView paste:nil];
+        // TODO: Re-add [textView paste:nil]
+        // JIRA: POST-15611
         [textView textViewDidProgrammaticallyUpdate];
         [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
         [textView textView:textView shouldInteractWithURL:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];

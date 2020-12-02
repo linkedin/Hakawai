@@ -126,6 +126,7 @@ describe(@"basic mentions plugin setup - MENTIONS PLUGIN V1", ^{
     __block HKWTextView *textView;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = NO;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
     });
 
@@ -149,6 +150,7 @@ describe(@"basic mentions plugin setup - MENTIONS PLUGIN V2", ^{
     __block HKWTextView *textView;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = YES;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
     });
 
@@ -173,6 +175,7 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V1", ^{
     __block HKWMentionsPluginV1 *mentionsPlugin;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = NO;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV1 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
@@ -248,8 +251,9 @@ describe(@"inserting and reading mentions - MENTIONS PLUGIN V2", ^{
     __block HKWMentionsPluginV2 *mentionsPlugin;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = YES;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-        mentionsPlugin = [HKWMentionsPluginV1 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
+        mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
     });
 
@@ -322,6 +326,7 @@ describe(@"mentions validation - MENTIONS PLUGIN V1", ^{
     __block HKWMentionsPluginV1 *mentionsPlugin;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = NO;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV1 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
@@ -346,6 +351,7 @@ describe(@"mentions validation - MENTIONS PLUGIN V2", ^{
     __block HKWMentionsPluginV2 *mentionsPlugin;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = YES;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
@@ -370,6 +376,7 @@ describe(@"deleting and reading mentions - MENTIONS PLUGIN V1", ^{
     __block HKWMentionsPluginV1 *mentionsPlugin;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = NO;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV1 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
@@ -406,6 +413,7 @@ describe(@"deleting and reading mentions - MENTIONS PLUGIN V2", ^{
     __block HKWMentionsPluginV2 *mentionsPlugin;
 
     beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = YES;
         textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
@@ -741,8 +749,8 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
     __block HKWMentionsPluginV2 *mentionsPlugin;
 
     beforeEach(^{
-        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         HKWTextView.enableMentionsPluginV2 = YES;
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
     });
@@ -968,7 +976,7 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
 
         // Paste CopyText at end, leaving:
         // CopyText|FirstName LastName|CopyText, where || denote mention attributes
-        NSUInteger endOfText = textView.text.length;
+        NSUInteger endOfText = copyText.length+mention.mentionText.length;
         textView.selectedRange = NSMakeRange(endOfText, 0);
         [textView paste:nil];
         expect(textView.text).after(1).to.equal(@"CopyTextFirstName LastNameCopyText");
@@ -990,8 +998,8 @@ describe(@"highlight mentions - MENTIONS PLUGIN V2", ^{
     __block HKWMentionsPluginV2 *mentionsPlugin;
 
     beforeEach(^{
-        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         HKWTextView.enableMentionsPluginV2 = YES;
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
         mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp];
         [textView setControlFlowPlugin:mentionsPlugin];
     });
