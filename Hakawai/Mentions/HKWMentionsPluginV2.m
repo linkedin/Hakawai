@@ -1065,9 +1065,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 /**
- We have to update mentions formatting after a programmatic paste because we just manually inserted a string, and @c shouldChangeTextInRange is not going to be called
+ We have to update mentions formatting after a programmatic custom paste because we just manually inserted a string, and @c shouldChangeTextInRange is not going to be called
  */
-- (void)textView:(__unused UITextView *)textView willProgrammaticallyPasteTextInRange:(NSRange)range {
+- (void)textView:(__unused UITextView *)textView willCustomPasteTextInRange:(NSRange)range {
     // If it was a programmatic paste, we just have to update the mention formatting
     if (self.currentlyHighlightedMentionRange.location != NSNotFound) {
         [self bleachExistingMentionAtRange:self.currentlyHighlightedMentionRange];

@@ -174,12 +174,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 -(void)textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
 
 /*!
- If available, this method is called when the text view is about to programmatically paste text
+ If available, this method is called when the text view is about to engage in a programmatic custom pasting of text
 
  @param textView Text view for paste
  @param range Range for paste
  */
-- (void)textView:(nonnull UITextView *)textView willProgrammaticallyPasteTextInRange:(NSRange)range;
+- (void)textView:(nonnull UITextView *)textView willCustomPasteTextInRange:(NSRange)range;
 
 /*!
  Extract mentions attributes from an attributed string. The array of mentions attribute objects returned by this method

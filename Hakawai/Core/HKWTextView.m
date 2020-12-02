@@ -219,16 +219,16 @@ static BOOL enableMentionsCreationStateMachineV2 = NO;
         // Paste the most recently copied string from the current text view, saved in stringCopiedFromCurrentTextView, so that we maintain mentions-styling
         // while pasting
         [self clearCopyStringIfNeeded];
-        BOOL implementsWillProgrammaticallyPasteTextInRange = [self.controlFlowPlugin respondsToSelector:@selector(textView:willProgrammaticallyPasteTextInRange:)];
+        BOOL implementsWillCustomPasteTextInRange = [self.controlFlowPlugin respondsToSelector:@selector(textView:willCustomPasteTextInRange:)];
         // If stringCopiedFromCurrentTextView is set and the proper callback exists to handle the update in the control flow plugin, insert the copied string
         // programmatically
-        if ([self.stringCopiedFromCurrentTextView length] > 0 && implementsWillProgrammaticallyPasteTextInRange) {
+        if ([self.stringCopiedFromCurrentTextView length] > 0 && implementsWillCustomPasteTextInRange) {
             __strong __auto_type copyString = self.stringCopiedFromCurrentTextView;
             // In order to maintain mentions styling, insert the saved copyString into the attributed text
             NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.stringCopiedFromCurrentTextView.length;
             NSRange selectionRangeBeforePaste = self.selectedRange;
             // Let control plugin know that text will be pasted, so it can remove any existing mentions attributes at that point
-            [self.controlFlowPlugin textView:self willProgrammaticallyPasteTextInRange:self.selectedRange];
+            [self.controlFlowPlugin textView:self willCustomPasteTextInRange:self.selectedRange];
             NSMutableAttributedString *string = [self.attributedText mutableCopy];
             [string replaceCharactersInRange:selectionRangeBeforePaste withAttributedString:copyString];
             [self setAttributedText:string];
