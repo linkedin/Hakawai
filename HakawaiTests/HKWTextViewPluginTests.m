@@ -294,8 +294,7 @@ describe(@"test basic/dummy control flow plugin", ^{
         // Make sure that nothing breaks when you run these basic text view methods with an empty control flow plugin
         // Need to test the most bare bones plugin to make sure it doesn't break
         // Basically makes sure we aren't calling any control flow plugin method without an if-responds check around it
-        // TODO: Re-add [textView paste:nil]
-        // JIRA: POST-15611
+        [textView paste:nil];
         [textView textViewDidProgrammaticallyUpdate];
         [textView textView:textView shouldInteractWithTextAttachment:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
         [textView textView:textView shouldInteractWithURL:nil inRange:NSMakeRange(0, 0) interaction:UITextItemInteractionInvokeDefaultAction];
