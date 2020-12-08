@@ -2123,7 +2123,7 @@
 - (id<HKWMentionsCreationStateMachine>)creationStateMachine {
     if (HKWTextView.enableMentionsCreationStateMachineV2) {
         if (!_creationStateMachine) {
-            _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self];
+            _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self isUsingCustomChooserView:self.customChooserViewDelegate != nil];
         }
         return _creationStateMachine;
     } else {

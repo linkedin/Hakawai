@@ -23,6 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 
 @interface HKWMentionsCreationStateMachineV2 : NSObject <HKWMentionsCreationStateMachine>
+
+/*!
+ Return a new, initialized state machine instance, and let it know whether we are using a custom chooser view or not
+ */
++ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate isUsingCustomChooserView:(BOOL)isUsingCustomChooserView;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -96,11 +96,6 @@
 */
 @property (nonatomic) unichar explicitSearchControlCharacter;
 
-/*!
- Return a new, initialized state machine instance.
- */
-+ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate;
-
 /**
  Informs the state machine typeahead results are returned, so it can update its internal state accordingly.
  */
