@@ -175,8 +175,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                                     isWhitespace:isWhitespace
                                                 controlCharacter:self.explicitSearchControlCharacter];
                 } else {
-                    [delegate asyncRetrieveEntitiesForKeyString:[self.stringBuffer copy]
-                                               controlCharacter:self.explicitSearchControlCharacter];
+                    [delegate didUpdateKeyString:[self.stringBuffer copy]
+                                controlCharacter:self.explicitSearchControlCharacter];
                 }
             }
             break;
@@ -280,8 +280,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                                 isWhitespace:NO
                                             controlCharacter:self.explicitSearchControlCharacter];
             } else {
-                [delegate asyncRetrieveEntitiesForKeyString:[self.stringBuffer copy]
-                                           controlCharacter:self.explicitSearchControlCharacter];
+                [delegate didUpdateKeyString:[self.stringBuffer copy]
+                            controlCharacter:self.explicitSearchControlCharacter];
             }
             break;
     }
@@ -330,8 +330,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                         isWhitespace:NO
                                     controlCharacter:self.explicitSearchControlCharacter];
     } else {
-        [self.delegate asyncRetrieveEntitiesForKeyString:prefix
-                                        controlCharacter:self.explicitSearchControlCharacter];
+        [self.delegate didUpdateKeyString:prefix
+                         controlCharacter:self.explicitSearchControlCharacter];
     }
 }
 
@@ -370,8 +370,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                         isWhitespace:NO
                                     controlCharacter:self.explicitSearchControlCharacter];
     } else {
-        [self.delegate asyncRetrieveEntitiesForKeyString:@""
-                                        controlCharacter:self.explicitSearchControlCharacter];
+        [self.delegate didUpdateKeyString:@""
+                         controlCharacter:self.explicitSearchControlCharacter];
     }
 }
 

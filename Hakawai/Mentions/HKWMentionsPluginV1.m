@@ -2210,6 +2210,16 @@
     return;
 }
 
+- (void)didUpdateKeyString:(nonnull NSString *)keyString
+          controlCharacter:(unichar)character {
+    // set up the chooser view prior to data request in order to support fully customized view
+    [self.creationStateMachine setupChooserViewIfNeeded];
+    __strong __auto_type strongCustomChooserViewDelegate = self.customChooserViewDelegate;
+    NSAssert(strongCustomChooserViewDelegate != nil, @"TODO");
+    [strongCustomChooserViewDelegate didUpdateKeyString:keyString
+                                       controlCharacter:character];
+}
+
 #pragma mark - Developer
 
 NSString * _Nonnull nameForMentionsState(HKWMentionsState s) {

@@ -92,7 +92,4 @@ typedef NS_ENUM(NSInteger, HKWMentionsSearchType) {
  */
 - (CGFloat)heightForLoadingCellInTableView:(UITableView *_Null_unspecified)tableView;
 
-- (void)asyncRetrieveEntitiesForKeyString:(nonnull NSString *)keyString
-                         controlCharacter:(unichar)character;
-
 @end

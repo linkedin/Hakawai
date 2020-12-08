@@ -4,7 +4,7 @@
 #import "HKWMentionsDefaultChooserViewDelegate.h"
 #import "HKWMentionsPlugin.h"
 
-@protocol HKWMentionsCreationStateMachineProtocol <HKWMentionsDefaultChooserViewDelegate>
+@protocol HKWMentionsCreationStateMachineProtocol <HKWMentionsDefaultChooserViewDelegate, HKWMentionsCustomChooserViewDelegate>
 
 /*!
  Get whether or not the host app supports displaying a loading cell.
