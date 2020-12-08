@@ -369,6 +369,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                           searchType:self.searchType
                                         isWhitespace:NO
                                     controlCharacter:self.explicitSearchControlCharacter];
+    } else {
+        [self.delegate asyncRetrieveEntitiesForKeyString:@""
+                                        controlCharacter:self.explicitSearchControlCharacter];
     }
 }
 
@@ -478,7 +481,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 }
 
 - (UIView<HKWChooserViewProtocol> *)createNewChooserView {
-    NSAssert(self.dataProvider != nil, @"Data provider should only be nil in custom chooser view case. Should have data provider for entity chooser view creation.");
     HKWMentionsChooserPositionMode mode = [self.delegate chooserPositionMode];
     CGRect chooserFrame = [self frameForMode:mode];
     // Handle the case where the chooser frame is completely custom
@@ -490,18 +492,24 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
     // Instantiate the chooser view
     UIView<HKWChooserViewProtocol> *chooserView = nil;
-    if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:)]) {
-        chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
-                                                         delegate:self.dataProvider];
-    }
-    else if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:dataSource:)]) {
-        chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
-                                                         delegate:self.dataProvider
-                                                       dataSource:self.dataProvider];
-    }
-    else {
-        NSAssert(NO, @"Chooser view class must support one or both of the following methods: \
-                 chooserViewWithFrame:delegate: or chooserViewWithFrame:delegate:dataSource:");
+    if (self.dataProvider) {
+        if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:)]) {
+            chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame];
+        }
+    } else {
+        if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:)]) {
+            chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
+                                                             delegate:self.dataProvider];
+        }
+        else if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:dataSource:)]) {
+            chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
+                                                             delegate:self.dataProvider
+                                                           dataSource:self.dataProvider];
+        }
+        else {
+            NSAssert(NO, @"Chooser view class must support one or both of the following methods: \
+                     chooserViewWithFrame:delegate: or chooserViewWithFrame:delegate:dataSource:");
+        }
     }
 
     if ([chooserView respondsToSelector:@selector(setBorderMode:)]) {
