@@ -174,6 +174,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                                       searchType:self.searchType
                                                     isWhitespace:isWhitespace
                                                 controlCharacter:self.explicitSearchControlCharacter];
+                } else {
+                    [delegate asyncRetrieveEntitiesForKeyString:[self.stringBuffer copy]
+                                               controlCharacter:self.explicitSearchControlCharacter];
                 }
             }
             break;
@@ -276,6 +279,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                                   searchType:self.searchType
                                                 isWhitespace:NO
                                             controlCharacter:self.explicitSearchControlCharacter];
+            } else {
+                [delegate asyncRetrieveEntitiesForKeyString:[self.stringBuffer copy]
+                                           controlCharacter:self.explicitSearchControlCharacter];
             }
             break;
     }
@@ -323,6 +329,9 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                           searchType:self.searchType
                                         isWhitespace:NO
                                     controlCharacter:self.explicitSearchControlCharacter];
+    } else {
+        [self.delegate asyncRetrieveEntitiesForKeyString:prefix
+                                        controlCharacter:self.explicitSearchControlCharacter];
     }
 }
 

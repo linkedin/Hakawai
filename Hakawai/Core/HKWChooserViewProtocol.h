@@ -43,6 +43,8 @@ typedef NS_ENUM(NSInteger, HKWChooserBorderMode) {
 
 @optional
 
++ (id)chooserViewWithFrame:(CGRect)frame;
+
 /*!
  Return an instance of the chooser view with a given frame, properly setting the delegate. This method is intended for
  use with chooser views that are not backed by a \c UITableView instance, or wish to completely control the process of
