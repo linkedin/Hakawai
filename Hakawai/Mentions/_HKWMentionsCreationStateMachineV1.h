@@ -23,6 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 
 @interface HKWMentionsCreationStateMachineV1 : NSObject <HKWMentionsCreationStateMachine>
+
+/*!
+ Return a new, initialized state machine instance.
+ */
++ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END

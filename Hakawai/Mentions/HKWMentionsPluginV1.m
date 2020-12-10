@@ -2123,7 +2123,7 @@
 - (id<HKWMentionsCreationStateMachine>)creationStateMachine {
     if (HKWTextView.enableMentionsCreationStateMachineV2) {
         if (!_creationStateMachine) {
-            _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self];
+            _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self isUsingCustomChooserView:(self.customChooserViewDelegate != nil && HKWTextView.directlyUpdateQueryWithCustomDelegate)];
         }
         return _creationStateMachine;
     } else {
@@ -2208,6 +2208,16 @@
 
 - (void)textView:(__unused UITextView *)textView willCustomPasteTextInRange:(__unused NSRange)range {
     return;
+}
+
+- (void)didUpdateKeyString:(nonnull NSString *)keyString
+          controlCharacter:(unichar)character {
+    // set up the chooser view prior to data request in order to support fully customized view
+    [self.creationStateMachine setupChooserViewIfNeeded];
+    __strong __auto_type strongCustomChooserViewDelegate = self.customChooserViewDelegate;
+    NSAssert(strongCustomChooserViewDelegate != nil, @"Must have a custom chooser view if the query is being updated directly via this method");
+    [strongCustomChooserViewDelegate didUpdateKeyString:keyString
+                                       controlCharacter:character];
 }
 
 #pragma mark - Developer

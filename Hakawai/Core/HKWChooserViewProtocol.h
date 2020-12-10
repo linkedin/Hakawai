@@ -44,12 +44,18 @@ typedef NS_ENUM(NSInteger, HKWChooserBorderMode) {
 @optional
 
 /*!
+ Return an instance of the chooser view with a given frame with no delegate. This method is intended for
+ use with completely custom chooser views.
+ */
++ (id)chooserViewWithFrame:(CGRect)frame;
+
+/*!
  Return an instance of the chooser view with a given frame, properly setting the delegate. This method is intended for
  use with chooser views that are not backed by a \c UITableView instance, or wish to completely control the process of
  displaying chooser options, although it can be used for table view-backed views.
 
  \warning At least one of the two methods: this method, or \c chooserViewWithFrame:delegate:dataSource must be
- implemented.
+ implemented, unless you are using a custom chooser view.
  */
 + (id)chooserViewWithFrame:(CGRect)frame
                   delegate:(id<UITableViewDelegate>)delegate;
@@ -58,7 +64,7 @@ typedef NS_ENUM(NSInteger, HKWChooserBorderMode) {
  Return an instance of the chooser view with a given frame, properly setting the delegate and data source. This method
  is intended for use with chooser views that are backed by a \c UITableView instance.
 
- \warning At least one of the two methods: this method, or \c chooserViewWithFrame:delegate: must be implemented.
+ \warning At least one of the two methods: this method, or \c chooserViewWithFrame:delegate: must be implemented, unless you are using a custom chooser view.
  */
 + (id)chooserViewWithFrame:(CGRect)frame
                   delegate:(id<UITableViewDelegate>)delegate

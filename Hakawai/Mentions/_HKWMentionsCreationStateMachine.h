@@ -4,7 +4,7 @@
 #import "HKWMentionsDefaultChooserViewDelegate.h"
 #import "HKWMentionsPlugin.h"
 
-@protocol HKWMentionsCreationStateMachineProtocol <HKWMentionsDefaultChooserViewDelegate>
+@protocol HKWMentionsCreationStateMachineProtocol <HKWMentionsDefaultChooserViewDelegate, HKWMentionsCustomChooserViewDelegate>
 
 /*!
  Get whether or not the host app supports displaying a loading cell.
@@ -95,11 +95,6 @@
  Needs to be public for integration between Hakawai and HotPot.
 */
 @property (nonatomic) unichar explicitSearchControlCharacter;
-
-/*!
- Return a new, initialized state machine instance.
- */
-+ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate;
 
 /**
  Informs the state machine typeahead results are returned, so it can update its internal state accordingly.

@@ -43,6 +43,12 @@
 
 @synthesize borderMode = _borderMode;
 
++ (id)chooserViewWithFrame:(CGRect)frame {
+    HKWDefaultChooserView *chooserView = [[[self class] alloc] initWithFrame:frame];
+    [chooserView initialSetupForFrame:frame];
+    return chooserView;
+}
+
 + (instancetype)chooserViewWithFrame:(CGRect)frame
                             delegate:(id<UITableViewDelegate>)delegate
                           dataSource:(id<UITableViewDataSource>)dataSource {

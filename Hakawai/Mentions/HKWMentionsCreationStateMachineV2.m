@@ -65,7 +65,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 @property (nonatomic, weak) id<HKWMentionsCreationStateMachineProtocol> delegate;
 
-@property (nonatomic) HKWMentionDataProvider *dataProvider;
+@property (nonatomic, nullable) HKWMentionDataProvider *dataProvider;
 @property (nonatomic) HKWMentionsCreationState state;
 @property (nonatomic) HKWMentionsCreationResultsState resultsState;
 @property (nonatomic) HKWMentionsCreationChooserState chooserState;
@@ -101,14 +101,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 #pragma mark - API
 
-+ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate {
++ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate isUsingCustomChooserView:(BOOL)isUsingCustomChooserView {
     NSAssert(delegate != nil, @"Cannot create state machine with nil delegate.");
     HKWMentionsCreationStateMachineV2 *sm = [[self class] new];
     sm.chooserViewClass = [HKWDefaultChooserView class];
     sm.delegate = delegate;
     sm.state = HKWMentionsCreationStateQuiescent;
     sm.chooserViewEdgeInsets = UIEdgeInsetsZero;
-    sm.dataProvider = [[HKWMentionDataProvider alloc] initWithStateMachine:sm delegate:delegate];
+    // We only need a data provider if we are not using a custom chooser view
+    if (!isUsingCustomChooserView) {
+        sm.dataProvider = [[HKWMentionDataProvider alloc] initWithStateMachine:sm delegate:delegate];
+    }
     return sm;
 }
 
@@ -165,11 +168,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                           ? HKWMentionsCreationActionWhitespaceCharacterInserted
                                           : HKWMentionsCreationActionNormalCharacterInserted);
                 [self.stringBuffer appendString:string];
-                // Fire off the request and start the timer
-                [self.dataProvider queryUpdatedWithKeyString:[self.stringBuffer copy]
-                                                  searchType:self.searchType
-                                                isWhitespace:isWhitespace
-                                            controlCharacter:self.explicitSearchControlCharacter];
+                if (self.dataProvider) {
+                    // Fire off the request and start the timer
+                    [self.dataProvider queryUpdatedWithKeyString:[self.stringBuffer copy]
+                                                      searchType:self.searchType
+                                                    isWhitespace:isWhitespace
+                                                controlCharacter:self.explicitSearchControlCharacter];
+                } else {
+                    // If we do not have a data provider, just pass the updated query directly to the mention plugin
+                    [delegate didUpdateKeyString:[self.stringBuffer copy]
+                                controlCharacter:self.explicitSearchControlCharacter];
+                }
             }
             break;
         }
@@ -265,11 +274,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
             // The user hasn't completely backed out of mentions creation, so we can continue firing requests.
             // Remove a character from the buffer and immediately fire a request
             [self.stringBuffer deleteCharactersInRange:toDeleteRange];
-            // Fire off the request and start the timer
-            [self.dataProvider queryUpdatedWithKeyString:[self.stringBuffer copy]
-                                              searchType:self.searchType
-                                            isWhitespace:NO
-                                        controlCharacter:self.explicitSearchControlCharacter];
+            if (self.dataProvider) {
+                // Fire off the request and start the timer
+                [self.dataProvider queryUpdatedWithKeyString:[self.stringBuffer copy]
+                                                  searchType:self.searchType
+                                                isWhitespace:NO
+                                            controlCharacter:self.explicitSearchControlCharacter];
+            } else {
+                // If we do not have a data provider, just pass the updated query directly to the mention plugin
+                [delegate didUpdateKeyString:[self.stringBuffer copy]
+                            controlCharacter:self.explicitSearchControlCharacter];
+            }
             break;
     }
 
@@ -310,11 +325,17 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     // Prepare state
     self.resultsState = HKWMentionsCreationResultsStateAwaitingFirstResult;
 
-    // Start the timer and fire off a request
-    [self.dataProvider queryUpdatedWithKeyString:prefix
-                              searchType:self.searchType
-                            isWhitespace:NO
-                        controlCharacter:self.explicitSearchControlCharacter];
+    if (self.dataProvider) {
+        // Start the timer and fire off a request
+        [self.dataProvider queryUpdatedWithKeyString:prefix
+                                          searchType:self.searchType
+                                        isWhitespace:NO
+                                    controlCharacter:self.explicitSearchControlCharacter];
+    } else {
+        // If we do not have a data provider, just pass the updated query directly to the mention plugin
+        [self.delegate didUpdateKeyString:prefix
+                         controlCharacter:self.explicitSearchControlCharacter];
+    }
 }
 
 - (void)cancelMentionCreation {
@@ -346,10 +367,16 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 - (void)fetchInitialMentions {
     self.searchType = HKWMentionsSearchTypeInitial;
-    [self.dataProvider queryUpdatedWithKeyString:@""
-                                      searchType:self.searchType
-                                    isWhitespace:NO
-                                controlCharacter:self.explicitSearchControlCharacter];
+    if (self.dataProvider) {
+        [self.dataProvider queryUpdatedWithKeyString:@""
+                                          searchType:self.searchType
+                                        isWhitespace:NO
+                                    controlCharacter:self.explicitSearchControlCharacter];
+    } else {
+        // If we do not have a data provider, just pass the updated query directly to the mention plugin
+        [self.delegate didUpdateKeyString:@""
+                         controlCharacter:self.explicitSearchControlCharacter];
+    }
 }
 
 #pragma mark - Chooser View Frame
@@ -469,18 +496,25 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
     // Instantiate the chooser view
     UIView<HKWChooserViewProtocol> *chooserView = nil;
-    if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:)]) {
-        chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
-                                                         delegate:self.dataProvider];
-    }
-    else if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:dataSource:)]) {
-        chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
-                                                         delegate:self.dataProvider
-                                                       dataSource:self.dataProvider];
-    }
-    else {
-        NSAssert(NO, @"Chooser view class must support one or both of the following methods: \
-                 chooserViewWithFrame:delegate: or chooserViewWithFrame:delegate:dataSource:");
+    if (self.dataProvider) {
+        if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:)]) {
+            chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
+                                                             delegate:self.dataProvider];
+        }
+        else if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:dataSource:)]) {
+            chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
+                                                             delegate:self.dataProvider
+                                                           dataSource:self.dataProvider];
+        }
+        else {
+            NSAssert(NO, @"If there is a dataprovider, chooser view class must support one or both of the following methods: \
+                     chooserViewWithFrame:delegate: or chooserViewWithFrame:delegate:dataSource:");
+        }
+    } else {
+        // If we are not using a data provider, just create the chooser view without one
+        if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:)]) {
+            chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame];
+        }
     }
 
     if ([chooserView respondsToSelector:@selector(setBorderMode:)]) {
