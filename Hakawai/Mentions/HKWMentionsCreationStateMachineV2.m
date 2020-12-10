@@ -175,6 +175,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                                     isWhitespace:isWhitespace
                                                 controlCharacter:self.explicitSearchControlCharacter];
                 } else {
+                    // If we do not have a data provider, just pass the updated query directly to the mention plugin
                     [delegate didUpdateKeyString:[self.stringBuffer copy]
                                 controlCharacter:self.explicitSearchControlCharacter];
                 }
@@ -280,6 +281,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                                 isWhitespace:NO
                                             controlCharacter:self.explicitSearchControlCharacter];
             } else {
+                // If we do not have a data provider, just pass the updated query directly to the mention plugin
                 [delegate didUpdateKeyString:[self.stringBuffer copy]
                             controlCharacter:self.explicitSearchControlCharacter];
             }
@@ -330,6 +332,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                         isWhitespace:NO
                                     controlCharacter:self.explicitSearchControlCharacter];
     } else {
+        // If we do not have a data provider, just pass the updated query directly to the mention plugin
         [self.delegate didUpdateKeyString:prefix
                          controlCharacter:self.explicitSearchControlCharacter];
     }
@@ -370,6 +373,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                         isWhitespace:NO
                                     controlCharacter:self.explicitSearchControlCharacter];
     } else {
+        // If we do not have a data provider, just pass the updated query directly to the mention plugin
         [self.delegate didUpdateKeyString:@""
                          controlCharacter:self.explicitSearchControlCharacter];
     }
@@ -493,10 +497,6 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     // Instantiate the chooser view
     UIView<HKWChooserViewProtocol> *chooserView = nil;
     if (self.dataProvider) {
-        if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:)]) {
-            chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame];
-        }
-    } else {
         if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:delegate:)]) {
             chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame
                                                              delegate:self.dataProvider];
@@ -507,8 +507,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
                                                            dataSource:self.dataProvider];
         }
         else {
-            NSAssert(NO, @"Chooser view class must support one or both of the following methods: \
+            NSAssert(NO, @"If there is a dataprovider, chooser view class must support one or both of the following methods: \
                      chooserViewWithFrame:delegate: or chooserViewWithFrame:delegate:dataSource:");
+        }
+    } else {
+        // If we are not using a data provider, just create the chooser view without one
+        if ([(id)self.chooserViewClass respondsToSelector:@selector(chooserViewWithFrame:)]) {
+            chooserView = [self.chooserViewClass chooserViewWithFrame:chooserFrame];
         }
     }
 

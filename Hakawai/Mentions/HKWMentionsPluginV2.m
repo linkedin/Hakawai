@@ -1115,7 +1115,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
     // set up the chooser view prior to data request in order to support fully customized view
     [self.creationStateMachine setupChooserViewIfNeeded];
-    // Remove this after creation state machine v2 is ramped, because async vs. didUpdate should be totally separate
+    // Remove this after HKWMentionsCreationStateMachineV2 is ramped, because async vs. didUpdate should be totally separate
     __strong __auto_type strongCustomChooserViewDelegate = self.customChooserViewDelegate;
     if (strongCustomChooserViewDelegate) {
         [strongCustomChooserViewDelegate didUpdateKeyString:keyString
@@ -1133,7 +1133,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     // set up the chooser view prior to data request in order to support fully customized view
     [self.creationStateMachine setupChooserViewIfNeeded];
     __strong __auto_type strongCustomChooserViewDelegate = self.customChooserViewDelegate;
-    NSAssert(strongCustomChooserViewDelegate != nil, @"TODO");
+    NSAssert(strongCustomChooserViewDelegate != nil, @"Must have a custom chooser view if the query is being updated directly via this method");
     [strongCustomChooserViewDelegate didUpdateKeyString:keyString
                                        controlCharacter:character];
 }
