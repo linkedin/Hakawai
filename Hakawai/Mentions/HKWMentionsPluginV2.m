@@ -1115,7 +1115,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                completion:(void (^)(NSArray *, BOOL, BOOL))completionBlock {
     // set up the chooser view prior to data request in order to support fully customized view
     [self.creationStateMachine setupChooserViewIfNeeded];
-    // Remove this after HKWMentionsCreationStateMachineV2 is ramped, because async vs. didUpdate should be totally separate
+    // Remove this after directlyUpdateQueryWithCustomDelegate is ramped, because async vs. didUpdate should be totally separate
     __strong __auto_type strongCustomChooserViewDelegate = self.customChooserViewDelegate;
     if (strongCustomChooserViewDelegate) {
         [strongCustomChooserViewDelegate didUpdateKeyString:keyString
@@ -1432,7 +1432,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 - (id<HKWMentionsCreationStateMachine>)creationStateMachine {
     if (HKWTextView.enableMentionsCreationStateMachineV2) {
         if (!_creationStateMachine) {
-            _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self isUsingCustomChooserView:self.customChooserViewDelegate != nil];
+            _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self isUsingCustomChooserView:(self.customChooserViewDelegate != nil && HKWTextView.directlyUpdateQueryWithCustomDelegate)];
         }
         return _creationStateMachine;
     } else {
