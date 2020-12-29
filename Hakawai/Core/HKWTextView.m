@@ -41,7 +41,6 @@
 @end
 
 static BOOL enableMentionsPluginV2 = NO;
-static BOOL enableMentionsCreationStateMachineV2 = NO;
 static BOOL directlyUpdateQueryWithCustomDelegate = NO;
 
 @implementation HKWTextView
@@ -52,14 +51,6 @@ static BOOL directlyUpdateQueryWithCustomDelegate = NO;
 
 + (void)setEnableMentionsPluginV2:(BOOL)enabled {
     enableMentionsPluginV2 = enabled;
-}
-
-+ (BOOL)enableMentionsCreationStateMachineV2 {
-    return enableMentionsCreationStateMachineV2;
-}
-
-+ (void)setEnableMentionsCreationStateMachineV2:(BOOL)enabled {
-    enableMentionsCreationStateMachineV2 = enabled;
 }
 
 + (BOOL)directlyUpdateQueryWithCustomDelegate {

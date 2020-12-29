@@ -24,7 +24,6 @@
 
 #import "_HKWMentionsStartDetectionStateMachine.h"
 #import "_HKWMentionsCreationStateMachineV2.h"
-#import "_HKWMentionsCreationStateMachineV1.h"
 #import "_HKWMentionsCreationStateMachine.h"
 
 #import "_HKWMentionsPrivateConstants.h"
@@ -66,7 +65,7 @@
 @property (nonatomic) BOOL nextInsertionShouldBeIgnored;
 
 @property (nonatomic, strong) HKWMentionsStartDetectionStateMachine *startDetectionStateMachine;
-@property (nonatomic, strong) id<HKWMentionsCreationStateMachine> creationStateMachine;
+@property (nonatomic, strong) HKWMentionsCreationStateMachineV2 *creationStateMachine;
 
 /*!
  The point at which the last character typed was inserted.
@@ -2120,18 +2119,11 @@
     return _startDetectionStateMachine;
 }
 
-- (id<HKWMentionsCreationStateMachine>)creationStateMachine {
-    if (HKWTextView.enableMentionsCreationStateMachineV2) {
-        if (!_creationStateMachine) {
-            _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self isUsingCustomChooserView:(self.customChooserViewDelegate != nil && HKWTextView.directlyUpdateQueryWithCustomDelegate)];
-        }
-        return _creationStateMachine;
-    } else {
-        if (!_creationStateMachine) {
-            _creationStateMachine = [HKWMentionsCreationStateMachineV1 stateMachineWithDelegate:self];
-        }
-        return _creationStateMachine;
+- (HKWMentionsCreationStateMachineV2 *)creationStateMachine {
+    if (!_creationStateMachine) {
+        _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self isUsingCustomChooserView:(self.customChooserViewDelegate != nil && HKWTextView.directlyUpdateQueryWithCustomDelegate)];
     }
+    return _creationStateMachine;
 }
 
 - (NSString *)pluginName {

@@ -298,8 +298,12 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationNetworkState) {
     if (indexPath.section == 1) {
         return;
     }
-    [self.stateMachine handleSelectionForEntity:self.entityArray[(NSUInteger)indexPath.row]
-                                      indexPath:indexPath];
+    id<HKWMentionsEntityProtocol> entity = self.entityArray[(NSUInteger)indexPath.row];
+    if (entity) {
+        __auto_type _Nonnull unwrappedEntity = entity;
+        [self.stateMachine handleSelectionForEntity:unwrappedEntity
+                                          indexPath:indexPath];
+    }
 }
 
 @end
