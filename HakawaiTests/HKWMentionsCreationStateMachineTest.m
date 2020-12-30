@@ -70,25 +70,26 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V1",
     it(@"should not show mention list for email", ^{
         [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"A"];
         [textView setText:@"A"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        HKWMentionsCreationStateMachineV2 *sm;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         NSArray *entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) replacementText:@"B"];
     [textView setText:@"AB"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) replacementText:@"@"];
     [textView setText:@"AB@"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(3, 0) replacementText:@"C"];
     [textView setText:@"AB@C"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
     });
@@ -96,19 +97,20 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V1",
     it(@"should show mention list for non email", ^{
         [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"A"];
         [textView setText:@"A"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        HKWMentionsCreationStateMachineV2 *sm;
+       sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         NSArray *entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) replacementText:@" "];
     [textView setText:@"A "];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) replacementText:@"@"];
     [textView setText:@"A @"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(5);
     });
@@ -152,25 +154,26 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
     it(@"should not show mention list for email", ^{
         [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"A"];
         [textView setText:@"A"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        HKWMentionsCreationStateMachineV2 *sm;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         NSArray *entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) replacementText:@"B"];
     [textView setText:@"AB"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) replacementText:@"@"];
     [textView setText:@"AB@"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(3, 0) replacementText:@"C"];
     [textView setText:@"AB@C"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
     });
@@ -178,19 +181,20 @@ describe(@"Showing mentions list for explicit search only - MENTIONS PLUGIN V2",
     it(@"should show mention list for non email", ^{
         [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(0, 0) replacementText:@"A"];
         [textView setText:@"A"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        HKWMentionsCreationStateMachineV2 *sm;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         NSArray *entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(1, 0) replacementText:@" "];
     [textView setText:@"A "];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(0);
 
     [mentionsPlugin textView:textView shouldChangeTextInRange:NSMakeRange(2, 0) replacementText:@"@"];
     [textView setText:@"A @"];
-        HKWMentionsCreationStateMachineV2 *sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
+        sm = (HKWMentionsCreationStateMachineV2 *)mentionsPlugin.creationStateMachine;
         entityArray = sm.dataProvider.entityArray;
     expect(entityArray.count).to.equal(5);
     });
