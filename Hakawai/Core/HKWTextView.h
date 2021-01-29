@@ -42,10 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HKWTextView : UITextView
 
 + (BOOL) enableMentionsPluginV2;
-+ (BOOL) enableMentionsCreationStateMachineV2;
 + (BOOL) directlyUpdateQueryWithCustomDelegate;
 + (void) setEnableMentionsPluginV2:(BOOL)enabled;
-+ (void) setEnableMentionsCreationStateMachineV2:(BOOL)enabled;
 + (void) setDirectlyUpdateQueryWithCustomDelegate:(BOOL)enabled;
 
 #pragma mark - Initialization
