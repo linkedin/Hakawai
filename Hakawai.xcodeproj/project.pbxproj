@@ -11,6 +11,7 @@
 		77004FD7B4A6E9EDAD723CA9 /* libPods-Hakawai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6238CF1B85D9D08466AD7A9C /* libPods-Hakawai.a */; };
 		7B2F035424E366C300C98454 /* HKWMentionsPluginV1.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B2F035024E366C200C98454 /* HKWMentionsPluginV1.m */; };
 		7B2F035524E366C300C98454 /* HKWMentionsPluginV2.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B2F035324E366C300C98454 /* HKWMentionsPluginV2.m */; };
+		8B5E141025A313AA0044A675 /* HKWMentionsCreationStateMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B5E140E25A313AA0044A675 /* HKWMentionsCreationStateMachine.m */; };
 		9C65FBC81F607DEB004A9CB4 /* HKWLayoutManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */; };
 		9C65FBC91F607DEB004A9CB4 /* HKWMentionsPluginTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */; };
 		B149A63E2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m in Sources */ = {isa = PBXBuildFile; fileRef = B149A63D2106291D00AFEAFB /* HKWMentionsCreationStateMachineTest.m */; };
@@ -31,7 +32,6 @@
 		E1B3088619A2C0D60096DE0E /* HKWLayoutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3087E19A2C0D60096DE0E /* HKWLayoutManager.m */; };
 		E1B3088719A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */; };
 		E1B3089319A2C1890096DE0E /* HKWMentionsAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */; };
-		E1B3089419A2C1890096DE0E /* HKWMentionsCreationStateMachineV2.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachineV2.m */; };
 		E1B3089619A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */; };
 		E1B308A419A2C21A0096DE0E /* HKWDefaultChooserArrowView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089A19A2C21A0096DE0E /* HKWDefaultChooserArrowView.m */; };
 		E1B308A519A2C21A0096DE0E /* HKWDefaultChooserBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B3089C19A2C21A0096DE0E /* HKWDefaultChooserBorderView.m */; };
@@ -84,6 +84,8 @@
 		7B2F035124E366C200C98454 /* HKWMentionsPluginV1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsPluginV1.h; path = Mentions/HKWMentionsPluginV1.h; sourceTree = "<group>"; };
 		7B2F035224E366C200C98454 /* HKWMentionsPluginV2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsPluginV2.h; path = Mentions/HKWMentionsPluginV2.h; sourceTree = "<group>"; };
 		7B2F035324E366C300C98454 /* HKWMentionsPluginV2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsPluginV2.m; path = Mentions/HKWMentionsPluginV2.m; sourceTree = "<group>"; };
+		8B5E140E25A313AA0044A675 /* HKWMentionsCreationStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsCreationStateMachine.m; path = Mentions/HKWMentionsCreationStateMachine.m; sourceTree = "<group>"; };
+		8B5E140F25A313AA0044A675 /* HKWMentionsCreationStateMachineProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsCreationStateMachineProtocol.h; path = Mentions/HKWMentionsCreationStateMachineProtocol.h; sourceTree = "<group>"; };
 		91FF0C96BCF39C932C98A368 /* Pods-HakawaiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManagerTests.m; sourceTree = "<group>"; };
 		9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWMentionsPluginTests.m; sourceTree = "<group>"; };
@@ -129,8 +131,6 @@
 		E1B3088019A2C0D60096DE0E /* HKWRoundedRectBackgroundAttributeValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWRoundedRectBackgroundAttributeValue.m; sourceTree = "<group>"; };
 		E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsAttribute.h; path = Mentions/HKWMentionsAttribute.h; sourceTree = "<group>"; };
 		E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsAttribute.m; path = Mentions/HKWMentionsAttribute.m; sourceTree = "<group>"; };
-		E1B3088C19A2C1890096DE0E /* _HKWMentionsCreationStateMachineV2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsCreationStateMachineV2.h; path = Mentions/_HKWMentionsCreationStateMachineV2.h; sourceTree = "<group>"; };
-		E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachineV2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsCreationStateMachineV2.m; path = Mentions/HKWMentionsCreationStateMachineV2.m; sourceTree = "<group>"; };
 		E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsEntityProtocol.h; path = Mentions/HKWMentionsEntityProtocol.h; sourceTree = "<group>"; };
 		E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsPlugin.h; path = Mentions/HKWMentionsPlugin.h; sourceTree = "<group>"; };
 		E1B3089119A2C1890096DE0E /* _HKWMentionsStartDetectionStateMachine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _HKWMentionsStartDetectionStateMachine.h; path = Mentions/_HKWMentionsStartDetectionStateMachine.h; sourceTree = "<group>"; };
@@ -259,15 +259,15 @@
 				E1B308A919A2CC0F0096DE0E /* _HKWMentionsPrivateConstants.h */,
 				E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */,
 				E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */,
+				8B5E140F25A313AA0044A675 /* HKWMentionsCreationStateMachineProtocol.h */,
 				DBA02B9124C23EB2000C7F79 /* HKWMentionsDefaultChooserViewDelegate.h */,
 				DBA02B9024C23EA1000C7F79 /* HKWMentionsCustomChooserViewDelegate.h */,
 				DBF74CF024C9395B00B42B96 /* _HKWMentionsCreationStateMachine.h */,
+				8B5E140E25A313AA0044A675 /* HKWMentionsCreationStateMachine.m */,
 				E1B3088A19A2C1890096DE0E /* HKWMentionsAttribute.h */,
 				E1B3088B19A2C1890096DE0E /* HKWMentionsAttribute.m */,
 				E1B3089119A2C1890096DE0E /* _HKWMentionsStartDetectionStateMachine.h */,
 				E1B3089219A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m */,
-				E1B3088C19A2C1890096DE0E /* _HKWMentionsCreationStateMachineV2.h */,
-				E1B3088D19A2C1890096DE0E /* HKWMentionsCreationStateMachineV2.m */,
 				DBF74CEC24C8DA5500B42B96 /* HKWMentionDataProvider.h */,
 				DB8802B1249D498900BE185F /* HKWMentionDataProvider.m */,
 				7B2F035124E366C200C98454 /* HKWMentionsPluginV1.h */,
@@ -520,6 +520,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B5E141025A313AA0044A675 /* HKWMentionsCreationStateMachine.m in Sources */,
 				E1B3089619A2C1890096DE0E /* HKWMentionsStartDetectionStateMachine.m in Sources */,
 				E187EE5E19E62F9100AF163A /* HKWAbstractionLayer.m in Sources */,
 				E1B3088519A2C0D60096DE0E /* HKWTextView.m in Sources */,
@@ -528,7 +529,6 @@
 				E1B308A519A2C21A0096DE0E /* HKWDefaultChooserBorderView.m in Sources */,
 				E11DF8D119EC8DA30072F4AD /* HKWTextView+TextTransformation.m in Sources */,
 				E1B3088619A2C0D60096DE0E /* HKWLayoutManager.m in Sources */,
-				E1B3089419A2C1890096DE0E /* HKWMentionsCreationStateMachineV2.m in Sources */,
 				E1B3088219A2C0D60096DE0E /* HKWTextView+Extras.m in Sources */,
 				7B2F035424E366C300C98454 /* HKWMentionsPluginV1.m in Sources */,
 				7B2F035524E366C300C98454 /* HKWMentionsPluginV2.m in Sources */,

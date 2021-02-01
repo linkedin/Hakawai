@@ -23,7 +23,7 @@
 #import "HKWMentionsAttribute.h"
 
 #import "_HKWMentionsStartDetectionStateMachine.h"
-#import "_HKWMentionsCreationStateMachineV2.h"
+#import "_HKWMentionsCreationStateMachine.h"
 #import "_HKWMentionsCreationStateMachine.h"
 
 #import "_HKWMentionsPrivateConstants.h"
@@ -65,7 +65,7 @@
 @property (nonatomic) BOOL nextInsertionShouldBeIgnored;
 
 @property (nonatomic, strong) HKWMentionsStartDetectionStateMachine *startDetectionStateMachine;
-@property (nonatomic, strong) HKWMentionsCreationStateMachineV2 *creationStateMachine;
+@property (nonatomic, strong) HKWMentionsCreationStateMachine *creationStateMachine;
 
 /*!
  The point at which the last character typed was inserted.
@@ -2119,9 +2119,9 @@
     return _startDetectionStateMachine;
 }
 
-- (HKWMentionsCreationStateMachineV2 *)creationStateMachine {
+- (HKWMentionsCreationStateMachine *)creationStateMachine {
     if (!_creationStateMachine) {
-        _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self isUsingCustomChooserView:(self.customChooserViewDelegate != nil && HKWTextView.directlyUpdateQueryWithCustomDelegate)];
+        _creationStateMachine = [HKWMentionsCreationStateMachine stateMachineWithDelegate:self isUsingCustomChooserView:(self.customChooserViewDelegate != nil && HKWTextView.directlyUpdateQueryWithCustomDelegate)];
     }
     return _creationStateMachine;
 }

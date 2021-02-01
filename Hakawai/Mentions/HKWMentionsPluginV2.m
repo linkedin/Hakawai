@@ -22,14 +22,14 @@
 
 #import "HKWMentionsAttribute.h"
 
-#import "_HKWMentionsCreationStateMachineV2.h"
+#import "_HKWMentionsCreationStateMachine.h"
 #import "_HKWMentionsCreationStateMachine.h"
 
 #import "_HKWMentionsPrivateConstants.h"
 
 @interface HKWMentionsPluginV2 () <HKWMentionsCreationStateMachineProtocol>
 
-@property (nonatomic, strong) HKWMentionsCreationStateMachineV2 *creationStateMachine;
+@property (nonatomic, strong) HKWMentionsCreationStateMachine *creationStateMachine;
 
 @property (nonatomic, strong) NSDictionary *mentionHighlightedAttributes;
 @property (nonatomic, strong) NSDictionary *mentionUnhighlightedAttributes;
@@ -1428,9 +1428,9 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return [self.creationStateMachine getEntityChooserView];
 }
 
-- (HKWMentionsCreationStateMachineV2 *)creationStateMachine {
+- (HKWMentionsCreationStateMachine *)creationStateMachine {
     if (!_creationStateMachine) {
-        _creationStateMachine = [HKWMentionsCreationStateMachineV2 stateMachineWithDelegate:self isUsingCustomChooserView:(self.customChooserViewDelegate != nil && HKWTextView.directlyUpdateQueryWithCustomDelegate)];
+        _creationStateMachine = [HKWMentionsCreationStateMachine stateMachineWithDelegate:self isUsingCustomChooserView:(self.customChooserViewDelegate != nil && HKWTextView.directlyUpdateQueryWithCustomDelegate)];
     }
     return _creationStateMachine;
 }

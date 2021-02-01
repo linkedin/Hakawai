@@ -1,5 +1,5 @@
 //
-//  HKWMentionsCreationStateMachineV2.m
+//  HKWMentionsCreationStateMachine.m
 //  Hakawai
 //
 //  Copyright (c) 2014 LinkedIn Corp. All rights reserved.
@@ -10,7 +10,7 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
-#import "_HKWMentionsCreationStateMachineV2.h"
+#import "_HKWMentionsCreationStateMachine.h"
 
 #import "HKWChooserViewProtocol.h"
 #import "_HKWDefaultChooserView.h"
@@ -61,7 +61,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     HKWMentionsCreationActionCharacterDeleted
 };
 
-@interface HKWMentionsCreationStateMachineV2 ()
+@interface HKWMentionsCreationStateMachine ()
 
 @property (nonatomic, weak) id<HKWMentionsCreationStateMachineProtocol> delegate;
 
@@ -91,7 +91,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 @end
 
-@implementation HKWMentionsCreationStateMachineV2
+@implementation HKWMentionsCreationStateMachine
 
 // NOTE: Do not remove these
 @synthesize chooserViewBackgroundColor = _chooserViewBackgroundColor;
@@ -103,7 +103,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 + (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate isUsingCustomChooserView:(BOOL)isUsingCustomChooserView {
     NSAssert(delegate != nil, @"Cannot create state machine with nil delegate.");
-    HKWMentionsCreationStateMachineV2 *sm = [[self class] new];
+    HKWMentionsCreationStateMachine *sm = [[self class] new];
     sm.chooserViewClass = [HKWDefaultChooserView class];
     sm.delegate = delegate;
     sm.state = HKWMentionsCreationStateQuiescent;
@@ -488,7 +488,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     HKWMentionsChooserPositionMode mode = [self.delegate chooserPositionMode];
     CGRect chooserFrame = [self frameForMode:mode];
     // Handle the case where the chooser frame is completely custom
-    if ([HKWMentionsCreationStateMachineV2 modeRequiresCustomFrame:mode]) {
+    if ([HKWMentionsCreationStateMachine modeRequiresCustomFrame:mode]) {
         // Placeholder frame; used until the constraints are properly applied
         chooserFrame = CGRectZero;
     }
@@ -518,10 +518,10 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
     }
 
     if ([chooserView respondsToSelector:@selector(setBorderMode:)]) {
-        if ([HKWMentionsCreationStateMachineV2 modeConfiguresArrowPointingUp:mode]) {
+        if ([HKWMentionsCreationStateMachine modeConfiguresArrowPointingUp:mode]) {
             chooserView.borderMode = HKWChooserBorderModeTop;
         }
-        else if ([HKWMentionsCreationStateMachineV2 modeConfiguresArrowPointingDown:mode]) {
+        else if ([HKWMentionsCreationStateMachine modeConfiguresArrowPointingDown:mode]) {
             chooserView.borderMode = HKWChooserBorderModeBottom;
         }
         else {
