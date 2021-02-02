@@ -28,7 +28,7 @@
 
 #import "_HKWMentionsPrivateConstants.h"
 
-@interface HKWMentionsPluginV1 () <HKWMentionsStartDetectionStateMachineProtocol, HKWMentionsCreationStateMachineProtocol>
+@interface HKWMentionsPluginV1 () <HKWMentionsStartDetectionStateMachineProtocol, HKWMentionsCreationStateMachineDelegate>
 
 // State properties
 @property (nonatomic) HKWMentionsState state;

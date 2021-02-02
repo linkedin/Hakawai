@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationNetworkState) {
 
 @interface HKWMentionDataProvider ()
 
-@property (nonatomic, weak) id<HKWMentionsCreationStateMachineProtocol> delegate;
+@property (nonatomic, weak) id<HKWMentionsCreationStateMachineDelegate> delegate;
 
 /// query for the current request
 @property (nonatomic, copy, nullable, readwrite) NSString *currentQuery;
@@ -64,7 +64,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationNetworkState) {
 }
 
 - (instancetype)initWithStateMachine:(nonnull HKWMentionsCreationStateMachine *)stateMachine
-                            delegate:(nonnull id<HKWMentionsCreationStateMachineProtocol>)delegate{
+                            delegate:(nonnull id<HKWMentionsCreationStateMachineDelegate>)delegate{
     self = [super init];
     if (self) {
         _entityArray = nil;

@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HKWMentionDataProvider: NSObject <UITableViewDataSource, UITableViewDelegate>
 
 - (instancetype)initWithStateMachine:(HKWMentionsCreationStateMachine *)stateMachine
-                            delegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate;
+                            delegate:(id<HKWMentionsCreationStateMachineDelegate>)delegate;
 
 - (void)queryUpdatedWithKeyString:(NSString *)string
                        searchType:(HKWMentionsSearchType)type

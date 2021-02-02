@@ -10,7 +10,7 @@
 //  an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //
 
-#import "HKWMentionsCreationStateMachineProtocol.h"
+#import "HKWMentionsCreationStateMachineDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,7 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
  creation. The state machine also manages making requests to the data source and displaying the chooser list. The state
  machine should inform the host when mentions creation is canceled or completed.
  */
-
 @interface HKWMentionsCreationStateMachine : NSObject
 
 /**
@@ -149,7 +148,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Return a new, initialized state machine instance, and let it know whether we are using a custom chooser view or not
  */
-+ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate isUsingCustomChooserView:(BOOL)isUsingCustomChooserView;
++ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineDelegate>)delegate isUsingCustomChooserView:(BOOL)isUsingCustomChooserView;
 
 @end
 

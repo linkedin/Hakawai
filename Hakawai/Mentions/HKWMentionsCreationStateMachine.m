@@ -63,7 +63,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 @interface HKWMentionsCreationStateMachine ()
 
-@property (nonatomic, weak) id<HKWMentionsCreationStateMachineProtocol> delegate;
+@property (nonatomic, weak) id<HKWMentionsCreationStateMachineDelegate> delegate;
 
 @property (nonatomic, nullable) HKWMentionDataProvider *dataProvider;
 @property (nonatomic) HKWMentionsCreationState state;
@@ -101,7 +101,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationAction) {
 
 #pragma mark - API
 
-+ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate isUsingCustomChooserView:(BOOL)isUsingCustomChooserView {
++ (instancetype)stateMachineWithDelegate:(id<HKWMentionsCreationStateMachineDelegate>)delegate isUsingCustomChooserView:(BOOL)isUsingCustomChooserView {
     NSAssert(delegate != nil, @"Cannot create state machine with nil delegate.");
     HKWMentionsCreationStateMachine *sm = [[self class] new];
     sm.chooserViewClass = [HKWDefaultChooserView class];
