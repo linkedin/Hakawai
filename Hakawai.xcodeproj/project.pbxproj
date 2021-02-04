@@ -85,7 +85,7 @@
 		7B2F035224E366C200C98454 /* HKWMentionsPluginV2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsPluginV2.h; path = Mentions/HKWMentionsPluginV2.h; sourceTree = "<group>"; };
 		7B2F035324E366C300C98454 /* HKWMentionsPluginV2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsPluginV2.m; path = Mentions/HKWMentionsPluginV2.m; sourceTree = "<group>"; };
 		8B5E140E25A313AA0044A675 /* HKWMentionsCreationStateMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HKWMentionsCreationStateMachine.m; path = Mentions/HKWMentionsCreationStateMachine.m; sourceTree = "<group>"; };
-		8B5E140F25A313AA0044A675 /* HKWMentionsCreationStateMachineDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsCreationStateMachineDelegate.h; path = Mentions/HKWMentionsCreationStateMachineDelegate.h; sourceTree = "<group>"; };
+		8BF83FE125CB210500B856F8 /* HKWMentionsCreationStateMachineDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HKWMentionsCreationStateMachineDelegate.h; path = Mentions/HKWMentionsCreationStateMachineDelegate.h; sourceTree = "<group>"; };
 		91FF0C96BCF39C932C98A368 /* Pods-HakawaiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HakawaiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HakawaiTests/Pods-HakawaiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9C65FBC61F607DEB004A9CB4 /* HKWLayoutManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWLayoutManagerTests.m; sourceTree = "<group>"; };
 		9C65FBC71F607DEB004A9CB4 /* HKWMentionsPluginTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HKWMentionsPluginTests.m; sourceTree = "<group>"; };
@@ -256,10 +256,10 @@
 		E1B3088819A2C1140096DE0E /* Mentions */ = {
 			isa = PBXGroup;
 			children = (
+				8BF83FE125CB210500B856F8 /* HKWMentionsCreationStateMachineDelegate.h */,
 				E1B308A919A2CC0F0096DE0E /* _HKWMentionsPrivateConstants.h */,
 				E1B3088E19A2C1890096DE0E /* HKWMentionsEntityProtocol.h */,
 				E1B3088F19A2C1890096DE0E /* HKWMentionsPlugin.h */,
-				8B5E140F25A313AA0044A675 /* HKWMentionsCreationStateMachineDelegate.h */,
 				DBA02B9124C23EB2000C7F79 /* HKWMentionsDefaultChooserViewDelegate.h */,
 				DBA02B9024C23EA1000C7F79 /* HKWMentionsCustomChooserViewDelegate.h */,
 				DBF74CF024C9395B00B42B96 /* _HKWMentionsCreationStateMachine.h */,
