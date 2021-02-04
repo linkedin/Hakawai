@@ -1,6 +1,6 @@
 #import "HKWMentionsPlugin.h"
 
-#import "_HKWMentionsCreationStateMachineV2.h"
+#import "_HKWMentionsCreationStateMachine.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -11,8 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface HKWMentionDataProvider: NSObject <UITableViewDataSource, UITableViewDelegate>
 
-- (instancetype)initWithStateMachine:(HKWMentionsCreationStateMachineV2 *)stateMachine
-                            delegate:(id<HKWMentionsCreationStateMachineProtocol>)delegate;
+- (instancetype)initWithStateMachine:(HKWMentionsCreationStateMachine *)stateMachine
+                            delegate:(id<HKWMentionsCreationStateMachineDelegate>)delegate;
 
 - (void)queryUpdatedWithKeyString:(NSString *)string
                        searchType:(HKWMentionsSearchType)type

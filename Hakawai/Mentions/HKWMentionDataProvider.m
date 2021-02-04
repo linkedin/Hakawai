@@ -1,6 +1,6 @@
 #import "HKWMentionDataProvider.h"
 
-#import "_HKWMentionsCreationStateMachineV2.h"
+#import "_HKWMentionsCreationStateMachine.h"
 
 #import "HKWChooserViewProtocol.h"
 #import "_HKWDefaultChooserView.h"
@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationNetworkState) {
 
 @interface HKWMentionDataProvider ()
 
-@property (nonatomic, weak) id<HKWMentionsCreationStateMachineProtocol> delegate;
+@property (nonatomic, weak) id<HKWMentionsCreationStateMachineDelegate> delegate;
 
 /// query for the current request
 @property (nonatomic, copy, nullable, readwrite) NSString *currentQuery;
@@ -45,7 +45,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationNetworkState) {
 /// sequence number monotonically increases.
 @property (nonatomic) NSUInteger sequenceNumber;
 
-@property (weak, nonatomic) HKWMentionsCreationStateMachineV2 *stateMachine;
+@property (weak, nonatomic) HKWMentionsCreationStateMachine *stateMachine;
 
 /// An array serving as a backing store for the chooser table view; it contains objects representing mentions entities
 /// that the user can select from.
@@ -63,8 +63,8 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationNetworkState) {
     return 0.1;
 }
 
-- (instancetype)initWithStateMachine:(nonnull HKWMentionsCreationStateMachineV2 *)stateMachine
-                            delegate:(nonnull id<HKWMentionsCreationStateMachineProtocol>)delegate{
+- (instancetype)initWithStateMachine:(nonnull HKWMentionsCreationStateMachine *)stateMachine
+                            delegate:(nonnull id<HKWMentionsCreationStateMachineDelegate>)delegate{
     self = [super init];
     if (self) {
         _entityArray = nil;
@@ -114,7 +114,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsCreationNetworkState) {
                                     controlCharacter:character
                                           completion:^(NSArray *results, BOOL dedupe,__unused BOOL isComplete) {
         typeof(self) strongSelf = weakSelf;
-        typeof(HKWMentionsCreationStateMachineV2) *stateMachine = strongSelf.stateMachine;
+        typeof(HKWMentionsCreationStateMachine) *stateMachine = strongSelf.stateMachine;
         strongSelf.currentQueryIsComplete = YES;
         // Check for error conditions
         if (sequenceNumber != self.sequenceNumber) {
