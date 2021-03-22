@@ -42,6 +42,7 @@
 
 static BOOL enableMentionsPluginV2 = NO;
 static BOOL directlyUpdateQueryWithCustomDelegate = NO;
+static BOOL enableControlCharactersToPrepend = NO;
 
 @implementation HKWTextView
 
@@ -59,6 +60,14 @@ static BOOL directlyUpdateQueryWithCustomDelegate = NO;
 
 + (void)setDirectlyUpdateQueryWithCustomDelegate:(BOOL)enabled {
     directlyUpdateQueryWithCustomDelegate = enabled;
+}
+
++ (BOOL)enableControlCharactersToPrepend {
+    return enableControlCharactersToPrepend;
+}
+
++ (void)setEnableControlCharactersToPrepend:(BOOL)enabled {
+    enableControlCharactersToPrepend = enabled;
 }
 
 #pragma mark - Lifecycle

@@ -23,13 +23,17 @@
 #import "HKWMentionsPluginV2.h"
 #import "HKWMentionsAttribute.h"
 #import "HKWCustomAttributes.h"
+#import "HKWExternalMentionConstants.h"
 
 @interface HKWMentionsPluginV1 ()
 - (BOOL)stringValidForMentionsCreation:(NSString *)string;
 @end
 
 @interface HKWMentionsPluginV2 ()
+@property (nonatomic, strong, nullable) NSCharacterSet *controlCharactersToPrepend;
 - (BOOL)stringValidForMentionsCreation:(NSString *)string;
+- (void)createMention:(HKWMentionsAttribute *)mention cursorLocation:(NSUInteger)cursorLocation;
+- (NSUInteger)mostRecentControlCharacterLocationInText:(NSString *)text;
 @end
 
 // Methods for testing attribute values/ranges in pluginV2
@@ -990,6 +994,89 @@ describe(@"pasting mentions - MENTIONS PLUGIN V2", ^{
         expect([mentionsPlugin valueForAttributeWithName:NSForegroundColorAttributeName forWordOfLength:copyText.length]).to.equal(textView.textColorSetByApp);
         expect([mentionsPlugin rangeForAttributeWithName:NSForegroundColorAttributeName forWordOfLength:copyText.length].location).to.equal(endOfText);
         expect([mentionsPlugin rangeForAttributeWithName:NSForegroundColorAttributeName forWordOfLength:copyText.length].length).to.equal(copyText.length);
+    });
+});
+
+describe(@"prepend control character - MENTIONS PLUGIN V2", ^{
+    __block HKWTextView *textView;
+    __block HKWMentionsPluginV2 *mentionsPlugin;
+    
+    beforeEach(^{
+        HKWTextView.enableMentionsPluginV2 = YES;
+        HKWTextView.enableControlCharactersToPrepend = YES;
+        textView = [[HKWTextView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:HKWMentionsChooserPositionModeCustomLockTopArrowPointingUp
+                                                          controlCharacters:[NSCharacterSet characterSetWithCharactersInString:@"@#＠"]
+                                                               searchLength:3];
+        [textView setControlFlowPlugin:mentionsPlugin];
+    });
+
+    it(@"prepend @", ^{
+        mentionsPlugin.controlCharactersToPrepend = HKWExternalMentionConstants.atSymbols;
+        textView.text = @"@First";
+        HKWMentionsAttribute *attribute = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"1"];
+        [mentionsPlugin createMention:attribute cursorLocation:textView.text.length - 1];
+
+        expect(textView.text).to.equal(@"@FirstName LastName");
+        expect(attribute.mentionText).to.equal(@"@FirstName LastName");
+    });
+    
+    it(@"prepend Japanese ＠", ^{
+        mentionsPlugin.controlCharactersToPrepend = HKWExternalMentionConstants.atSymbols;
+        textView.text = @"＠リンクトイン";
+        HKWMentionsAttribute *attribute = [HKWMentionsAttribute mentionWithText:@"リンクトイン アメリカ" identifier:@"2"];
+        [mentionsPlugin createMention:attribute cursorLocation:textView.text.length - 1];
+
+        expect(textView.text).to.equal(@"＠リンクトイン アメリカ");
+        expect(attribute.mentionText).to.equal(@"＠リンクトイン アメリカ");
+    });
+    
+    it(@"prepend @ with multiple controlCharactersToPrepend", ^{
+        mentionsPlugin.controlCharactersToPrepend = [NSCharacterSet characterSetWithCharactersInString:@"@#"];
+        textView.text = @"@First";
+        HKWMentionsAttribute *attribute = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"3"];
+        [mentionsPlugin createMention:attribute cursorLocation:textView.text.length - 1];
+
+        expect(textView.text).to.equal(@"@FirstName LastName");
+        expect(attribute.mentionText).to.equal(@"@FirstName LastName");
+    });
+
+    it(@"do not prepand character when controlCharactersToPrepend is empty", ^{
+        mentionsPlugin.controlCharactersToPrepend = nil;
+        textView.text = @"@First";
+        HKWMentionsAttribute *attribute = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"4"];
+        [mentionsPlugin createMention:attribute cursorLocation:textView.text.length - 1];
+
+        expect(textView.text).to.equal(@"FirstName LastName");
+        expect(attribute.mentionText).to.equal(@"FirstName LastName");
+    });
+    
+    it(@"ignore control character with attribute", ^{
+        mentionsPlugin.controlCharactersToPrepend = [NSCharacterSet characterSetWithCharactersInString:@"@#"];
+        textView.text = @"@First";
+        HKWMentionsAttribute *attribute = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"5"];
+        [mentionsPlugin createMention:attribute cursorLocation:textView.text.length - 1];
+        
+        attribute.range = NSMakeRange(0, textView.text.length);
+        textView.text = [textView.text stringByAppendingString:@" test"];
+        [mentionsPlugin addMention:attribute];
+
+        expect([mentionsPlugin mostRecentControlCharacterLocationInText:@"@FirstName LastName test"]).to.equal(NSNotFound);
+    });
+
+    it(@"highlight mention text with control character prepended", ^{
+        mentionsPlugin.controlCharactersToPrepend = HKWExternalMentionConstants.atSymbols;
+        textView.text = @"@First";
+        HKWMentionsAttribute *attribute = [HKWMentionsAttribute mentionWithText:@"FirstName LastName" identifier:@"1"];
+        [mentionsPlugin createMention:attribute cursorLocation:textView.text.length - 1];
+        textView.selectedRange = NSMakeRange(3, 0);
+
+        // Highlighted
+        NSRange highlightedRange;
+        id highlightedAttribute = [textView.attributedText attribute:HKWRoundedRectBackgroundAttributeName atIndex:attribute.mentionText.length/2 longestEffectiveRange:&highlightedRange inRange:NSMakeRange(0, textView.attributedText.length)];
+        expect(highlightedRange.location).to.equal(0);
+        expect(highlightedRange.length).to.equal(attribute.mentionText.length);
+        expect([highlightedAttribute class]).to.equal([HKWRoundedRectBackgroundAttributeValue class]);
     });
 });
 

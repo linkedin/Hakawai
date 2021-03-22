@@ -27,8 +27,16 @@ NS_ASSUME_NONNULL_BEGIN
                                value if implicit mentions should not be enabled
  */
 + (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
-                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
-                                 searchLength:(NSInteger)searchLength;
+                                    controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                                         searchLength:(NSInteger)searchLength;
+
+/*!
+ Instantiate a mentions plug-in with the specified chooser mode, control character set, control characters to prepend, search length
+ */
++ (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                                    controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                           controlCharactersToPrepend:(NSCharacterSet *_Null_unspecified)controlCharactersToPrepend
+                                         searchLength:(NSInteger)searchLength;
 
 /*!
  Instantiate a mentions plug-in with the specified chooser mode, control character set, search length, a color for
@@ -47,6 +55,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
                                     controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                                         searchLength:(NSInteger)searchLength
+                       unhighlightedMentionAttributes:(NSDictionary *_Null_unspecified)unhighlightedAttributes
+                         highlightedMentionAttributes:(NSDictionary *_Null_unspecified)highlightedAttributes;
+
+/*!
+ Instantiate a mentions plug-in with the specified chooser mode, control character set, control characters to prepend, search length, custom attributes
+ to apply to unselected mentions, and custom attributes to apply to selected mentions.
+ */
++ (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                                    controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                           controlCharactersToPrepend:(NSCharacterSet *_Null_unspecified)controlCharactersToPrepend
                                          searchLength:(NSInteger)searchLength
                        unhighlightedMentionAttributes:(NSDictionary *_Null_unspecified)unhighlightedAttributes
                          highlightedMentionAttributes:(NSDictionary *_Null_unspecified)highlightedAttributes;
