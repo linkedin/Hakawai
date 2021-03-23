@@ -34,6 +34,8 @@
 @property (nonatomic, strong) NSDictionary *mentionHighlightedAttributes;
 @property (nonatomic, strong) NSDictionary *mentionUnhighlightedAttributes;
 
+@property (nonatomic, strong, nullable) NSCharacterSet *controlCharactersToPrepend;
+
 @property (nonatomic, readwrite) HKWMentionsChooserPositionMode chooserPositionMode;
 
 @property (nonatomic, readonly) BOOL viewportLocksToTopUponMentionCreation;
@@ -65,6 +67,15 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 + (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                   controlCharactersToPrepend:(NSCharacterSet *_Null_unspecified)controlCharactersToPrepend
+                                 searchLength:(NSInteger)searchLength {
+    HKWMentionsPluginV2 *mentionsPlugin = [self mentionsPluginWithChooserMode:mode controlCharacters:controlCharacterSet searchLength:searchLength];
+    mentionsPlugin.controlCharactersToPrepend = controlCharactersToPrepend;
+    return mentionsPlugin;
+}
+
++ (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
                             controlCharacters:(NSCharacterSet *)controlCharacterSet
                                  searchLength:(NSInteger)searchLength {
     return [self mentionsPluginWithChooserMode:mode
@@ -87,8 +98,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     return [self mentionsPluginWithChooserMode:mode
                              controlCharacters:controlCharacterSet
                                   searchLength:searchLength
-                   unhighlightedMentionAttributes:unhighlightedAttributes
-                     highlightedMentionAttributes:highlightedAttributes];
+                unhighlightedMentionAttributes:unhighlightedAttributes
+                  highlightedMentionAttributes:highlightedAttributes];
 }
 
 + (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
@@ -96,6 +107,20 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                  searchLength:(NSInteger)searchLength
                unhighlightedMentionAttributes:(NSDictionary *)unhighlightedAttributes
                  highlightedMentionAttributes:(NSDictionary *)highlightedAttributes {
+    return [self mentionsPluginWithChooserMode:mode
+                             controlCharacters:controlCharacterSet
+                    controlCharactersToPrepend:nil
+                                  searchLength:searchLength
+                unhighlightedMentionAttributes:unhighlightedAttributes
+                  highlightedMentionAttributes:highlightedAttributes];
+}
+
++ (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                   controlCharactersToPrepend:(NSCharacterSet *_Null_unspecified)controlCharactersToPrepend
+                                 searchLength:(NSInteger)searchLength
+               unhighlightedMentionAttributes:(NSDictionary *_Null_unspecified)unhighlightedAttributes
+                 highlightedMentionAttributes:(NSDictionary *_Null_unspecified)highlightedAttributes {
     // Make sure iOS version is 7.1 or greater
     if (!HKW_systemVersionIsAtLeast(@"7.1")) {
         NSAssert(NO, @"Mentions plug-in is only supported for iOS 7.1 or later.");
@@ -104,6 +129,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     HKWMentionsPluginV2 *plugin = [[[self class] alloc] init];
     plugin.chooserPositionMode = mode;
     plugin.controlCharacterSet = controlCharacterSet;
+    plugin.controlCharactersToPrepend = controlCharactersToPrepend;
     plugin.implicitSearchLength = searchLength;
 
     // Validate attribute dictionaries
@@ -726,7 +752,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  @param text The text in which to perform a backwards search for a control character
  @returns Location for most recent control character in a string
  */
-+ (NSUInteger)mostRecentControlCharacterLocationInText:(NSString *)text controlCharacterSet:(NSCharacterSet *)controlCharacterSet {
+- (NSUInteger)mostRecentControlCharacterLocationInText:(NSString *)text {
     if (text.length == 0) {
         return NSNotFound;
     }
@@ -734,7 +760,13 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     for (int index = endOfTextIndex; index >= 0; index--) {
         NSUInteger unsignedIndex = (unsigned long)index;
         unichar character = [text characterAtIndex:unsignedIndex];
-        if ([controlCharacterSet characterIsMember:character]) {
+        if ([self.controlCharacterSet characterIsMember:character]) {
+            // If the most recent control character has mention attribute, return NSNotFound
+            if (HKWTextView.enableControlCharactersToPrepend
+                && [self.controlCharactersToPrepend characterIsMember:character]
+                && [self mentionAttributeAtLocation:unsignedIndex range:nil]) {
+                return NSNotFound;
+            }
             return unsignedIndex;
         }
     }
@@ -754,7 +786,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
     NSString *substringToSearchForControlChar = [substringUntilLocation substringFromIndex:maximumSearchIndex];
     // Find control character location
-    NSUInteger controlCharLocation = [HKWMentionsPluginV2 mostRecentControlCharacterLocationInText:substringToSearchForControlChar controlCharacterSet:self.controlCharacterSet];
+    NSUInteger controlCharLocation = [self mostRecentControlCharacterLocationInText:substringToSearchForControlChar];
     if (controlCharLocation != NSNotFound) {
         // If it exists, offset it by the search index to get actual location in the parent text view
         controlCharLocation = controlCharLocation + maximumSearchIndex;
@@ -1194,7 +1226,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     [self performMentionCreationEndCleanup];
 
     // Actually create the mention
-    NSString *mentionText = mention.mentionText;
     __strong __auto_type parentTextView = self.parentTextView;
     NSAssert(parentTextView.selectedRange.length == 0,
              @"Cannot create a mention unless cursor is in insertion mode.");
@@ -1206,8 +1237,17 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSRange rangeToTransform;
     // Find where previous control character was, and replace mention at that point
     NSString *substringUntilCursor = [parentTextView.text substringToIndex:cursorLocation];
-    NSUInteger controlCharLocation = [HKWMentionsPluginV2 mostRecentControlCharacterLocationInText:substringUntilCursor
-                                                                               controlCharacterSet:self.controlCharacterSet];
+    NSUInteger controlCharLocation = [self mostRecentControlCharacterLocationInText:substringUntilCursor];
+    // Prepend control character to mentionText if needed
+    if (HKWTextView.enableControlCharactersToPrepend && controlCharLocation != NSNotFound) {
+        unichar controlCharacter = [parentTextView.text characterAtIndex:controlCharLocation];
+        BOOL shouldPrependControlCharacter = [self.controlCharactersToPrepend characterIsMember:controlCharacter];
+        if (shouldPrependControlCharacter) {
+            // Use %C instead of %c for unichar
+            mention.mentionText = [NSString stringWithFormat:@"%C%@", controlCharacter, mention.mentionText];
+        }
+    }
+    NSString *mentionText = mention.mentionText;
     // Replace until the end of the word at the current cursor location
     NSUInteger endOfWordToReplace = [self endOfValidWordInText:parentTextView.text afterLocation:cursorLocation];
     rangeToTransform = NSMakeRange(controlCharLocation, endOfWordToReplace - controlCharLocation);

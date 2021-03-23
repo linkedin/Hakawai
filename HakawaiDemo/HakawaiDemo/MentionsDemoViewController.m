@@ -52,6 +52,8 @@ BOOL HKW_systemVersionIsAtLeast(NSString *version);
         NSCharacterSet *controlCharacters = [NSCharacterSet characterSetWithCharactersInString:@"@+＠"];
         // The user may also begin a mention by typing three characters (set searchLength to 0 to disable)
         id<HKWMentionsPlugin> mentionsPlugin;
+        [HKWTextView setEnableMentionsPluginV2:YES];
+        [HKWTextView setEnableControlCharactersToPrepend:YES];
         if (HKWTextView.enableMentionsPluginV2) {
             mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:mode
                                                               controlCharacters:controlCharacters

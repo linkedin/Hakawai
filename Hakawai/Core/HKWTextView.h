@@ -43,8 +43,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL) enableMentionsPluginV2;
 + (BOOL) directlyUpdateQueryWithCustomDelegate;
++ (BOOL) enableControlCharactersToPrepend;
 + (void) setEnableMentionsPluginV2:(BOOL)enabled;
 + (void) setDirectlyUpdateQueryWithCustomDelegate:(BOOL)enabled;
++ (void) setEnableControlCharactersToPrepend:(BOOL)enabled;
 
 #pragma mark - Initialization
 
