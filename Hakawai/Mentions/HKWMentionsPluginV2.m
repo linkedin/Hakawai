@@ -298,7 +298,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                                          methods provided to work with mentions attributes.");
                                                   continue;
                                               }
-                                              HKWMentionsAttribute *attributeData = (HKWMentionsAttribute *)object;
+                                              HKWMentionsAttribute *attributeData = (HKWMentionsAttribute *)[object mutableCopy];
                                               attributeData.range = range;
                                               [buffer addObject:attributeData];
                                           }
