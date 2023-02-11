@@ -751,7 +751,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
  @param text The text in which to perform a backwards search for a control character. Note that this text can be a trimmed one if the orignal text's length exceeds @c MAX_MENTION_QUERY_LENGTH .
  @param locationOffsetInOriginalText The offset of @c originalText.length - @c MAX_MENTION_QUERY_LENGTH to locate the correct char.
- @returns Location for most recent control character in a @c text .
+ @returns Location for most recent control character in a @c text
  */
 - (NSUInteger)mostRecentControlCharacterLocationInText:(NSString *)text locationOffsetInOriginalText:(NSUInteger)locationOffsetInOriginalText {
     if (text.length == 0) {
