@@ -45,7 +45,7 @@
 /*!
  If available, this method is called when the text view is programatically updated (e.g. setText: or setAttributedText:)
  */
--(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView;
+- (void)textViewDidProgrammaticallyUpdate:(UITextView *)textView;
 
 /*!
  If available, this method is called when the text view is about to engage in a programmatic custom pasting of text
@@ -75,7 +75,7 @@
 /*!
  If available, this method is called when the text view is programatically updated (e.g. setText: or setAttributedText:)
  */
--(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView;
+- (void)textViewDidProgrammaticallyUpdate:(UITextView *)textView;
 
 // UITextViewDelegate optional helper methods
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView;

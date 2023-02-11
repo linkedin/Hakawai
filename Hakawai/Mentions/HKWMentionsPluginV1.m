@@ -1432,7 +1432,7 @@
     [self.creationStateMachine dataReturnedWithEmptyResults:isEmptyResults keystringEndsWithWhiteSpace:keystringEndsWithWhiteSpace];
 }
 
--(void) textViewDidProgrammaticallyUpdate:(UITextView *)textView {
+- (void)textViewDidProgrammaticallyUpdate:(UITextView *)textView {
     if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
         [self.creationStateMachine cancelMentionCreation];
     } else {

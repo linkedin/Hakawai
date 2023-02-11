@@ -136,7 +136,7 @@ withCharacterNowPrecedingCursor:(unichar)precedingChar
 /*!
  Inform the state machine that the attached control view has reset it's state, and now represents the specified string
  */
--(void) resetStateUsingString:(NSString *)string;
+- (void)resetStateUsingString:(NSString *)string;
 
 /*!
  Return characters after given location till whitespace is encountered.

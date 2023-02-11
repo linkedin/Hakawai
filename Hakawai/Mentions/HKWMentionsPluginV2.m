@@ -749,10 +749,11 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 /**
  Search backwards in a string for a character in the control character set
 
- @param text The text in which to perform a backwards search for a control character
- @returns Location for most recent control character in a string
+ @param text The text in which to perform a backwards search for a control character. Note that this text can be a trimmed one if the orignal text's length exceeds @c MAX_MENTION_QUERY_LENGTH .
+ @param locationOffsetInOriginalText The offset of @c originalText.length - @c MAX_MENTION_QUERY_LENGTH to locate the correct char.
+ @returns Location for most recent control character in a @c text .
  */
-- (NSUInteger)mostRecentControlCharacterLocationInText:(NSString *)text {
+- (NSUInteger)mostRecentControlCharacterLocationInText:(NSString *)text locationOffsetInOriginalText:(NSUInteger)locationOffsetInOriginalText {
     if (text.length == 0) {
         return NSNotFound;
     }
@@ -762,9 +763,10 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         unichar character = [text characterAtIndex:unsignedIndex];
         if ([self.controlCharacterSet characterIsMember:character]) {
             // If the most recent control character has mention attribute, return NSNotFound
+            // Note that here we need to add back the locationOffsetInOriginalText which represents `originalText.length - trimmedText.length`.
             if (HKWTextView.enableControlCharactersToPrepend
                 && [self.controlCharactersToPrepend characterIsMember:character]
-                && [self mentionAttributeAtLocation:unsignedIndex range:nil]) {
+                && [self mentionAttributeAtLocation:unsignedIndex + locationOffsetInOriginalText range:nil]) {
                 return NSNotFound;
             }
             return unsignedIndex;
@@ -786,7 +788,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSUInteger maximumSearchIndex = (NSUInteger)MAX((int)location-MAX_MENTION_QUERY_LENGTH, 0);
     NSString *substringToSearchForControlChar = [substringUntilLocation substringFromIndex:maximumSearchIndex];
     // Find control character location
-    NSUInteger controlCharLocation = [self mostRecentControlCharacterLocationInText:substringToSearchForControlChar];
+    NSUInteger controlCharLocation = [self mostRecentControlCharacterLocationInText:substringToSearchForControlChar
+                                                       locationOffsetInOriginalText:maximumSearchIndex];
     if (controlCharLocation != NSNotFound) {
         // If it exists, offset it by the search index to get actual location in the parent text view
         controlCharLocation = controlCharLocation + maximumSearchIndex;
@@ -1237,7 +1240,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     NSRange rangeToTransform;
     // Find where previous control character was, and replace mention at that point
     NSString *substringUntilCursor = [parentTextView.text substringToIndex:cursorLocation];
-    NSUInteger controlCharLocation = [self mostRecentControlCharacterLocationInText:substringUntilCursor];
+    NSUInteger controlCharLocation = [self mostRecentControlCharacterLocationInText:substringUntilCursor locationOffsetInOriginalText:0];
     // Prepend control character to mentionText if needed
     if (HKWTextView.enableControlCharactersToPrepend && controlCharLocation != NSNotFound) {
         unichar controlCharacter = [parentTextView.text characterAtIndex:controlCharLocation];

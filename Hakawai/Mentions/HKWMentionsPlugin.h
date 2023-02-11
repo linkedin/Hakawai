@@ -171,7 +171,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 /*!
  Inform the plugin that the textview was programatically updated (e.g. setText: or setAttributedText:)
  */
--(void)textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
+- (void)textViewDidProgrammaticallyUpdate:(UITextView *_Null_unspecified)textView;
 
 /*!
  If available, this method is called when the text view is about to engage in a programmatic custom pasting of text

@@ -356,7 +356,7 @@ static BOOL enableControlCharactersToPrepend = NO;
     }
 }
 
--(void) textViewDidProgrammaticallyUpdate {
+- (void)textViewDidProgrammaticallyUpdate {
 
     if ([self.controlFlowPlugin respondsToSelector:@selector(textViewDidProgrammaticallyUpdate:)]) {
         [self.controlFlowPlugin textViewDidProgrammaticallyUpdate:self];

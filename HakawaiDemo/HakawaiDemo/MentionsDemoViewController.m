@@ -57,6 +57,7 @@ BOOL HKW_systemVersionIsAtLeast(NSString *version);
         if (HKWTextView.enableMentionsPluginV2) {
             mentionsPlugin = [HKWMentionsPluginV2 mentionsPluginWithChooserMode:mode
                                                               controlCharacters:controlCharacters
+                                                     controlCharactersToPrepend:controlCharacters
                                                                    searchLength:3];
         } else {
             mentionsPlugin = [HKWMentionsPluginV1 mentionsPluginWithChooserMode:mode
