@@ -43,6 +43,7 @@
 static BOOL enableMentionsPluginV2 = NO;
 static BOOL directlyUpdateQueryWithCustomDelegate = NO;
 static BOOL enableControlCharactersToPrepend = NO;
+static BOOL enableControlCharacterMaxLengthFix = YES;
 
 @implementation HKWTextView
 
@@ -64,6 +65,14 @@ static BOOL enableControlCharactersToPrepend = NO;
 
 + (BOOL)enableControlCharactersToPrepend {
     return enableControlCharactersToPrepend;
+}
+
++ (BOOL)enableControlCharacterMaxLengthFix {
+    return enableControlCharacterMaxLengthFix;
+}
+
++ (void)setEnableControlCharacterMaxLengthFix:(BOOL)enabled {
+    enableControlCharacterMaxLengthFix = enabled;
 }
 
 + (void)setEnableControlCharactersToPrepend:(BOOL)enabled {

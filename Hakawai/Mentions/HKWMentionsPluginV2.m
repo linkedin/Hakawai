@@ -764,9 +764,10 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
         if ([self.controlCharacterSet characterIsMember:character]) {
             // If the most recent control character has mention attribute, return NSNotFound
             // Note that here we need to add back the locationOffsetInOriginalText which represents `originalText.length - trimmedText.length`.
+            NSUInteger location = HKWTextView.enableControlCharacterMaxLengthFix ? (unsignedIndex + locationOffsetInOriginalText) : unsignedIndex;
             if (HKWTextView.enableControlCharactersToPrepend
                 && [self.controlCharactersToPrepend characterIsMember:character]
-                && [self mentionAttributeAtLocation:unsignedIndex + locationOffsetInOriginalText range:nil]) {
+                && [self mentionAttributeAtLocation:location range:nil]) {
                 return NSNotFound;
             }
             return unsignedIndex;

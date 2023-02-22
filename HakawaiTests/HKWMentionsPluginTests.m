@@ -34,6 +34,7 @@
 - (BOOL)stringValidForMentionsCreation:(NSString *)string;
 - (void)createMention:(HKWMentionsAttribute *)mention cursorLocation:(NSUInteger)cursorLocation;
 - (NSUInteger)mostRecentControlCharacterLocationInText:(NSString *)text locationOffsetInOriginalText:(NSUInteger)locationOffsetInOriginalText;
+- (NSUInteger)mostRecentValidControlCharacterLocation:(NSString *)text beforeLocation:(NSUInteger)location;
 @end
 
 // Methods for testing attribute values/ranges in pluginV2
@@ -1083,18 +1084,19 @@ describe(@"prepend control character - MENTIONS PLUGIN V2", ^{
     });
 
     it(@"can find control character when text length exceeds MAX_MENTION_QUERY_LENGTH", ^{
+        HKWTextView.enableControlCharacterMaxLengthFix = YES;
         mentionsPlugin.controlCharactersToPrepend = HKWExternalMentionConstants.atSymbols;
         NSString *text = @"";
         // Append a string with 10 chars for 10 times
         NSString *singleText = @"@abcdefghi";
-        for (NSUInteger i = 0; i < 10; i++) {
+        for (NSUInteger i = 0; i <= 10; i++) {
             text = [text stringByAppendingString:singleText];
         }
         // Append a control char at the end (text = 100 char + "@")
         text = [text stringByAppendingString:@"@"];
         textView.text = text;
         // Add attributes to first 100 char
-        for (NSUInteger i = 0; i < 10; i++) {
+        for (NSUInteger i = 0; i <= 10; i++) {
             HKWMentionsAttribute *attribute = [HKWMentionsAttribute mentionWithText:singleText identifier:[NSString stringWithFormat:@"%lud", (unsigned long)i]];
             attribute.range = NSMakeRange(i * singleText.length, singleText.length);
             [mentionsPlugin addMention:attribute];
@@ -1102,7 +1104,7 @@ describe(@"prepend control character - MENTIONS PLUGIN V2", ^{
         // Make sure text is the same
         expect(textView.text).to.equal(text);
         // Make sure we can find the latest control char at the very end
-        expect([mentionsPlugin mostRecentControlCharacterLocationInText:textView.text locationOffsetInOriginalText:textView.text.length - MAX_MENTION_QUERY_LENGTH]).to.equal(textView.text.length - 1);
+        expect([mentionsPlugin mostRecentValidControlCharacterLocation:textView.text beforeLocation:(NSUInteger)(textView.text.length)]).to.equal(textView.text.length - 1);
     });
 });
 
