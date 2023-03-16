@@ -115,7 +115,7 @@
  QuickPath keyboard will hold a NSConditionLock on attributedText while accessing to it at the same time results in a deadlock. Calling main queue
  to make sure it won't be synchronized to cause a deadlock. Apple Feedback Tracking number: [FB6828895]
  */
-- (void)insertTextAttachment:(NSTextAttachment *)attachment location:(NSUInteger)location {
+-(void)insertTextAttachment:(NSTextAttachment *)attachment location:(NSUInteger)location {
     [self insertTextAttachmentImpl:attachment location:location];
 }
 
