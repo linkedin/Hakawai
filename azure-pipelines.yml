@@ -14,7 +14,7 @@ pool:
 variables:
   workspace: 'Hakawai.xcworkspace'
   scheme: 'Hakawai'
-  xcodeVersion: '10'
+  xcodeVersion: '12'
 
 steps:
 - task: CocoaPods@0
