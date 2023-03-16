@@ -8,7 +8,7 @@ pr:
     - master
 
 pool:
-  vmImage: macOS-10.14
+  vmImage: macOS-11
   demands: xcode
 
 variables:
