@@ -41,12 +41,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface HKWTextView : UITextView
 
-+ (BOOL) enableMentionsPluginV2;
-+ (BOOL) directlyUpdateQueryWithCustomDelegate;
-+ (BOOL) enableControlCharactersToPrepend;
-+ (void) setEnableMentionsPluginV2:(BOOL)enabled;
-+ (void) setDirectlyUpdateQueryWithCustomDelegate:(BOOL)enabled;
-+ (void) setEnableControlCharactersToPrepend:(BOOL)enabled;
++ (BOOL)enableMentionsPluginV2;
++ (BOOL)directlyUpdateQueryWithCustomDelegate;
++ (BOOL)enableControlCharactersToPrepend;
++ (BOOL)enableControlCharacterMaxLengthFix;
++ (void)setEnableMentionsPluginV2:(BOOL)enabled;
++ (void)setDirectlyUpdateQueryWithCustomDelegate:(BOOL)enabled;
++ (void)setEnableControlCharactersToPrepend:(BOOL)enabled;
++ (void)setEnableControlCharacterMaxLengthFix:(BOOL)enabled;
 
 #pragma mark - Initialization
 
@@ -79,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
  \note If a abstraction layer control flow plug-in is registered, setting this method will unregister the other plug-in;
  however, setting this to nil if an abstraction layer plug-in is registered will do nothing.
  */
-@property (nonatomic, strong, nullable) id<HKWDirectControlFlowPluginProtocol>controlFlowPlugin;
+@property (nonatomic, strong, nullable) id<HKWDirectControlFlowPluginProtocol> controlFlowPlugin;
 
 /*!
  Register a control flow plug-in with the editor. Unlike simple plug-ins, only one control flow plug-in can be enabled
@@ -88,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
  \note If a abstraction layer control flow plug-in is registered, setting this method will unregister the other plug-in;
  however, setting this to nil if a direct plug-in is registered will do nothing.
  */
-@property (nonatomic, strong, nullable) id<HKWAbstractionLayerControlFlowPluginProtocol>abstractionControlFlowPlugin;
+@property (nonatomic, strong, nullable) id<HKWAbstractionLayerControlFlowPluginProtocol> abstractionControlFlowPlugin;
 
 /*!
  Register a simple plug-in with the editor.
@@ -104,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
  Inform the the textview that it was programatically updated (e.g. setText: or setAttributedText:) so that associated
  plugins can update their state accordingly.
  */
--(void) textViewDidProgrammaticallyUpdate;
+- (void)textViewDidProgrammaticallyUpdate;
 
 #pragma mark - API (plug-in status)
 

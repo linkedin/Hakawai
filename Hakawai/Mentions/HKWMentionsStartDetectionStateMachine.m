@@ -67,8 +67,7 @@ typedef NS_ENUM(NSInteger, CharacterType) {
     return sm;
 }
 
--(void) resetStateUsingString:(NSString *)string {
-
+- (void)resetStateUsingString:(NSString *)string {
     self.state = HKWMentionsStartDetectionStateQuiescentReady;
     self.charactersSinceLastWhitespace = 0;
     
@@ -83,7 +82,6 @@ typedef NS_ENUM(NSInteger, CharacterType) {
             self.charactersSinceLastWhitespace = self.stringBuffer.length - NSMaxRange(lastWhitespaceRange);
         }
     }
-    
 }
 
 - (void)validStringInserted:(NSString *)string
