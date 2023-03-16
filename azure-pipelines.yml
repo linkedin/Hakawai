@@ -39,5 +39,5 @@ steps:
     scheme: $(scheme)
     xcodeVersion: $(xcodeVersion)
     destinationPlatformOption: 'iOS'
-    destinationSimulators: 'iPhone X'
+    destinationSimulators: 'iPhone 8'
     publishJUnitResults: true
