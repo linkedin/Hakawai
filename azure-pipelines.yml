@@ -1,12 +1,6 @@
 trigger:
 - master
 
-pr:
-  autoCancel: true
-  branches:
-    include:
-    - master
-
 pool:
   vmImage: macOS-11
   demands: xcode
