@@ -12,7 +12,7 @@ variables:
 
 steps:
 - task: CocoaPods@0
-  displayName: 'pod install'
+  displayName: 'pod install test'
 
 - task: Xcode@5
   displayName: 'Xcode build'
