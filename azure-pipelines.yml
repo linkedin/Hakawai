@@ -1,6 +1,8 @@
 trigger:
 - master
 
+pr: none
+
 pool:
   vmImage: macOS-11
   demands: xcode
