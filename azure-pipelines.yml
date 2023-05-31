@@ -1,7 +1,11 @@
 trigger:
 - master
 
-pr: none
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - master
 
 pool:
   vmImage: macOS-11
