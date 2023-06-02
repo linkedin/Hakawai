@@ -108,9 +108,10 @@
 @property (nonatomic) BOOL overridingSpellChecking;
 
 
-#pragma mark - Other proeprties
+#pragma mark - Other properties
 
 @property (nonatomic, strong, readwrite) UIFont *fontSetByApp;
 @property (nonatomic, strong, readwrite) UIColor *textColorSetByApp;
+@property (nonatomic, strong, readwrite) NSDictionary *typingAttributesSetByApp;
 
 @end

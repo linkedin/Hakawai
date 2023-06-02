@@ -141,6 +141,7 @@ static BOOL enableControlCharacterMaxLengthFix = YES;
 
     replacement.font = self.font;
     replacement.fontSetByApp = self.font;
+    replacement.typingAttributesSetByApp = self.typingAttributes;
 
     replacement.clearsOnInsertion = NO;
     replacement.selectable = self.selectable;
@@ -746,6 +747,13 @@ static BOOL enableControlCharacterMaxLengthFix = YES;
     [super setFont:font];
     if (font) {
         self.fontSetByApp = font;
+    }
+}
+
+- (void)setTypingAttributes:(NSDictionary *)typingAttributes {
+    [super setTypingAttributes:typingAttributes];
+    if (typingAttributes) {
+        self.typingAttributesSetByApp = typingAttributes;
     }
 }
 
