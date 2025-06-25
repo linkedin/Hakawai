@@ -809,7 +809,7 @@
 
 - (void)toggleAutocorrectAsRequiredForRange:(NSRange)range {
     // PROVISIONAL FIX: Determine whether or not a mention exists, and disable or enable autocorrect
-    if (self.state == HKWMentionsPluginStateCreatingMention) {
+    if (self.state == HKWMentionsStartDetectionStateCreatingMention) {
         return;
     }
     __strong __auto_type parentTextView = self.parentTextView;

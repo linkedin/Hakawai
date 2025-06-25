@@ -240,10 +240,10 @@ static BOOL enableControlCharacterMaxLengthFix = YES;
         BOOL implementsWillCustomPasteTextInRange = [self.controlFlowPlugin respondsToSelector:@selector(textView:willCustomPasteTextInRange:)];
         // If stringCopiedFromCurrentTextView is set and the proper callback exists to handle the update in the control flow plugin, insert the copied string
         // programmatically
-        if ([self.stringCopiedFromCurrentTextView length] > 0 && implementsWillCustomPasteTextInRange) {
-            __strong __auto_type copyString = self.stringCopiedFromCurrentTextView;
+        if (self.stringCopiedFromCurrentTextView && [self.stringCopiedFromCurrentTextView length] > 0 && implementsWillCustomPasteTextInRange) {
+            __strong NSAttributedString *copyString = self.stringCopiedFromCurrentTextView;
             // In order to maintain mentions styling, insert the saved copyString into the attributed text
-            NSUInteger cursorLocationAfterPaste = self.selectedRange.location+self.stringCopiedFromCurrentTextView.length;
+            NSUInteger cursorLocationAfterPaste = self.selectedRange.location + self.stringCopiedFromCurrentTextView.length;
             NSRange selectionRangeBeforePaste = self.selectedRange;
             // Let control plugin know that text will be pasted, so it can remove any existing mentions attributes at that point
             [self.controlFlowPlugin textView:self willCustomPasteTextInRange:self.selectedRange];
