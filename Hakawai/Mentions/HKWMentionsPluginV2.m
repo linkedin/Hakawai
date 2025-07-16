@@ -722,9 +722,8 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 }
 
 /**
- Find the location for the end of the next word, starting at the given location.
-
- If we ever encounter a mention character, this word is invalid, and we return @c NSNotFound
+ Finds where the next word ends in the text, starting from the given location.
+ Stops at the first whitespace or punctuation. If a mention is found, returns @c NSNotFound.
 
  @param location location to begin search from
  @param text text to search
@@ -732,19 +731,26 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  */
 - (NSUInteger)endOfValidWordInText:(nonnull NSString *)text afterLocation:(NSUInteger)location {
     NSUInteger i;
-    for(i = location; i < text.length ; i++) {
-        // If there is a mentions character before there is a whitespace, then this is not a valid word for querying
+    
+    // Combine punctuation and whitespace/newline characters
+    NSMutableCharacterSet *stoppingCharacterSet = [[NSCharacterSet punctuationCharacterSet] mutableCopy];
+    [stoppingCharacterSet formUnionWithCharacterSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+    for (i = location; i < text.length; i++) {
+        // If there is a mentions attribute, this is not a valid word
         HKWMentionsAttribute *mentionAttribute = [self mentionAttributeAtLocation:i range:nil];
         if (mentionAttribute) {
             return NSNotFound;
         }
-        const unichar character = [text characterAtIndex:i];
-        if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:character]) {
+        
+        unichar character = [text characterAtIndex:i];
+        if ([stoppingCharacterSet characterIsMember:character]) {
             return i;
         }
     }
     return i;
 }
+
 
 /**
  Search backwards in a string for a character in the control character set
@@ -1277,6 +1283,21 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }];
     // Move the cursor
     parentTextView.selectedRange = NSMakeRange(controlCharLocation + [mentionText length], 0);
+    
+    // Check if the mention ends at the end of paragraph. If yes, then add a space.
+    NSUInteger insertionEndLocation = controlCharLocation + [mentionText length];
+    BOOL isAtEndOfParagraph = (insertionEndLocation == parentTextView.text.length ||
+                               (insertionEndLocation < parentTextView.text.length &&
+                                [parentTextView.text characterAtIndex:insertionEndLocation] == '\n'));
+    if (isAtEndOfParagraph) {
+        NSMutableAttributedString *mutableText = [parentTextView.attributedText mutableCopy];
+        NSAttributedString *space = [[NSAttributedString alloc] initWithString:@" " attributes:parentTextView.typingAttributes];
+        [mutableText insertAttributedString:space atIndex:insertionEndLocation];
+        parentTextView.attributedText = mutableText;
+        // Move cursor past the space
+        parentTextView.selectedRange = NSMakeRange(insertionEndLocation + 1, 0);
+    }
+    
     parentTextView.shouldRejectAutocorrectInsertions = NO;
 
     // Inform the delegate (if appropriate)
