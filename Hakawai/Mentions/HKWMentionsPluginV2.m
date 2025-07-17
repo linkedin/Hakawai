@@ -751,7 +751,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     
     // Combine punctuation and whitespace/newline characters
     NSMutableCharacterSet *stoppingCharacterSet = [[NSCharacterSet whitespaceAndNewlineCharacterSet] mutableCopy];
-    // If shouldEnableEnhancedMentionReplacementRules is enabled, stops at the punctuation characters as well.
+    // If enabled, stops at the punctuation characters as well.
     if (self.shouldEnableEnhancedMentionReplacementRules) {
         [stoppingCharacterSet formUnionWithCharacterSet:[NSCharacterSet punctuationCharacterSet]];
     }
