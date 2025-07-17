@@ -2253,4 +2253,6 @@ NSString * _Nonnull nameForMentionsState(HKWMentionsState s) {
 
 @synthesize stateChangeDelegate;
 
+@synthesize shouldEnableEnhancedMentionReplacementRules;
+
 @end

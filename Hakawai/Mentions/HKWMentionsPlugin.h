@@ -157,6 +157,7 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
 @property (nonatomic, readonly) BOOL implicitMentionsEnabled;
 
 @property (nonatomic) BOOL shouldEnableUndoUponUnregistration;
+
 /*!
  There should be only one chooser view delegate.
  If you are using default chooser view provided by Hakawai, set `defaultChooserViewDelegate`. Otherwsie set `customChooserViewDelegate`
@@ -244,6 +245,13 @@ typedef NS_ENUM(NSInteger, HKWMentionsPluginState) {
  on, empty results won't modify the mentions creation state.
  */
 @property (nonatomic) BOOL shouldContinueSearchingAfterEmptyResults;
+
+/*!
+ When this feature is enabled, if a mention is inserted at the end of a paragraph, a space will be automatically added after the mention.
+ When a mention is inserted within a paragraph, no space will be added after the mention, and only the characters immediately preceding it—up to punctuation marks—will be replaced.
+ */
+@property (nonatomic) BOOL shouldEnableEnhancedMentionReplacementRules;
+
 
 #pragma mark - API for HKWMentionsCustomChooserViewDelegate
 
