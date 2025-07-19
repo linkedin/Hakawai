@@ -70,6 +70,18 @@ NS_ASSUME_NONNULL_BEGIN
                        unhighlightedMentionAttributes:(NSDictionary *_Null_unspecified)unhighlightedAttributes
                          highlightedMentionAttributes:(NSDictionary *_Null_unspecified)highlightedAttributes;
 
+/*!
+ Instantiate a mentions plug-in with the specified chooser mode, control character set, control characters to prepend, search length, custom attributes
+ and Improved mention replacement rules to apply to unselected mentions, and custom attributes to apply to selected mentions.
+ */
++ (nonnull instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                                    controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                           controlCharactersToPrepend:(NSCharacterSet *_Null_unspecified)controlCharactersToPrepend
+                                         searchLength:(NSInteger)searchLength
+                       unhighlightedMentionAttributes:(NSDictionary *_Null_unspecified)unhighlightedAttributes
+                         highlightedMentionAttributes:(NSDictionary *_Null_unspecified)highlightedAttributes
+                enableEnhancedMentionReplacementRules:(Boolean)enableEnhancedMentionReplacementRules;
+
 @end
 
 NS_ASSUME_NONNULL_END

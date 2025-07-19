@@ -121,6 +121,22 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
                                  searchLength:(NSInteger)searchLength
                unhighlightedMentionAttributes:(NSDictionary *_Null_unspecified)unhighlightedAttributes
                  highlightedMentionAttributes:(NSDictionary *_Null_unspecified)highlightedAttributes {
+    return [self mentionsPluginWithChooserMode:mode
+                             controlCharacters:controlCharacterSet
+                    controlCharactersToPrepend:controlCharactersToPrepend
+                                  searchLength:searchLength
+                unhighlightedMentionAttributes:unhighlightedAttributes
+                  highlightedMentionAttributes:highlightedAttributes
+         enableEnhancedMentionReplacementRules:false];
+}
+
++ (instancetype)mentionsPluginWithChooserMode:(HKWMentionsChooserPositionMode)mode
+                            controlCharacters:(NSCharacterSet *_Null_unspecified)controlCharacterSet
+                   controlCharactersToPrepend:(NSCharacterSet *_Null_unspecified)controlCharactersToPrepend
+                                 searchLength:(NSInteger)searchLength
+               unhighlightedMentionAttributes:(NSDictionary *_Null_unspecified)unhighlightedAttributes
+                 highlightedMentionAttributes:(NSDictionary *_Null_unspecified)highlightedAttributes
+        enableEnhancedMentionReplacementRules:(Boolean)enableEnhancedMentionReplacementRules {
     // Make sure iOS version is 7.1 or greater
     if (!HKW_systemVersionIsAtLeast(@"7.1")) {
         NSAssert(NO, @"Mentions plug-in is only supported for iOS 7.1 or later.");
@@ -131,6 +147,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     plugin.controlCharacterSet = controlCharacterSet;
     plugin.controlCharactersToPrepend = controlCharactersToPrepend;
     plugin.implicitSearchLength = searchLength;
+    plugin.shouldEnableEnhancedMentionReplacementRules = enableEnhancedMentionReplacementRules;
 
     // Validate attribute dictionaries
     // (unhighlighted mention attributes)
@@ -723,7 +740,6 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 
 /**
  Find the location for the end of the next word, starting at the given location.
-
  If we ever encounter a mention character, this word is invalid, and we return @c NSNotFound
 
  @param location location to begin search from
@@ -732,19 +748,29 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
  */
 - (NSUInteger)endOfValidWordInText:(nonnull NSString *)text afterLocation:(NSUInteger)location {
     NSUInteger i;
-    for(i = location; i < text.length ; i++) {
-        // If there is a mentions character before there is a whitespace, then this is not a valid word for querying
+    
+    // Combine punctuation and whitespace/newline characters
+    NSMutableCharacterSet *stoppingCharacterSet = [[NSCharacterSet whitespaceAndNewlineCharacterSet] mutableCopy];
+    // If enabled, stops at the punctuation characters as well.
+    if (self.shouldEnableEnhancedMentionReplacementRules) {
+        [stoppingCharacterSet formUnionWithCharacterSet:[NSCharacterSet punctuationCharacterSet]];
+    }
+
+    for (i = location; i < text.length; i++) {
+        // If there is a mentions attribute, this is not a valid word
         HKWMentionsAttribute *mentionAttribute = [self mentionAttributeAtLocation:i range:nil];
         if (mentionAttribute) {
             return NSNotFound;
         }
-        const unichar character = [text characterAtIndex:i];
-        if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:character]) {
+        
+        unichar character = [text characterAtIndex:i];
+        if ([stoppingCharacterSet characterIsMember:character]) {
             return i;
         }
     }
     return i;
 }
+
 
 /**
  Search backwards in a string for a character in the control character set
@@ -1277,6 +1303,23 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
     }];
     // Move the cursor
     parentTextView.selectedRange = NSMakeRange(controlCharLocation + [mentionText length], 0);
+    
+    if (self.shouldEnableEnhancedMentionReplacementRules) {
+        // Check if the mention ends at the end of paragraph. If yes, then add a space.
+        NSUInteger insertionEndLocation = controlCharLocation + [mentionText length];
+        BOOL isAtEndOfParagraph = (insertionEndLocation == parentTextView.text.length ||
+                                   (insertionEndLocation < parentTextView.text.length &&
+                                    [parentTextView.text characterAtIndex:insertionEndLocation] == '\n'));
+        if (isAtEndOfParagraph) {
+            NSMutableAttributedString *mutableText = [parentTextView.attributedText mutableCopy];
+            NSAttributedString *space = [[NSAttributedString alloc] initWithString:@" " attributes:parentTextView.typingAttributes];
+            [mutableText insertAttributedString:space atIndex:insertionEndLocation];
+            parentTextView.attributedText = mutableText;
+            // Move cursor past the space
+            parentTextView.selectedRange = NSMakeRange(insertionEndLocation + 1, 0);
+        }
+    }
+    
     parentTextView.shouldRejectAutocorrectInsertions = NO;
 
     // Inform the delegate (if appropriate)
@@ -1582,5 +1625,7 @@ static int MAX_MENTION_QUERY_LENGTH = 100;
 @synthesize shouldEnableUndoUponUnregistration;
 
 @synthesize stateChangeDelegate;
+
+@synthesize shouldEnableEnhancedMentionReplacementRules;
 
 @end
