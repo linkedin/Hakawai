@@ -186,4 +186,10 @@ typedef NS_ENUM(NSInteger, HKWAccessoryViewMode) {
  */
 @property (nonatomic, readonly) UIColor *textColorSetByApp;
 
+/*!
+ If the app explicitly set the text view's typingAttributes return the most recent attributes set by the app.
+ If the app never set the text color, return nil.
+ */
+@property (nonatomic, readonly) NSDictionary *typingAttributesSetByApp;
+
 @end
