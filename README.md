@@ -30,12 +30,14 @@ A subclass of `UITextView` providing extended functionality and support for 'plu
 
 ### Requirements
 
-- **iOS 7.1:** Hakawai supports iOS 7.1 or later, as it makes extensive use of TextKit. Severe TextKit bugs in iOS 7.0 break many of the features offered by the library. At your own risk, you may try using Hakawai with iOS 7.0 (this may be a viable option if you only want to use the text transformers).
+- **iOS 10.0:** The Swift package and CocoaPods spec both declare iOS 10.0 as the minimum deployment target.
 
-- **Linker flags:** Hakawai uses class extensions, and as a result you should add the `-ObjC` linker flag to your project settings if it's not there already. CocoaPods will automatically configure this for you if it's not already set.
+- **Static archives:** If your app links Hakawai as a static archive, add `-ObjC` to Other Linker Flags so the linker includes its Objective-C categories. CocoaPods sets this flag automatically.
 
 ### Integrating Hakawai
 
+- **Swift Package Manager:** In Xcode, choose **File > Add Package Dependencies** and enter the URL of this repository. To try a local checkout, choose **Add Local** and select the folder containing `Package.swift`. Use a branch containing `Package.swift` until a release tag includes it. Add the `Hakawai` product to your iOS app target. It includes Core and the Mentions plug-in.
+  - In Swift, use `import Hakawai`. In Objective-C, use `@import Hakawai;` or `#import <Hakawai/Hakawai.h>`.
 - **Cocoapods:** just add `pod 'Hakawai'` to your Podfile and install as normal
 - **Manually:** check out the project and copy the source files into your own project
 
