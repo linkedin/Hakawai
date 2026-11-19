@@ -4,3 +4,4 @@ Hakawai.xcworkspace/xcuserdata
 Pods
 HakawaiDemo/HakawaiDemo.xcodeproj/xcuserdata
 .DS_Store
+/.build/
