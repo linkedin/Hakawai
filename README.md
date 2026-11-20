@@ -37,7 +37,7 @@ A subclass of `UITextView` providing extended functionality and support for 'plu
 ### Integrating Hakawai
 
 - **Swift Package Manager:** In Xcode, choose **File > Add Package Dependencies** and enter the URL of this repository. To try a local checkout, choose **Add Local** and select the folder containing `Package.swift`. Use a branch containing `Package.swift` until a release tag includes it. Add the `Hakawai` product to your iOS app target. It includes Core and the Mentions plug-in.
-  - In Swift, use `import Hakawai`. In Objective-C, use `@import Hakawai;` or `#import <Hakawai/Hakawai.h>`.
+  - In Swift, use `import Hakawai`. In Objective-C, use `@import Hakawai;`.
 - **Cocoapods:** just add `pod 'Hakawai'` to your Podfile and install as normal
 - **Manually:** check out the project and copy the source files into your own project
 
